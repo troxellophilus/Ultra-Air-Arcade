@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6506EDA31AA56C98000AC9DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6506EDA21AA56C98000AC9DD /* AppDelegate.swift */; };
+		6506EDA51AA56C98000AC9DD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6506EDA41AA56C98000AC9DD /* ViewController.swift */; };
+		6506EDA81AA56C98000AC9DD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6506EDA61AA56C98000AC9DD /* Main.storyboard */; };
+		6506EDAA1AA56C98000AC9DD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6506EDA91AA56C98000AC9DD /* Images.xcassets */; };
+		6506EDAD1AA56C98000AC9DD /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6506EDAB1AA56C98000AC9DD /* LaunchScreen.xib */; };
+		6506EDB91AA56C98000AC9DD /* GradebookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6506EDB81AA56C98000AC9DD /* GradebookTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6506EDB31AA56C98000AC9DD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6506ED951AA56C98000AC9DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6506ED9C1AA56C98000AC9DD;
+			remoteInfo = Gradebook;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6506ED9D1AA56C98000AC9DD /* Gradebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gradebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6506EDA11AA56C98000AC9DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6506EDA21AA56C98000AC9DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		6506EDA41AA56C98000AC9DD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		6506EDA71AA56C98000AC9DD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		6506EDA91AA56C98000AC9DD /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		6506EDAC1AA56C98000AC9DD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		6506EDB21AA56C98000AC9DD /* GradebookTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GradebookTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6506EDB71AA56C98000AC9DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6506EDB81AA56C98000AC9DD /* GradebookTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradebookTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6506ED9A1AA56C98000AC9DD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6506EDAF1AA56C98000AC9DD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6506ED941AA56C98000AC9DD = {
+			isa = PBXGroup;
+			children = (
+				6506ED9F1AA56C98000AC9DD /* Gradebook */,
+				6506EDB51AA56C98000AC9DD /* GradebookTests */,
+				6506ED9E1AA56C98000AC9DD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6506ED9E1AA56C98000AC9DD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6506ED9D1AA56C98000AC9DD /* Gradebook.app */,
+				6506EDB21AA56C98000AC9DD /* GradebookTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6506ED9F1AA56C98000AC9DD /* Gradebook */ = {
+			isa = PBXGroup;
+			children = (
+				6506EDA21AA56C98000AC9DD /* AppDelegate.swift */,
+				6506EDA41AA56C98000AC9DD /* ViewController.swift */,
+				6506EDA61AA56C98000AC9DD /* Main.storyboard */,
+				6506EDA91AA56C98000AC9DD /* Images.xcassets */,
+				6506EDAB1AA56C98000AC9DD /* LaunchScreen.xib */,
+				6506EDA01AA56C98000AC9DD /* Supporting Files */,
+			);
+			path = Gradebook;
+			sourceTree = "<group>";
+		};
+		6506EDA01AA56C98000AC9DD /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6506EDA11AA56C98000AC9DD /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		6506EDB51AA56C98000AC9DD /* GradebookTests */ = {
+			isa = PBXGroup;
+			children = (
+				6506EDB81AA56C98000AC9DD /* GradebookTests.swift */,
+				6506EDB61AA56C98000AC9DD /* Supporting Files */,
+			);
+			path = GradebookTests;
+			sourceTree = "<group>";
+		};
+		6506EDB61AA56C98000AC9DD /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6506EDB71AA56C98000AC9DD /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6506ED9C1AA56C98000AC9DD /* Gradebook */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6506EDBC1AA56C98000AC9DD /* Build configuration list for PBXNativeTarget "Gradebook" */;
+			buildPhases = (
+				6506ED991AA56C98000AC9DD /* Sources */,
+				6506ED9A1AA56C98000AC9DD /* Frameworks */,
+				6506ED9B1AA56C98000AC9DD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Gradebook;
+			productName = Gradebook;
+			productReference = 6506ED9D1AA56C98000AC9DD /* Gradebook.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6506EDB11AA56C98000AC9DD /* GradebookTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6506EDBF1AA56C98000AC9DD /* Build configuration list for PBXNativeTarget "GradebookTests" */;
+			buildPhases = (
+				6506EDAE1AA56C98000AC9DD /* Sources */,
+				6506EDAF1AA56C98000AC9DD /* Frameworks */,
+				6506EDB01AA56C98000AC9DD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6506EDB41AA56C98000AC9DD /* PBXTargetDependency */,
+			);
+			name = GradebookTests;
+			productName = GradebookTests;
+			productReference = 6506EDB21AA56C98000AC9DD /* GradebookTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6506ED951AA56C98000AC9DD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = "Billy Aujla";
+				TargetAttributes = {
+					6506ED9C1AA56C98000AC9DD = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+					6506EDB11AA56C98000AC9DD = {
+						CreatedOnToolsVersion = 6.1.1;
+						TestTargetID = 6506ED9C1AA56C98000AC9DD;
+					};
+				};
+			};
+			buildConfigurationList = 6506ED981AA56C98000AC9DD /* Build configuration list for PBXProject "Gradebook" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6506ED941AA56C98000AC9DD;
+			productRefGroup = 6506ED9E1AA56C98000AC9DD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6506ED9C1AA56C98000AC9DD /* Gradebook */,
+				6506EDB11AA56C98000AC9DD /* GradebookTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6506ED9B1AA56C98000AC9DD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6506EDA81AA56C98000AC9DD /* Main.storyboard in Resources */,
+				6506EDAD1AA56C98000AC9DD /* LaunchScreen.xib in Resources */,
+				6506EDAA1AA56C98000AC9DD /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6506EDB01AA56C98000AC9DD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6506ED991AA56C98000AC9DD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6506EDA51AA56C98000AC9DD /* ViewController.swift in Sources */,
+				6506EDA31AA56C98000AC9DD /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6506EDAE1AA56C98000AC9DD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6506EDB91AA56C98000AC9DD /* GradebookTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6506EDB41AA56C98000AC9DD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6506ED9C1AA56C98000AC9DD /* Gradebook */;
+			targetProxy = 6506EDB31AA56C98000AC9DD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		6506EDA61AA56C98000AC9DD /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6506EDA71AA56C98000AC9DD /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		6506EDAB1AA56C98000AC9DD /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6506EDAC1AA56C98000AC9DD /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6506EDBA1AA56C98000AC9DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6506EDBB1AA56C98000AC9DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6506EDBD1AA56C98000AC9DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Gradebook/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6506EDBE1AA56C98000AC9DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Gradebook/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		6506EDC01AA56C98000AC9DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = GradebookTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gradebook.app/Gradebook";
+			};
+			name = Debug;
+		};
+		6506EDC11AA56C98000AC9DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = GradebookTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gradebook.app/Gradebook";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6506ED981AA56C98000AC9DD /* Build configuration list for PBXProject "Gradebook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6506EDBA1AA56C98000AC9DD /* Debug */,
+				6506EDBB1AA56C98000AC9DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6506EDBC1AA56C98000AC9DD /* Build configuration list for PBXNativeTarget "Gradebook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6506EDBD1AA56C98000AC9DD /* Debug */,
+				6506EDBE1AA56C98000AC9DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		6506EDBF1AA56C98000AC9DD /* Build configuration list for PBXNativeTarget "GradebookTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6506EDC01AA56C98000AC9DD /* Debug */,
+				6506EDC11AA56C98000AC9DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6506ED951AA56C98000AC9DD /* Project object */;
+}
