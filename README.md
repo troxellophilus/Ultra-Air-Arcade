@@ -1,6 +1,4 @@
 # Ultra-Air-Arcade
-<h2>Ultra Air Arcade Source</h2>
-
 <h3>Team Members:</h3>
 <ul>
   <li>Billy Aujla</li>
