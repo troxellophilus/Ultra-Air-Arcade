@@ -3,3 +3,6 @@ fedora:
 
 osx:
 	clang++ -std=c++11 -stdlib=libc++ *.cpp *.cc -lglfw3 -framework OpenGL -lGLEW
+
+clean:
+	rm a.out
