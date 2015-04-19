@@ -7,18 +7,15 @@
 #include <vector>
 #include <iostream>
 #ifdef __APPLE__
-#include <GLUT/glut.h>
 #include <eigen3/Eigen/Dense>
 #endif
 #ifdef __unix__
-#include <GL/glut.h>
 #include <Eigen/Dense>
 #endif
 #ifdef _WIN32
 #define GLFW_INCLUDE_GLCOREARB
 #include <GL/glew.h>
 #include <cstdlib>
-#include <glut.h>
 #include <stdlib.h>
 #include <vector>
 #endif
