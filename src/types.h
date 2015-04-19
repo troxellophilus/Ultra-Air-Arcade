@@ -1,7 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include "tiny_obj_loader.h"
+#include "ext/tiny_obj_loader.h"
 
 #define NUMSHAPES 3
 

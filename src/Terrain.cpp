@@ -8,20 +8,20 @@
    normals = new Eigen::Vector3f[width][length];
 }*/
 
-void Terrain::setHeight(int w, int l, double h){
+void Terrain::setHeight(int w, int l, float h){
 
 
 }
 
-Terrain::Terrain(const char * fileName, double baseHeight, vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf) {
+Terrain::Terrain(const char * fileName, float baseHeight, vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf) {
    Image *image = loadBMP(fileName);
    
    this->width = image->width;
    this->length = image->height;
 
-   cout << width << length << endl;
+   //cout << width << length << endl;
 
-   heights = new double[width * length];
+   heights = new float[width * length];
    normals = new Eigen::Vector3f[width * length];
    
    int i =0;
@@ -30,8 +30,8 @@ Terrain::Terrain(const char * fileName, double baseHeight, vector<float>& posBuf
          //cout << i << endl;
          unsigned char color = (unsigned char)image->pixels[3 * (z * image->width + x)];
 
-         double h = baseHeight * (color/255.0);
-         cout << h << endl; 
+         float h = baseHeight * (color/255.0);
+         //cout << h << endl; 
          heights[z * width + x] = h;
          i++;
       }
@@ -110,7 +110,7 @@ void Terrain::computeNormals(){
 }
 
 void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf){
-	for(int z = 0; z < length; z++){
+   for(int z = 0; z < length; z++){
       for(int x = 0; x < width; x++){
          posBuf.push_back(x);
          posBuf.push_back(heights[z * width + x]);
