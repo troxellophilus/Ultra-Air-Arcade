@@ -1,0 +1,1253 @@
+The system is: Linux - 3.8.11 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/2.8.12.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/2.8.12.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec506168476/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec506168476.dir/build.make CMakeFiles/cmTryCompileExec506168476.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec506168476.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec506168476.dir/testCCompiler.c.o   -c /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec506168476
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec506168476.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec506168476.dir/testCCompiler.c.o  -o cmTryCompileExec506168476 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3291842088/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3291842088.dir/build.make CMakeFiles/cmTryCompileExec3291842088.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-2.8/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec3291842088
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3291842088.dir/link.txt --verbose=1
+/usr/bin/cc     -v CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec3291842088 -rdynamic  
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 4.8.2-19ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs --enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.8 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.8 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-4.8-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Thread model: posix
+gcc version 4.8.2 (Ubuntu 4.8.2-19ubuntu1) 
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3291842088' '-rdynamic' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTryCompileExec3291842088 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:/usr/bin/make "cmTryCompileExec3291842088/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTryCompileExec3291842088.dir/build.make CMakeFiles/cmTryCompileExec3291842088.dir/build]
+  ignore line: [make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-2.8/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec3291842088]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3291842088.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec3291842088 -rdynamic  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper]
+  ignore line: [Target: x86_64-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 4.8.2-19ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs --enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.8 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.8 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-4.8-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.8.2 (Ubuntu 4.8.2-19ubuntu1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3291842088' '-rdynamic' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTryCompileExec3291842088 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/collect2] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec3291842088] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o] ==> ignore
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib]
+    arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..]
+    arg [CMakeFiles/cmTryCompileExec3291842088.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o] ==> ignore
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8] ==> [/usr/lib/gcc/x86_64-linux-gnu/4.8]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..] ==> [/usr/lib]
+  implicit libs: [c]
+  implicit dirs: [/usr/lib/gcc/x86_64-linux-gnu/4.8;/usr/lib/x86_64-linux-gnu;/usr/lib;/lib/x86_64-linux-gnu;/lib]
+  implicit fwks: []
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2950283253/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2950283253.dir/build.make CMakeFiles/cmTryCompileExec2950283253.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec2950283253.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTryCompileExec2950283253.dir/testCXXCompiler.cxx.o -c /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec2950283253
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2950283253.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTryCompileExec2950283253.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec2950283253 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3252455357/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3252455357.dir/build.make CMakeFiles/cmTryCompileExec3252455357.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-2.8/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec3252455357
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3252455357.dir/link.txt --verbose=1
+/usr/bin/c++      -v CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3252455357 -rdynamic  
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 4.8.2-19ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs --enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.8 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.8 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-4.8-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Thread model: posix
+gcc version 4.8.2 (Ubuntu 4.8.2-19ubuntu1) 
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3252455357' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTryCompileExec3252455357 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:/usr/bin/make "cmTryCompileExec3252455357/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTryCompileExec3252455357.dir/build.make CMakeFiles/cmTryCompileExec3252455357.dir/build]
+  ignore line: [make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-2.8/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec3252455357]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3252455357.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3252455357 -rdynamic  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/c++]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper]
+  ignore line: [Target: x86_64-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 4.8.2-19ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs --enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.8 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.8 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-4.8-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.8.2 (Ubuntu 4.8.2-19ubuntu1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3252455357' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTryCompileExec3252455357 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/collect2] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec3252455357] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o] ==> ignore
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib]
+    arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..]
+    arg [CMakeFiles/cmTryCompileExec3252455357.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o] ==> ignore
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8] ==> [/usr/lib/gcc/x86_64-linux-gnu/4.8]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/4.8/../../..] ==> [/usr/lib]
+  implicit libs: [stdc++;m;c]
+  implicit dirs: [/usr/lib/gcc/x86_64-linux-gnu/4.8;/usr/lib/x86_64-linux-gnu;/usr/lib;/lib/x86_64-linux-gnu;/lib]
+  implicit fwks: []
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec355032418/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec355032418.dir/build.make CMakeFiles/cmTryCompileExec355032418.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec355032418.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec355032418.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec355032418
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec355032418.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec355032418.dir/CheckFunctionExists.c.o  -o cmTryCompileExec355032418 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2771420366/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2771420366.dir/build.make CMakeFiles/cmTryCompileExec2771420366.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2771420366.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec2771420366.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2771420366
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2771420366.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec2771420366.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2771420366 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec4073601850/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec4073601850.dir/build.make CMakeFiles/cmTryCompileExec4073601850.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec4073601850.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec4073601850.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec4073601850
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4073601850.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec4073601850.dir/CheckFunctionExists.c.o  -o cmTryCompileExec4073601850 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1388679396/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1388679396.dir/build.make CMakeFiles/cmTryCompileExec1388679396.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1388679396.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec1388679396.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1388679396
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1388679396.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec1388679396.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1388679396 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3433856511/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3433856511.dir/build.make CMakeFiles/cmTryCompileExec3433856511.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3433856511.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec3433856511.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3433856511
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3433856511.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec3433856511.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3433856511 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3429673745/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3429673745.dir/build.make CMakeFiles/cmTryCompileExec3429673745.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3429673745.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec3429673745.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3429673745
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3429673745.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec3429673745.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3429673745 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3668430323/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3668430323.dir/build.make CMakeFiles/cmTryCompileExec3668430323.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3668430323.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec3668430323.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3668430323
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3668430323.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec3668430323.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3668430323 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3267078170/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3267078170.dir/build.make CMakeFiles/cmTryCompileExec3267078170.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3267078170.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec3267078170.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3267078170
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3267078170.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec3267078170.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3267078170 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3457171740/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3457171740.dir/build.make CMakeFiles/cmTryCompileExec3457171740.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3457171740.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec3457171740.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3457171740
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3457171740.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec3457171740.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3457171740 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1845125067/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1845125067.dir/build.make CMakeFiles/cmTryCompileExec1845125067.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1845125067.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec1845125067.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1845125067
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1845125067.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec1845125067.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1845125067 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1777850805/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1777850805.dir/build.make CMakeFiles/cmTryCompileExec1777850805.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1777850805.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec1777850805.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1777850805
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1777850805.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec1777850805.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1777850805 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2212390591/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2212390591.dir/build.make CMakeFiles/cmTryCompileExec2212390591.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2212390591.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec2212390591.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2212390591
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2212390591.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec2212390591.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2212390591 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1612680608/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1612680608.dir/build.make CMakeFiles/cmTryCompileExec1612680608.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1612680608.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec1612680608.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1612680608
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1612680608.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec1612680608.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1612680608 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec754277010/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec754277010.dir/build.make CMakeFiles/cmTryCompileExec754277010.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec754277010.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec754277010.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec754277010
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec754277010.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec754277010.dir/CheckFunctionExists.c.o  -o cmTryCompileExec754277010 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3153074791/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3153074791.dir/build.make CMakeFiles/cmTryCompileExec3153074791.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3153074791.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec3153074791.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3153074791
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3153074791.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec3153074791.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3153074791 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1792711567/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1792711567.dir/build.make CMakeFiles/cmTryCompileExec1792711567.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1792711567.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec1792711567.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1792711567
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1792711567.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec1792711567.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1792711567 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1512628462/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1512628462.dir/build.make CMakeFiles/cmTryCompileExec1512628462.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1512628462.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec1512628462.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1512628462
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1512628462.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec1512628462.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1512628462 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2540865439/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2540865439.dir/build.make CMakeFiles/cmTryCompileExec2540865439.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2540865439.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec2540865439.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2540865439
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2540865439.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec2540865439.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2540865439 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2361562489/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2361562489.dir/build.make CMakeFiles/cmTryCompileExec2361562489.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2361562489.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec2361562489.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2361562489
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2361562489.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec2361562489.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2361562489 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec442678455/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec442678455.dir/build.make CMakeFiles/cmTryCompileExec442678455.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec442678455.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec442678455.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec442678455
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec442678455.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec442678455.dir/CheckFunctionExists.c.o  -o cmTryCompileExec442678455 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2843884171/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2843884171.dir/build.make CMakeFiles/cmTryCompileExec2843884171.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2843884171.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec2843884171.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2843884171
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2843884171.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec2843884171.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2843884171 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec425015661/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec425015661.dir/build.make CMakeFiles/cmTryCompileExec425015661.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec425015661.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec425015661.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec425015661
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec425015661.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec425015661.dir/CheckFunctionExists.c.o  -o cmTryCompileExec425015661 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2043999612/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2043999612.dir/build.make CMakeFiles/cmTryCompileExec2043999612.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2043999612.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec2043999612.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2043999612
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2043999612.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec2043999612.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2043999612 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3169467188/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3169467188.dir/build.make CMakeFiles/cmTryCompileExec3169467188.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3169467188.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec3169467188.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3169467188
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3169467188.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec3169467188.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3169467188 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec317660870/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec317660870.dir/build.make CMakeFiles/cmTryCompileExec317660870.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec317660870.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec317660870.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec317660870
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec317660870.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec317660870.dir/CheckFunctionExists.c.o  -o cmTryCompileExec317660870 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3189216062/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3189216062.dir/build.make CMakeFiles/cmTryCompileExec3189216062.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3189216062.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec3189216062.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3189216062
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3189216062.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec3189216062.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3189216062 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1713782892/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1713782892.dir/build.make CMakeFiles/cmTryCompileExec1713782892.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1713782892.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec1713782892.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1713782892
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1713782892.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec1713782892.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1713782892 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec4193441043/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec4193441043.dir/build.make CMakeFiles/cmTryCompileExec4193441043.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec4193441043.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec4193441043.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec4193441043
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4193441043.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec4193441043.dir/CheckFunctionExists.c.o  -o cmTryCompileExec4193441043 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3311712268/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3311712268.dir/build.make CMakeFiles/cmTryCompileExec3311712268.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3311712268.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec3311712268.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3311712268
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3311712268.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec3311712268.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3311712268 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec401670731/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec401670731.dir/build.make CMakeFiles/cmTryCompileExec401670731.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec401670731.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec401670731.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec401670731
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec401670731.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec401670731.dir/CheckFunctionExists.c.o  -o cmTryCompileExec401670731 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2051397014/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2051397014.dir/build.make CMakeFiles/cmTryCompileExec2051397014.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2051397014.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec2051397014.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2051397014
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2051397014.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec2051397014.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2051397014 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec744594792/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec744594792.dir/build.make CMakeFiles/cmTryCompileExec744594792.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec744594792.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec744594792.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec744594792
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec744594792.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec744594792.dir/CheckFunctionExists.c.o  -o cmTryCompileExec744594792 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec510526306/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec510526306.dir/build.make CMakeFiles/cmTryCompileExec510526306.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec510526306.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec510526306.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec510526306
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec510526306.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec510526306.dir/CheckFunctionExists.c.o  -o cmTryCompileExec510526306 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2813608668/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2813608668.dir/build.make CMakeFiles/cmTryCompileExec2813608668.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2813608668.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec2813608668.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2813608668
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2813608668.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec2813608668.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2813608668 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1623615083/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1623615083.dir/build.make CMakeFiles/cmTryCompileExec1623615083.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1623615083.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec1623615083.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1623615083
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1623615083.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec1623615083.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1623615083 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec826768724/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec826768724.dir/build.make CMakeFiles/cmTryCompileExec826768724.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec826768724.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec826768724.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec826768724
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec826768724.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec826768724.dir/CheckFunctionExists.c.o  -o cmTryCompileExec826768724 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec537361732/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec537361732.dir/build.make CMakeFiles/cmTryCompileExec537361732.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec537361732.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec537361732.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec537361732
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec537361732.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec537361732.dir/CheckFunctionExists.c.o  -o cmTryCompileExec537361732 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2020510732/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2020510732.dir/build.make CMakeFiles/cmTryCompileExec2020510732.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2020510732.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec2020510732.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2020510732
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2020510732.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec2020510732.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2020510732 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec209214816/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec209214816.dir/build.make CMakeFiles/cmTryCompileExec209214816.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec209214816.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec209214816.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec209214816
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec209214816.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec209214816.dir/CheckFunctionExists.c.o  -o cmTryCompileExec209214816 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3250277873/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3250277873.dir/build.make CMakeFiles/cmTryCompileExec3250277873.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3250277873.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec3250277873.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3250277873
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3250277873.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec3250277873.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3250277873 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3431437206/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3431437206.dir/build.make CMakeFiles/cmTryCompileExec3431437206.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3431437206.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec3431437206.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3431437206
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3431437206.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec3431437206.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3431437206 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1402768648/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1402768648.dir/build.make CMakeFiles/cmTryCompileExec1402768648.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1402768648.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec1402768648.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1402768648
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1402768648.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec1402768648.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1402768648 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1207946614/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1207946614.dir/build.make CMakeFiles/cmTryCompileExec1207946614.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1207946614.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec1207946614.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1207946614
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1207946614.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec1207946614.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1207946614 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3836543650/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3836543650.dir/build.make CMakeFiles/cmTryCompileExec3836543650.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3836543650.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec3836543650.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3836543650
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3836543650.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec3836543650.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3836543650 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3409809029/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3409809029.dir/build.make CMakeFiles/cmTryCompileExec3409809029.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3409809029.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec3409809029.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3409809029
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3409809029.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec3409809029.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3409809029 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2249208772/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2249208772.dir/build.make CMakeFiles/cmTryCompileExec2249208772.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2249208772.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec2249208772.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2249208772
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2249208772.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec2249208772.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2249208772 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec791178186/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec791178186.dir/build.make CMakeFiles/cmTryCompileExec791178186.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec791178186.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec791178186.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec791178186
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec791178186.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec791178186.dir/CheckFunctionExists.c.o  -o cmTryCompileExec791178186 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1293152728/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1293152728.dir/build.make CMakeFiles/cmTryCompileExec1293152728.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1293152728.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec1293152728.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1293152728
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1293152728.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec1293152728.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1293152728 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2064347169/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2064347169.dir/build.make CMakeFiles/cmTryCompileExec2064347169.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2064347169.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec2064347169.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2064347169
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2064347169.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec2064347169.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2064347169 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3407710658/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3407710658.dir/build.make CMakeFiles/cmTryCompileExec3407710658.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3407710658.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec3407710658.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3407710658
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3407710658.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec3407710658.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3407710658 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2436283112/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2436283112.dir/build.make CMakeFiles/cmTryCompileExec2436283112.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2436283112.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec2436283112.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2436283112
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2436283112.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec2436283112.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2436283112 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2014310242/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2014310242.dir/build.make CMakeFiles/cmTryCompileExec2014310242.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2014310242.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec2014310242.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2014310242
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2014310242.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec2014310242.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2014310242 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3303950731/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3303950731.dir/build.make CMakeFiles/cmTryCompileExec3303950731.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3303950731.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec3303950731.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3303950731
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3303950731.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec3303950731.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3303950731 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec679850791/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec679850791.dir/build.make CMakeFiles/cmTryCompileExec679850791.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec679850791.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec679850791.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec679850791
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec679850791.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec679850791.dir/CheckFunctionExists.c.o  -o cmTryCompileExec679850791 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec837732710/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec837732710.dir/build.make CMakeFiles/cmTryCompileExec837732710.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec837732710.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec837732710.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec837732710
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec837732710.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec837732710.dir/CheckFunctionExists.c.o  -o cmTryCompileExec837732710 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2437874208/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2437874208.dir/build.make CMakeFiles/cmTryCompileExec2437874208.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2437874208.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec2437874208.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2437874208
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2437874208.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec2437874208.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2437874208 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3065033561/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3065033561.dir/build.make CMakeFiles/cmTryCompileExec3065033561.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3065033561.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec3065033561.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3065033561
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3065033561.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec3065033561.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3065033561 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1117345304/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1117345304.dir/build.make CMakeFiles/cmTryCompileExec1117345304.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1117345304.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec1117345304.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1117345304
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1117345304.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec1117345304.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1117345304 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2047372397/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2047372397.dir/build.make CMakeFiles/cmTryCompileExec2047372397.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2047372397.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec2047372397.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2047372397
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2047372397.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec2047372397.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2047372397 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1860505887/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1860505887.dir/build.make CMakeFiles/cmTryCompileExec1860505887.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1860505887.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec1860505887.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1860505887
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1860505887.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec1860505887.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1860505887 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1189937536/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1189937536.dir/build.make CMakeFiles/cmTryCompileExec1189937536.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1189937536.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec1189937536.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1189937536
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1189937536.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec1189937536.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1189937536 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1425318281/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1425318281.dir/build.make CMakeFiles/cmTryCompileExec1425318281.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1425318281.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec1425318281.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1425318281
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1425318281.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec1425318281.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1425318281 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2389480638/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2389480638.dir/build.make CMakeFiles/cmTryCompileExec2389480638.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2389480638.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec2389480638.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2389480638
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2389480638.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec2389480638.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2389480638 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1099768173/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1099768173.dir/build.make CMakeFiles/cmTryCompileExec1099768173.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1099768173.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec1099768173.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1099768173
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1099768173.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec1099768173.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1099768173 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1299589299/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1299589299.dir/build.make CMakeFiles/cmTryCompileExec1299589299.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1299589299.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec1299589299.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1299589299
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1299589299.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec1299589299.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1299589299 -rdynamic 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1663192441/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1663192441.dir/build.make CMakeFiles/cmTryCompileExec1663192441.dir/build
+make[1]: Entering directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1663192441.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec1663192441.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1663192441
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1663192441.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec1663192441.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1663192441 -rdynamic -lICE 
+make[1]: Leaving directory `/home/lejonmcgowan/Dropbox/School/2015Spring/476CPE/Ultra-Air-Arcade/src/CMakeFiles/CMakeTmp'
+
+
