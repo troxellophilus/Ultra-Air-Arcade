@@ -4,7 +4,7 @@ all:
 	g++ -Wno-deprecated $(INC) *.cpp *.cc -DGL_GLEXT_PROTOTYPES -lglut -lGL -lGLU
 
 osx:
-	g++ -Wno-deprecated $(INC) *.cpp *.cc -framework GLUT -framework OpenGL
+	clang++ -v -Wno-deprecated $(INC) *.cpp -framework GLUT -framework OpenGL
 
 clean:
 	rm -f *~ *.o a.out

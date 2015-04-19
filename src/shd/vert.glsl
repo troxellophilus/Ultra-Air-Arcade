@@ -20,7 +20,6 @@ out vec3 vCol;
 void main() {
    // FOR PHONG SHADING 
    if (renderObj != 0) {
-      vec3 diffuse_comp, specular_comp, ambient_comp;
       vec3 I_c = vec3(1.0, 1.0, 1.0);
       vPos = vec3(M * aPos);
       vCol = I_c;

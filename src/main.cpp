@@ -108,8 +108,11 @@ void initGL(Object *o, int i) {
 }
 
 void initGround() {
+    //glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
+    //glEnable(GL_DEPTH_TEST);
+
     Terrain terrain = Terrain("../Assets/heightmap/Tamriel.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
-    
+
     glGenBuffers(1, &posBufObjG);
     glBindBuffer(GL_ARRAY_BUFFER, posBufObjG);
     glBufferData(GL_ARRAY_BUFFER, terPosBuf.size()*sizeof(float), &terPosBuf[0], GL_STATIC_DRAW);
@@ -121,6 +124,9 @@ void initGround() {
     glGenBuffers(1, &indBufObjG);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObjG);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, terIndBuf.size()*sizeof(unsigned int), &terIndBuf[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 bool installShaders(const string &vShaderName, const string &fShaderName) {
@@ -265,20 +271,20 @@ void drawGL(Entity *character, int i) {
 }
 
 void drawGround() {
+	glEnable(GL_CULL_FACE);
     glUseProgram(prog);
-    
-    SetModel(vec3(0), 0, vec3(1));
-    glUniform1i(renderObj, 1);
     
     glEnableVertexAttribArray(aPos);
     glBindBuffer(GL_ARRAY_BUFFER, posBufObjG);
     glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
     GLSL::enableVertexAttribArray(aNor);
     glBindBuffer(GL_ARRAY_BUFFER, norBufObjG);
     glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObjG);
     
+    glUniform1i(renderObj, 1);
     SetMaterial(Materials::jade);
     SetModel(glm::vec3(0), 0, vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
@@ -286,6 +292,7 @@ void drawGround() {
     GLSL::disableVertexAttribArray(aPos);
     GLSL::disableVertexAttribArray(aNor);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glUseProgram(0);
     assert(glGetError() == GL_NO_ERROR);
@@ -312,8 +319,8 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    g_width = 1024;
-    g_height = 768;
+    g_width = 640;
+    g_height = 480;
     // Open a window and create its OpenGL context
     window = glfwCreateWindow(g_width, g_height, "DTZW Code Base", NULL, NULL);
     if( window == NULL ){
@@ -353,19 +360,25 @@ int main(int argc, char **argv) {
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
     
-    installShaders("vert.glsl", "frag.glsl");
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
     initGround();
+
+    installShaders("shd/vert.glsl", "shd/frag.glsl");
     
     // Set up characters
     vector<Entity> characters;
-    
+
     float start = glfwGetTime();
     float elapsed = 0;
     float last = -1;
 
-    Camera camera((float)glfwGetTime(), 1024, 768);
+    Camera camera((float)glfwGetTime(), g_width, g_height);
+
+    // Set up player
+    vector<Object *> plObjs;
+    vector<glm::vec3> plPoss;
+    plObjs.push_back(&obj[1]);
+    plPoss.push_back(camera.getPosition());
+    Entity player = Entity(plObjs, plPoss);
 
     while (!glfwWindowShouldClose(window)) {
 	    float ratio;
@@ -386,7 +399,7 @@ int main(int argc, char **argv) {
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
-	// Create new Entitys if necessary
+	// Create new characters if necessary
         if (int(elapsed) != int(last) && int(elapsed) % 5 == 0) {
 		vector<Object *> objects;
 		vector<glm::vec3> positions;
@@ -436,6 +449,11 @@ int main(int argc, char **argv) {
                     sampler->sampleEntitys(&character, &character2);
             }
         }
+
+	// Draw player
+	initGL(player.getObject(0), 0);
+	player.update(glfwGetTime() - last);
+	drawGL(&player, 0);
         
 	// Draw terrain
         drawGround();
@@ -449,6 +467,7 @@ int main(int argc, char **argv) {
 	double cx, cy;
 	glfwGetCursorPos(window, &cx, &cy);
 	camera.update(glfwGetTime(), keys, cx, cy);
+	player.setPosition(0, camera.getPosition());
 
         last = elapsed;
         elapsed = glfwGetTime() - start;
