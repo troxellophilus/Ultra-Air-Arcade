@@ -16,9 +16,13 @@
 // Default values for Camera (uses these if not set to anything else)
 #define FOVY           75.0
 #define ZNEAR           0.1
-#define ZFAR         1000.0
+#define ZFAR         100000.0
+#ifdef __APPLE__
 #define SCROLL_SPEED    0.001
-#define CAM_SPEED       3.0
+#else
+#define SCROLL_SPEED	0.1
+#endif
+#define CAM_SPEED       10.0
 
 class Camera {
 private:
