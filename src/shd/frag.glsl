@@ -30,7 +30,10 @@ void main() {
       	diffuse_comp = UdColor * I_c * max(dot(vNor, L), 0.0);
       	specular_comp = UsColor * I_c * pow(max(dot(vNor, R), 0.0), Ushine);
       	ambient_comp = UaColor * I_c;
-      	outColor = vec4(specular_comp + diffuse_comp + ambient_comp, 1.0);
+
+        float intensity = (500 * dist) / (dist * dist + dist + 1);
+
+      	outColor = vec4(intensity * (specular_comp + diffuse_comp + ambient_comp), 1.0);
 } else {
       outColor = vec4(vCol, 1.0);
    }

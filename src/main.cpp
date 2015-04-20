@@ -111,7 +111,7 @@ void initGround() {
     //glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
     //glEnable(GL_DEPTH_TEST);
 
-    Terrain terrain = Terrain("../Assets/heightmap/Tamriel.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    Terrain terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &posBufObjG);
     glBindBuffer(GL_ARRAY_BUFFER, posBufObjG);
@@ -220,16 +220,10 @@ void SetMaterial(Material mat) {
     glUniform1f(h_uMatShine, shn);
 }
 
-void drawGL(Entity *character, int i) {
+void drawGL(Entity *entity, int i) {
     glUseProgram(prog);
  
-    int nIndices;
-    if (i == 0) {
-        nIndices = (int)(character->getObject(0))->shapes[0].mesh.indices.size();
-    }
-    else {
-        nIndices = (int)(character->getObject(1))->shapes[0].mesh.indices.size();
-    }
+    int nIndices = (int)(entity->getObject(i))->shapes[0].mesh.indices.size();
     
     // Enable and bind position array for drawing
     glEnableVertexAttribArray(aPos);
@@ -245,19 +239,13 @@ void drawGL(Entity *character, int i) {
     
     // Bind index array for drawing
     // Compute and send the projection matrix - leave this as is
-    glUniform3f(lPos, 10, 10, 10);
-    if (i == 0) {
-        glUniform1i(renderObj, 1);
-        SetMaterial(character->getMaterial(0));
-        SetModel(character->getPosition(0), character->getOrientation().y, vec3(0.3f, 0.3f, 0.3f));
-        glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-    }
-    else {
-        glUniform1i(renderObj, 1);
-        SetMaterial(character->getMaterial(1));
-        SetModel(character->getPosition(1), 0, vec3(0.05, 0.05, 0.05));
-        glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-    }
+    glUniform3f(lPos, 1000, 500, 1000);
+
+    glUniform1i(renderObj, 1);
+
+    SetMaterial(entity->getMaterial(0));
+    SetModel(entity->getPosition(0), entity->getOrientation().y, entity->getScale(i));
+    glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
     
     // Disable and unbind
     GLSL::disableVertexAttribArray(aPos);
@@ -285,7 +273,7 @@ void drawGround() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObjG);
     
     glUniform1i(renderObj, 1);
-    SetMaterial(Materials::jade);
+    SetMaterial(Materials::wood);
     SetModel(glm::vec3(0), 0, vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
     
@@ -339,6 +327,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/sphere.obj", obj[0]);
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
+    loadShapes("../Assets/models/Biplane.obj", obj[3]);
     
     std::cout << " loaded the objects " << endl;
     // Initialize GLEW
@@ -359,10 +348,10 @@ int main(int argc, char **argv) {
     /* tell GL to only draw onto a pixel if the shape is closer to the viewer */
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
-    
-    initGround();
 
     installShaders("shd/vert.glsl", "shd/frag.glsl");
+    
+    initGround();
     
     // Set up characters
     vector<Entity> characters;
@@ -376,9 +365,11 @@ int main(int argc, char **argv) {
     // Set up player
     vector<Object *> plObjs;
     vector<glm::vec3> plPoss;
+    vector<glm::vec3> plScas;
     plObjs.push_back(&obj[1]);
     plPoss.push_back(camera.getPosition());
-    Entity player = Entity(plObjs, plPoss);
+    plScas.push_back(glm::vec3(0.03,0.03,0.03));
+    Entity player = Entity(plObjs, plPoss, plScas);
 
     while (!glfwWindowShouldClose(window)) {
 	    float ratio;
@@ -403,30 +394,27 @@ int main(int argc, char **argv) {
         if (int(elapsed) != int(last) && int(elapsed) % 5 == 0) {
 		vector<Object *> objects;
 		vector<glm::vec3> positions;
+		vector<glm::vec3> scales;
 		vector<Material> materials;
 
 		objects.push_back(&obj[2]);
 		objects.push_back(&obj[0]);
 		positions.push_back(glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5));
 		positions.push_back(positions[0] + glm::vec3(0.,0.4,0.));
+		scales.push_back(glm::vec3(0.3f,0.3f,0.3f));
+		scales.push_back(glm::vec3(0.05f,0.05f,0.05f));
 		materials.push_back(Materials::wood);
 		materials.push_back(Materials::obsidian);
 
             glm::vec3 cVel = glm::vec3((rand() % 2 * 2 - 1) * 0.02f, 0.0f, (rand() % 2 * 2 - 1) * 0.02f);
             
-            Entity c(objects, positions);
+            Entity c(objects, positions, scales);
 	    c.setMaterial(0, materials[0]);
 	    c.setMaterial(1, materials[1]);
 	    c.setVelocity(cVel);
             characters.push_back(c);
             
             numObj++;
-        }
-        
-	// Draw character indicators
-        initGL(characters.begin()->getObject(1), 0);
-        for (auto &character : characters) {
-            drawGL(&character, 1);
         }
         
 	// Draw character
@@ -452,6 +440,8 @@ int main(int argc, char **argv) {
 
 	// Draw player
 	initGL(player.getObject(0), 0);
+	player.setPosition(0, glm::vec3(glm::inverse(view) * glm::vec4(0.0, 0.05, -1.0, 1.0)));
+	player.setMaterial(0, Materials::obsidian);
 	player.update(glfwGetTime() - last);
 	drawGL(&player, 0);
         
@@ -467,7 +457,6 @@ int main(int argc, char **argv) {
 	double cx, cy;
 	glfwGetCursorPos(window, &cx, &cy);
 	camera.update(glfwGetTime(), keys, cx, cy);
-	player.setPosition(0, camera.getPosition());
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

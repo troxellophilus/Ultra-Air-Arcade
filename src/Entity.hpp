@@ -25,16 +25,18 @@ private:
     glm::vec3 pos[NUM_OBJ]; // translation transform for current position
     glm::vec3 vel; // vx, vy, vz of the character in units/s
     glm::vec3 ori;
+    glm::vec3 sca[NUM_OBJ]; // scale
     Material mat[NUM_OBJ];
     uint8_t flgs = 0x0;
     
 public:
     // Constructor
-    Entity(vector<Object *>, vector<glm::vec3>);
+    Entity(vector<Object *>, vector<glm::vec3>, vector<glm::vec3>);
 
     // Getters
     Object * getObject(int which);
     glm::vec3 getPosition(int which);
+    glm::vec3 getScale(int which);
     glm::vec3 getVelocity();
     glm::vec3 getOrientation();
     Material getMaterial(int which);
@@ -42,6 +44,7 @@ public:
 
     // Setters
     void setPosition(int which, glm::vec3);
+    void setScale(int which, glm::vec3);
     void setObject(int which, Object *);
     void setVelocity(glm::vec3);
     void setMaterial(int which, Material material);
@@ -52,10 +55,11 @@ public:
     void update(double);
 };
 
-Entity::Entity(vector<Object *> objects, vector<glm::vec3> positions) {
+Entity::Entity(vector<Object *> objects, vector<glm::vec3> positions, vector<glm::vec3> scales) {
     for (int i = 0; i < objects.size(); i++) {
 	obj[i] = objects[i];
 	pos[i] = glm::vec3(positions[i]);
+        sca[i] = glm::vec3(scales[i]);
     }
     vel = glm::vec3(0);
     ori = glm::vec3(0, 5, 0);
@@ -93,6 +97,10 @@ glm::vec3 Entity::getPosition(int which) {
     return pos[which];
 }
 
+glm::vec3 Entity::getScale(int which) {
+    return sca[which];
+}
+
 glm::vec3 Entity::getVelocity() {
     return vel;
 }
@@ -111,6 +119,10 @@ void Entity::setObject(int which, Object *object) {
 
 void Entity::setPosition(int which, glm::vec3 position) {
     pos[which] = glm::vec3(position);
+}
+
+void Entity::setScale(int which, glm::vec3 scale) {
+    sca[which] = glm::vec3(scale);
 }
 
 void Entity::setVelocity(glm::vec3 velocity) {

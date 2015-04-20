@@ -18,7 +18,7 @@
 #define ZNEAR           0.1
 #define ZFAR         1000.0
 #define SCROLL_SPEED    0.001
-#define CAM_SPEED       3.0
+#define CAM_SPEED      30.0
 
 class Camera {
 private:
@@ -58,6 +58,7 @@ public:
 	glm::mat4 getProjectionMatrix();
 	glm::mat4 getViewMatrix();
 	glm::vec3 getPosition();
+	glm::vec3 getDirection();
 	uint8_t getFlags();
 	
 	// Setters
@@ -105,6 +106,8 @@ void Camera::update(float time, bool *keys, float cursorX, float cursorY) {
 	glm::vec3 RZ = glm::vec3(R[2][0], R[2][1], R[2][2]);
 	glm::vec3 RX = glm::vec3(R[0][0], R[0][1], R[0][2]);
 
+	dir = RX;
+
 	if (keys['W'])
 		eye -= RZ * tDif * tfa;
 	if (keys['S'])
@@ -137,6 +140,10 @@ glm::mat4 Camera::getViewMatrix() {
 
 glm::vec3 Camera::getPosition() {
 	return glm::vec3(eye);
+}
+
+glm::vec3 Camera::getDirection() {
+	return glm::vec3(dir);
 }
 
 uint8_t Camera::getFlags() {
