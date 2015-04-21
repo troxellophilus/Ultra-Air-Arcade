@@ -9,7 +9,10 @@
 //    Many useful helper functions for GLSL shaders - gleaned from various sources including orange book
 //    Created by zwood on 2/21/10.
 
-#define GLFW_INCLUDE_GLCOREARB
+#ifdef __APPLE__
+    #define GLFW_INCLUDE_GLCOREARB
+#endif
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 

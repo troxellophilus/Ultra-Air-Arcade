@@ -5,9 +5,15 @@
  */
 
 #include <GL/glew.h>
-#define GLFW_INCLUDE_GLCOREARB
+
+#ifdef __APPLE__
+    #define GLFW_INCLUDE_GLCOREARB
+#endif
+
 #include <GLFW/glfw3.h>
 
+#define GLM_FORCE_RADIANS
+ 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
