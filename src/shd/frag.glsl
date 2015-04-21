@@ -15,9 +15,9 @@ in vec3 vPos;
 out vec4 outColor;
 
 vec4 calcColor(vec3 fadeTo, vec3 fadeFrom, float dist, float bottom) {
-   float red = fadeTo.r - (fadeTo.r - fadeFrom.r) * (vPos.y - bottom) / (dist - bottom);
-   float green = fadeTo.g - (fadeTo.g - fadeFrom.g) * (vPos.y - bottom) / (dist - bottom);
-   float blue = fadeTo.b - (fadeTo.b - fadeFrom.b) * (vPos.y - bottom) / (dist - bottom);
+   float red = fadeTo.r - (fadeTo.r - fadeFrom.r) * (vPos.y - bottom) / (dist);
+   float green = fadeTo.g - (fadeTo.g - fadeFrom.g) * (vPos.y - bottom) / (dist);
+   float blue = fadeTo.b - (fadeTo.b - fadeFrom.b) * (vPos.y - bottom) / (dist);
 
    return vec4(red, green, blue, 1.0);
 }
@@ -43,12 +43,12 @@ void main() {
 
       	outColor = vec4(intensity * (specular_comp + diffuse_comp + ambient_comp), 1.0);
     } else if (renderObj == 1) { 	// For rendering skydome
-      if (vPos.y < 5.0)
-			outColor = calcColor(vec3(0.03, 0.874, 1.0), vec3(0.0745, 0.815, 1.0), 5.0, 0.0);
-		else if (vPos.y >= 5.0 && vPos.y <= 50.0)
-			outColor = calcColor(vec3(0.0745, 0.815, 1.0), vec3(0.058, 0.725, 1.0), 35.0, 5.0);
+      if (vPos.y < 50.0)
+			outColor = calcColor(vec3(0.03, 0.874, 1.0), vec3(0.0745, 0.815, 1.0), 50.0, 0.0);
+		else if (vPos.y >= 50.0 && vPos.y <= 250.0)
+			outColor = calcColor(vec3(0.0745, 0.815, 1.0), vec3(0.058, 0.725, 1.0), 200.0, 50.0);
 		else
-			outColor = calcColor(vec3(0.058, 0.725, 1.0), vec3(0.007, 0.407, 1.0), 10.0, 40.0);
+			outColor = calcColor(vec3(0.058, 0.725, 1.0), vec3(0.007, 0.407, 1.0), 250.0, 250.0);
       } else {								// Catch-all
 		outColor = vec4(vCol, 1.0);
    }
