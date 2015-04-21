@@ -393,7 +393,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/sphere.obj", obj[0]);
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
-    loadShapes("../Assets/models/p51.obj", obj[3]);
+    loadShapes("../Assets/models/Plane1.obj", obj[3]);
     loadShapes("../Assets/models/skydome.obj", skydome);
     
     std::cout << " loaded the objects " << endl;
