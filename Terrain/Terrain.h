@@ -12,7 +12,7 @@
 #endif
 #ifdef __unix__
 #include <GL/glut.h>
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #endif
 #ifdef _WIN32
 #define GLFW_INCLUDE_GLCOREARB

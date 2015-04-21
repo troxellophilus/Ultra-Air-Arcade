@@ -51,6 +51,7 @@ vector<float> terNorBuf;
 vector<unsigned int> terIndBuf;
 
 Object obj[NUMSHAPES];
+Object skydome;
 
 Collision *sampler = new Collision();
 
@@ -107,11 +108,39 @@ void initGL(Object *o, int i) {
     assert(glGetError() == GL_NO_ERROR);
 }
 
+void initSky() {
+	 glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+
+    const vector<float> &posBuf = skydome.shapes[0].mesh.positions;
+    glGenBuffers(1, &posBufObj);
+    glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
+    glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
+    
+    // Send the normal array to the GPU
+    const vector<float> &norBuf = skydome.shapes[0].mesh.normals;
+    glGenBuffers(1, &norBufObj);
+    glBindBuffer(GL_ARRAY_BUFFER, norBufObj);
+    glBufferData(GL_ARRAY_BUFFER, norBuf.size()*sizeof(float), &norBuf[0], GL_STATIC_DRAW);
+    
+    // Send the index array to the GPU
+    const vector<unsigned int> &indBuf = skydome.shapes[0].mesh.indices;
+    glGenBuffers(1, &indBufObj);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObj);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indBuf.size()*sizeof(unsigned int), &indBuf[0], GL_STATIC_DRAW);
+    
+    // Unbind the arrays
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    GLSL::checkVersion();
+    assert(glGetError() == GL_NO_ERROR);
+}
+
 void initGround() {
     //glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
     //glEnable(GL_DEPTH_TEST);
 
-    Terrain terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    Terrain terrain = Terrain("../Assets/heightmap/Tamriel.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &posBufObjG);
     glBindBuffer(GL_ARRAY_BUFFER, posBufObjG);
@@ -258,6 +287,42 @@ void drawGL(Entity *entity, int i) {
     assert(glGetError() == GL_NO_ERROR);
 }
 
+void drawSky() {
+	glUseProgram(prog);
+	int nIndices = (int)skydome.shapes[0].mesh.indices.size();
+
+	glEnableVertexAttribArray(aPos);
+	glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(aNor);
+	glBindBuffer(GL_ARRAY_BUFFER, norBufObj);
+	glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObj);
+
+	// Bind index array for drawing
+	// Compute and send the projection matrix - leave this as is
+
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(750.0f, 750.0f, 750.0f)); 
+	glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(512.0f, 0.0f, 512.0f));
+
+	glm::mat4 com = trans * scale;
+	glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
+	glUniform1i(renderObj, 1);
+	glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
+
+	// Disable and unbind
+	GLSL::disableVertexAttribArray(aPos);
+	GLSL::disableVertexAttribArray(aNor);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	// Last lines
+	glUseProgram(0);
+	assert(glGetError() == GL_NO_ERROR);
+}
+
 void drawGround() {
 	glEnable(GL_CULL_FACE);
     glUseProgram(prog);
@@ -272,7 +337,7 @@ void drawGround() {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObjG);
     
-    glUniform1i(renderObj, 1);
+    glUniform1i(renderObj, 0);
     SetMaterial(Materials::wood);
     SetModel(glm::vec3(0), 0, vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
@@ -328,6 +393,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
     loadShapes("../Assets/models/Biplane.obj", obj[3]);
+    loadShapes("../Assets/models/skydome.obj", skydome);
     
     std::cout << " loaded the objects " << endl;
     // Initialize GLEW
@@ -446,7 +512,9 @@ int main(int argc, char **argv) {
 	drawGL(&player, 0);
         
 	// Draw terrain
-        drawGround();
+   drawGround();
+	initSky();
+	drawSky();
         
 	// Build keys array and update camera
 	bool keys[128];

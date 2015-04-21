@@ -4,7 +4,8 @@
 
 #ifndef CHARACTER_H
 #define CHARACTER_H
-
+#include "types.h"
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 class Character {
