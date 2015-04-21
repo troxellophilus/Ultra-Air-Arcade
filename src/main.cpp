@@ -20,22 +20,18 @@
 #include "helper.h"
 #include "GLSL.h"
 
-
 //#define _DEBUG
 
 using namespace std;
 using namespace glm;
 
+enum { TERRAIN, SKY, PLANE, NUM_VBO };
 
 GLuint prog;
 GLuint vao;
-GLuint posBufObj = 0;
-GLuint norBufObj = 0;
-GLuint indBufObj = 0;
-
-GLuint posBufObjG = 0;
-GLuint norBufObjG = 0;
-GLuint indBufObjG = 0;
+GLuint pbo[NUM_VBO];
+GLuint nbo[NUM_VBO];
+GLuint ibo[NUM_VBO];
 
 GLint aPos = 0;
 GLint aNor = 0;
@@ -79,26 +75,25 @@ void SetModel(vec3 trans, float rot, vec3 sc) {
     glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
 }
 
-void initGL(Object *o, int i) {
-    glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-    
+int initVBO(Entity *e, int whichbo) {
+    vector<float> posBuf, norBuf;
+    vector<unsigned int> indBuf;
+
+    e->packVertices(&posBuf, &norBuf, &indBuf);
+
     // Send the position array to the GPU
-    const vector<float> &posBuf = o->shapes[0].mesh.positions;
-    glGenBuffers(1, &posBufObj);
-    glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
+    glGenBuffers(1, &pbo[whichbo]);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
     glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
     
     // Send the normal array to the GPU
-    const vector<float> &norBuf = o->shapes[0].mesh.normals;
-    glGenBuffers(1, &norBufObj);
-    glBindBuffer(GL_ARRAY_BUFFER, norBufObj);
+    glGenBuffers(1, &nbo[whichbo]);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
     glBufferData(GL_ARRAY_BUFFER, norBuf.size()*sizeof(float), &norBuf[0], GL_STATIC_DRAW);
     
     // Send the index array to the GPU
-    const vector<unsigned int> &indBuf = o->shapes[0].mesh.indices;
-    glGenBuffers(1, &indBufObj);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObj);
+    glGenBuffers(1, &ibo[whichbo]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indBuf.size()*sizeof(unsigned int), &indBuf[0], GL_STATIC_DRAW);
     
     // Unbind the arrays
@@ -106,27 +101,29 @@ void initGL(Object *o, int i) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     GLSL::checkVersion();
     assert(glGetError() == GL_NO_ERROR);
+
+    return (int)indBuf.size();
 }
 
 void initSky() {
-	 glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
+	// glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
+    //glEnable(GL_DEPTH_TEST);
 
     const vector<float> &posBuf = skydome.shapes[0].mesh.positions;
-    glGenBuffers(1, &posBufObj);
-    glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
+    glGenBuffers(1, &pbo[SKY]);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[SKY]);
     glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
     
     // Send the normal array to the GPU
     const vector<float> &norBuf = skydome.shapes[0].mesh.normals;
-    glGenBuffers(1, &norBufObj);
-    glBindBuffer(GL_ARRAY_BUFFER, norBufObj);
+    glGenBuffers(1, &nbo[SKY]);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[SKY]);
     glBufferData(GL_ARRAY_BUFFER, norBuf.size()*sizeof(float), &norBuf[0], GL_STATIC_DRAW);
     
     // Send the index array to the GPU
     const vector<unsigned int> &indBuf = skydome.shapes[0].mesh.indices;
-    glGenBuffers(1, &indBufObj);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObj);
+    glGenBuffers(1, &ibo[SKY]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[SKY]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indBuf.size()*sizeof(unsigned int), &indBuf[0], GL_STATIC_DRAW);
     
     // Unbind the arrays
@@ -142,16 +139,16 @@ void initGround() {
 
     Terrain terrain = Terrain("../Assets/heightmap/Tamriel.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
-    glGenBuffers(1, &posBufObjG);
-    glBindBuffer(GL_ARRAY_BUFFER, posBufObjG);
+    glGenBuffers(1, &pbo[TERRAIN]);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
     glBufferData(GL_ARRAY_BUFFER, terPosBuf.size()*sizeof(float), &terPosBuf[0], GL_STATIC_DRAW);
     
-    glGenBuffers(1, &norBufObjG);
-    glBindBuffer(GL_ARRAY_BUFFER, norBufObjG);
+    glGenBuffers(1, &nbo[TERRAIN]);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
     glBufferData(GL_ARRAY_BUFFER, terNorBuf.size()*sizeof(float), &terNorBuf[0], GL_STATIC_DRAW);
     
-    glGenBuffers(1, &indBufObjG);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObjG);
+    glGenBuffers(1, &ibo[TERRAIN]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, terIndBuf.size()*sizeof(unsigned int), &terIndBuf[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -249,31 +246,29 @@ void SetMaterial(Material mat) {
     glUniform1f(h_uMatShine, shn);
 }
 
-void drawGL(Entity *entity, int i) {
+void drawVBO(Entity *entity, int nIndices, int whichbo) {
     glUseProgram(prog);
  
-    int nIndices = (int)(entity->getObject(i))->shapes[0].mesh.indices.size();
-    
     // Enable and bind position array for drawing
     glEnableVertexAttribArray(aPos);
-    glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
     glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
     // Enable and bind normal array for drawing
     glEnableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, norBufObj);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
     glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObj);
-    
     // Bind index array for drawing
-    // Compute and send the projection matrix - leave this as is
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
+    
     glUniform3f(lPos, 1000, 500, 1000);
 
-    glUniform1i(renderObj, 1);
+    glUniform1i(renderObj, 0);
 
-    SetMaterial(entity->getMaterial(0));
-    SetModel(entity->getPosition(0), entity->getOrientation().y, entity->getScale(i));
+    SetMaterial(entity->getMaterial());
+    SetModel(entity->getPosition(), entity->getOrientation().y, entity->getScale());
+
     glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
     
     // Disable and unbind
@@ -292,14 +287,14 @@ void drawSky() {
 	int nIndices = (int)skydome.shapes[0].mesh.indices.size();
 
 	glEnableVertexAttribArray(aPos);
-	glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
+	glBindBuffer(GL_ARRAY_BUFFER, pbo[SKY]);
 	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glEnableVertexAttribArray(aNor);
-	glBindBuffer(GL_ARRAY_BUFFER, norBufObj);
+	glBindBuffer(GL_ARRAY_BUFFER, nbo[SKY]);
 	glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObj);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[SKY]);
 
 	// Bind index array for drawing
 	// Compute and send the projection matrix - leave this as is
@@ -328,14 +323,14 @@ void drawGround() {
     glUseProgram(prog);
     
     glEnableVertexAttribArray(aPos);
-    glBindBuffer(GL_ARRAY_BUFFER, posBufObjG);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
     glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     GLSL::enableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, norBufObjG);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
     glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBufObjG);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
     
     glUniform1i(renderObj, 0);
     SetMaterial(Materials::wood);
@@ -392,7 +387,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/sphere.obj", obj[0]);
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
-    loadShapes("../Assets/models/Biplane.obj", obj[3]);
+    loadShapes("../Assets/models/p51.obj", obj[3]);
     loadShapes("../Assets/models/skydome.obj", skydome);
     
     std::cout << " loaded the objects " << endl;
@@ -418,6 +413,7 @@ int main(int argc, char **argv) {
     installShaders("shd/vert.glsl", "shd/frag.glsl");
     
     initGround();
+    initSky();
     
     // Set up characters
     vector<Entity> characters;
@@ -429,13 +425,11 @@ int main(int argc, char **argv) {
     Camera camera((float)glfwGetTime(), g_width, g_height);
 
     // Set up player
-    vector<Object *> plObjs;
-    vector<glm::vec3> plPoss;
-    vector<glm::vec3> plScas;
-    plObjs.push_back(&obj[1]);
-    plPoss.push_back(camera.getPosition());
-    plScas.push_back(glm::vec3(0.03,0.03,0.03));
-    Entity player = Entity(plObjs, plPoss, plScas);
+    Object * plObj = &obj[3];
+    glm::vec3 plPos = camera.getPosition();
+    glm::vec3 plSca = glm::vec3(0.2,0.2,0.2);
+    Entity player = Entity(plObj, plPos, plSca, Materials::obsidian);
+    int pIndices = initVBO(&player, PLANE);
 
     while (!glfwWindowShouldClose(window)) {
 	    float ratio;
@@ -458,39 +452,27 @@ int main(int argc, char **argv) {
 
 	// Create new characters if necessary
         if (int(elapsed) != int(last) && int(elapsed) % 5 == 0) {
-		vector<Object *> objects;
-		vector<glm::vec3> positions;
-		vector<glm::vec3> scales;
-		vector<Material> materials;
-
-		objects.push_back(&obj[2]);
-		objects.push_back(&obj[0]);
-		positions.push_back(glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5));
-		positions.push_back(positions[0] + glm::vec3(0.,0.4,0.));
-		scales.push_back(glm::vec3(0.3f,0.3f,0.3f));
-		scales.push_back(glm::vec3(0.05f,0.05f,0.05f));
-		materials.push_back(Materials::wood);
-		materials.push_back(Materials::obsidian);
+		Object * object = &obj[3];
+		glm::vec3 position = glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5);
+		glm::vec3 scale = glm::vec3(0.3f,0.3f,0.3f);
+		Material material = Materials::emerald;
 
             glm::vec3 cVel = glm::vec3((rand() % 2 * 2 - 1) * 0.02f, 0.0f, (rand() % 2 * 2 - 1) * 0.02f);
             
-            Entity c(objects, positions, scales);
-	    c.setMaterial(0, materials[0]);
-	    c.setMaterial(1, materials[1]);
+            Entity c(object, position, scale, material);
 	    c.setVelocity(cVel);
             characters.push_back(c);
-            
+
             numObj++;
         }
         
 	// Draw character
-        initGL(characters.begin()->getObject(0), 0);
         for (auto &character : characters) {
-            drawGL(&character, 0);
+            drawVBO(&character, pIndices, PLANE);
             character.update(glfwGetTime() - last);
 
-            if (character.getPosition(0).x < -10 || character.getPosition(0).z < -10 ||
-                character.getPosition(0).x > 10 || character.getPosition(0).z > 10)
+            if (character.getPosition().x < -10 || character.getPosition().z < -10 ||
+                character.getPosition().x > 10 || character.getPosition().z > 10)
                 character.setVelocity(glm::vec3(0) - character.getVelocity());
 
             uint32_t flags = character.getFlags();
@@ -505,15 +487,13 @@ int main(int argc, char **argv) {
         }
 
 	// Draw player
-	initGL(player.getObject(0), 0);
-	player.setPosition(0, glm::vec3(glm::inverse(view) * glm::vec4(0.0, 0.05, -1.0, 1.0)));
-	player.setMaterial(0, Materials::obsidian);
+	player.setPosition(glm::vec3(glm::inverse(view) * glm::vec4(0.0, 0.05, -1.0, 1.0)));
+	player.setMaterial(Materials::emerald);
 	player.update(glfwGetTime() - last);
-	drawGL(&player, 0);
+	drawVBO(&player, pIndices, PLANE);
         
 	// Draw terrain
-   drawGround();
-	initSky();
+        drawGround();
 	drawSky();
         
 	// Build keys array and update camera
