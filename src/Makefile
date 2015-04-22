@@ -11,7 +11,7 @@ all:
 
 
 osx:
-	g++ -o lab1 -ansi -pedantic -Werror *.cpp  -lGLEW -lglfw3 -framework OpenGL
+	clang++ -std=c++11 -stdlib=libc++ *.cpp ext/*.cpp ext/*.cc -lglfw3 -framework OpenGL -lGLEW -framework Cocoa
 
 clean:
 	rm -f *~ *.o lab1
