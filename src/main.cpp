@@ -5,9 +5,15 @@
  */
 
 #include <GL/glew.h>
-#define GLFW_INCLUDE_GLCOREARB
+
+#ifdef __APPLE__
+    #define GLFW_INCLUDE_GLCOREARB
+#endif
+
 #include <GLFW/glfw3.h>
 
+#define GLM_FORCE_RADIANS
+ 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -388,7 +394,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/sphere.obj", obj[0]);
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
-    loadShapes("../Assets/models/p51.obj", obj[3]);
+    loadShapes("../Assets/models/Plane1.obj", obj[3]);
     loadShapes("../Assets/models/skydome.obj", skydome);
     
     std::cout << " loaded the objects " << endl;
