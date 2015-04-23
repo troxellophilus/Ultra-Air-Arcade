@@ -10,6 +10,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <cmath>
 
 #include "Entity.hpp"
 #include "Collision.hpp"
@@ -46,6 +47,13 @@ GLint uProjMatrix = 0;
 GLint renderObj = 0;
 GLint h_uMatAmb, h_uMatDif, h_uMatSpec, h_uMatShine;
 
+// Billboard vars
+GLuint CameraRight_worldspace_ID;
+GLuint CameraUp_worldspace_ID;
+GLuint BillboardPosID;
+GLuint BillboardSizeID;
+GLuint billboard_vertex_buffer;
+
 vector<float> terPosBuf;
 vector<float> terNorBuf;
 vector<unsigned int> terIndBuf;
@@ -60,6 +68,13 @@ static float g_width, g_height;
 unsigned int frames = 0;
 unsigned int numObj = 0;
 unsigned int collisions = 0;
+
+float xtrans[100];
+float ztrans[100];
+
+float randNum() {
+    return ((float) rand() / (RAND_MAX)) * 600.0;
+}
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -106,6 +121,46 @@ void initGL(Object *o, int i) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     GLSL::checkVersion();
     assert(glGetError() == GL_NO_ERROR);
+}
+
+void initBillboard() {
+// Set up billboard
+	static const GLfloat g_vertex_buffer_data[] = { 
+		 -0.5f, -0.5f, 0.0f,
+		  0.5f, -0.5f, 0.0f,
+		 -0.5f, 0.5f, 0.0f,
+		  0.5f, 0.5f, 0.0f,
+	};
+
+	glGenBuffers(1, &billboard_vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+}
+
+void drawBillboard(Camera *camera) {
+	glEnable(GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniform1i(renderObj, 2);
+	glm::mat4 ViewMatrix = camera->getViewMatrix();
+	glUniform3f(CameraRight_worldspace_ID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
+	glUniform3f(CameraUp_worldspace_ID   , ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
+
+	int i;
+
+	for (i = 0; i < 100; i++) {
+		glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]); // The billboard will be just above the cube
+		glUniform2f(BillboardSizeID, 20.0f, 20.0f);     // and 1m*12cm, because it matches its 256*32 resolution =)
+
+		// Enable and bind position array for drawing
+		glEnableVertexAttribArray(aPos);
+		glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+		glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		// Draw the billboard !
+		// This draws a triangle_strip which looks like a quad.
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+
+	glDisableVertexAttribArray(0);
 }
 
 void initSky() {
@@ -230,6 +285,12 @@ bool installShaders(const string &vShaderName, const string &fShaderName) {
     h_uMatDif = glGetUniformLocation(prog, "UdColor");
     h_uMatSpec = glGetUniformLocation(prog, "UsColor");
     h_uMatShine = glGetUniformLocation(prog, "Ushine");
+
+	// Shader vars for billboard
+	CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
+	CameraUp_worldspace_ID  = glGetUniformLocation(prog, "CameraUp_worldspace");
+	BillboardPosID = glGetUniformLocation(prog, "BillboardPos");
+	BillboardSizeID = glGetUniformLocation(prog, "BillboardSize");
     
     assert(glGetError() == GL_NO_ERROR);
     return true;
@@ -360,7 +421,13 @@ int main(int argc, char **argv) {
     GLFWwindow* window;
 
     glfwSetErrorCallback(error_callback);
-    
+
+	int i;
+	for (i = 0; i < 100; i++) {
+		xtrans[i] = randNum();
+		ztrans[i] = randNum();
+	}    
+
     // Initialise GLFW
     if(!glfwInit()) {
 	    exit(EXIT_FAILURE);
@@ -418,7 +485,7 @@ int main(int argc, char **argv) {
     installShaders("shd/vert.glsl", "shd/frag.glsl");
     
     initGround();
-    
+
     // Set up characters
     vector<Entity> characters;
 
@@ -458,32 +525,34 @@ int main(int argc, char **argv) {
 
 	// Create new characters if necessary
         if (int(elapsed) != int(last) && int(elapsed) % 5 == 0) {
-		vector<Object *> objects;
-		vector<glm::vec3> positions;
-		vector<glm::vec3> scales;
-		vector<Material> materials;
+			vector<Object *> objects;
+			vector<glm::vec3> positions;
+			vector<glm::vec3> scales;
+			vector<Material> materials;
 
-		objects.push_back(&obj[2]);
-		objects.push_back(&obj[0]);
-		positions.push_back(glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5));
-		positions.push_back(positions[0] + glm::vec3(0.,0.4,0.));
-		scales.push_back(glm::vec3(0.3f,0.3f,0.3f));
-		scales.push_back(glm::vec3(0.05f,0.05f,0.05f));
-		materials.push_back(Materials::wood);
-		materials.push_back(Materials::obsidian);
+			objects.push_back(&obj[2]);
+			objects.push_back(&obj[0]);
+			positions.push_back(glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5));
+			positions.push_back(positions[0] + glm::vec3(0.,0.4,0.));
+			scales.push_back(glm::vec3(0.3f,0.3f,0.3f));
+			scales.push_back(glm::vec3(0.05f,0.05f,0.05f));
+			materials.push_back(Materials::wood);
+			materials.push_back(Materials::obsidian);
 
-            glm::vec3 cVel = glm::vec3((rand() % 2 * 2 - 1) * 0.02f, 0.0f, (rand() % 2 * 2 - 1) * 0.02f);
-            
-            Entity c(objects, positions, scales);
-	    c.setMaterial(0, materials[0]);
-	    c.setMaterial(1, materials[1]);
-	    c.setVelocity(cVel);
+		    glm::vec3 cVel = glm::vec3((rand() % 2 * 2 - 1) * 0.02f, 0.0f, (rand() % 2 * 2 - 1) * 0.02f);
+				        
+		    Entity c(objects, positions, scales);
+			c.setMaterial(0, materials[0]);
+			c.setMaterial(1, materials[1]);
+			c.setVelocity(cVel);
             characters.push_back(c);
             
             numObj++;
         }
         
 	// Draw character
+		initBillboard();
+		drawBillboard(&camera);
         initGL(characters.begin()->getObject(0), 0);
         for (auto &character : characters) {
             drawGL(&character, 0);
@@ -512,7 +581,7 @@ int main(int argc, char **argv) {
 	drawGL(&player, 0);
         
 	// Draw terrain
-   drawGround();
+ 	drawGround();
 	initSky();
 	drawSky();
         
