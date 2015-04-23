@@ -8,6 +8,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include "Entity.hpp"
 
 #define PI 3.14159265
 
@@ -16,7 +18,7 @@
 // Default values for Camera (uses these if not set to anything else)
 #define FOVY           75.0
 #define ZNEAR           0.1
-#define ZFAR         100000.0
+#define ZFAR        10000.0
 #ifdef __APPLE__
 #define SCROLL_SPEED    0.001
 #else
@@ -45,11 +47,10 @@ private:
 	float zfr; // Z Far
 
 	// View
-	glm::vec2 rot; // Rotations
+	glm::vec2 rot; // Mouse rotations tracker
 	float rfa; // rfactor
 	float tfa; // tfactor
 	glm::vec3 eye; // Position of the camera
-	glm::vec3 dir; // Camera position + direction vector
 	
 	// Flags
 	uint8_t flg = 0x0;
@@ -62,7 +63,6 @@ public:
 	glm::mat4 getProjectionMatrix();
 	glm::mat4 getViewMatrix();
 	glm::vec3 getPosition();
-	glm::vec3 getDirection();
 	uint8_t getFlags();
 	
 	// Setters
@@ -70,11 +70,10 @@ public:
 	void setNearZ(float zNear);
 	void setFarZ(float zFar);
 	void setPosition(glm::vec3 position);
-	void setDirection(glm::vec3 direction);
 	void setUpAngle(glm::vec3 upAngle);
 	
 	// Methods
-	void update(float time, bool *keys, float cursorX, float cursorY);
+	void update(float time, Entity *player, bool *keys, float cursorX, float cursorY);
 };
 
 // Constructors
@@ -93,12 +92,11 @@ Camera::Camera(float start, float width, float height) {
 	tfa = CAM_SPEED;
 	eye = glm::vec3(0.f, 0.4f, 0.f);
 	lst = start;
-	dir = glm::vec3(0.f,0.f,-1.f);
 }
 
 // Methods
 
-void Camera::update(float time, bool *keys, float cursorX, float cursorY) {
+void Camera::update(float time, Entity *player, bool *keys, float cursorX, float cursorY) {
 	cur = time;
 	float tDif = cur - lst;
 
@@ -107,19 +105,21 @@ void Camera::update(float time, bool *keys, float cursorX, float cursorY) {
 	rot -= rfa * dv;
 
 	glm::mat4 R = glm::rotate(rot.x, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(rot.y, glm::vec3(1.0f,0.0f,0.0f));
-	glm::vec3 RZ = glm::vec3(R[2][0], R[2][1], R[2][2]);
-	glm::vec3 RX = glm::vec3(R[0][0], R[0][1], R[0][2]);
+	glm::vec3 RZ = glm::vec3(R[2][0], R[2][1], R[2][2]); // rotation vec3 pointing down z axis
+	glm::vec3 RX = glm::vec3(R[0][0], R[0][1], R[0][2]); // rotation vec3 pointing down x axis
 
-	dir = RX;
+	player->setPitchYawTarget(RZ);
 
 	if (keys['W'])
-		eye -= RZ * tDif * tfa;
+		player->accelerate();
 	if (keys['S'])
-		eye += RZ * tDif * tfa;
+		player->decelerate();
 	if (keys['D'])
-		eye -= RX * tDif * tfa;
+		player->rollRight();
 	if (keys['A'])
-		eye += RX * tDif * tfa;
+		player->rollLeft();
+
+	eye = player->getPosition();
 
 	lst = cur;
 
@@ -136,18 +136,15 @@ glm::mat4 Camera::getProjectionMatrix() {
 glm::mat4 Camera::getViewMatrix() {
 	glm::mat4 T = glm::translate(eye);
 	glm::mat4 R = glm::rotate(rot.x, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(rot.y, glm::vec3(1.0f,0.0f,0.0f));
+	glm::mat4 TP = glm::translate(glm::vec3(0, 0, 1));
 	
-	glm::mat4 C = T * R;
+	glm::mat4 C = T * R * TP;
 
 	return glm::inverse(C);
 }
 
 glm::vec3 Camera::getPosition() {
 	return glm::vec3(eye);
-}
-
-glm::vec3 Camera::getDirection() {
-	return glm::vec3(dir);
 }
 
 uint8_t Camera::getFlags() {
@@ -170,10 +167,6 @@ void Camera::setFarZ(float zFar) {
 
 void Camera::setPosition(glm::vec3 position) {
 	eye = glm::vec3(position);
-}
-
-void Camera::setDirection(glm::vec3 direction) {
-	dir = glm::vec3(direction);
 }
 
 #endif
