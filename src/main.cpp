@@ -525,26 +525,6 @@ int main(int argc, char **argv) {
 
 	// Create new characters if necessary
         if (int(elapsed) != int(last) && int(elapsed) % 5 == 0) {
-			vector<Object *> objects;
-			vector<glm::vec3> positions;
-			vector<glm::vec3> scales;
-			vector<Material> materials;
-
-			objects.push_back(&obj[2]);
-			objects.push_back(&obj[0]);
-			positions.push_back(glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5));
-			positions.push_back(positions[0] + glm::vec3(0.,0.4,0.));
-			scales.push_back(glm::vec3(0.3f,0.3f,0.3f));
-			scales.push_back(glm::vec3(0.05f,0.05f,0.05f));
-			materials.push_back(Materials::wood);
-			materials.push_back(Materials::obsidian);
-
-		    glm::vec3 cVel = glm::vec3((rand() % 2 * 2 - 1) * 0.02f, 0.0f, (rand() % 2 * 2 - 1) * 0.02f);
-				        
-		    Entity c(objects, positions, scales);
-			c.setMaterial(0, materials[0]);
-			c.setMaterial(1, materials[1]);
-			c.setVelocity(cVel);
 		Object * object = &obj[3];
 		glm::vec3 position = glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5);
 		glm::vec3 scale = glm::vec3(0.3f,0.3f,0.3f);
@@ -562,7 +542,6 @@ int main(int argc, char **argv) {
 	// Draw character
 		initBillboard();
 		drawBillboard(&camera);
-        initGL(characters.begin()->getObject(0), 0);
         for (auto &character : characters) {
             drawVBO(&character, pIndices, PLANE);
             character.update(glfwGetTime() - last);
@@ -591,7 +570,6 @@ int main(int argc, char **argv) {
         
 	// Draw terrain
  	drawGround();
-	initSky();
 	drawSky();
         
 	// Build keys array and update camera

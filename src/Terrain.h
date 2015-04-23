@@ -10,7 +10,7 @@
 #include <eigen3/Eigen/Dense>
 #endif
 #ifdef __unix__
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #endif
 #ifdef _WIN32
 #define GLFW_INCLUDE_GLCOREARB
