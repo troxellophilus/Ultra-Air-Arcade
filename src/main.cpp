@@ -10,6 +10,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "Entity.hpp"
 #include "Collision.hpp"
@@ -67,11 +68,11 @@ static void error_callback(int error, const char* description) {
 }
 
 /* model transforms */
-void SetModel(vec3 trans, float rot, vec3 sc) {
+void SetModel(vec3 trans, glm::vec3 rot, vec3 sc) {
     glm::mat4 Trans = glm::translate( glm::mat4(1.0f), trans);
-    glm::mat4 RotateY = glm::rotate( glm::mat4(1.0f), rot, glm::vec3(0.0f, 1, 0));
+    glm::mat4 Orient = glm::orientation(rot, glm::vec3(0, 1, 0));
     glm::mat4 Sc = glm::scale(glm::mat4(1.0f), sc);
-    glm::mat4 com = Trans*RotateY*Sc;
+    glm::mat4 com = Trans*Orient*Sc;
     glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
 }
 
@@ -267,7 +268,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     glUniform1i(renderObj, 0);
 
     SetMaterial(entity->getMaterial());
-    SetModel(entity->getPosition(), entity->getOrientation().y, entity->getScale());
+    SetModel(entity->getPosition(), entity->getOrientation(), entity->getScale());
 
     glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
     
@@ -334,7 +335,7 @@ void drawGround() {
     
     glUniform1i(renderObj, 0);
     SetMaterial(Materials::wood);
-    SetModel(glm::vec3(0), 0, vec3(1));
+    SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
     
     GLSL::disableVertexAttribArray(aPos);
@@ -487,7 +488,8 @@ int main(int argc, char **argv) {
         }
 
 	// Draw player
-	player.setPosition(glm::vec3(glm::inverse(view) * glm::vec4(0.0, 0.05, -1.0, 1.0)));
+	//player.setPosition(glm::vec3(glm::inverse(view) * glm::vec4(0.0, 0.05, -1.0, 1.0)));
+	//player.setVelocity(glm::vec3(0,0,10));
 	player.setMaterial(Materials::emerald);
 	player.update(glfwGetTime() - last);
 	drawVBO(&player, pIndices, PLANE);
@@ -504,7 +506,7 @@ int main(int argc, char **argv) {
 	keys['D'] = glfwGetKey(window, 'D') == GLFW_PRESS;
 	double cx, cy;
 	glfwGetCursorPos(window, &cx, &cy);
-	camera.update(glfwGetTime(), keys, cx, cy);
+	camera.update(glfwGetTime(), &player, keys, cx, cy);
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

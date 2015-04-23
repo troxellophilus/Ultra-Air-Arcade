@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 #include "Materials.hpp"
 #include "types.h"
 
@@ -15,22 +16,29 @@
 #define U_FLAG 0x04
 #define R_FLAG 0x08
 
+#define MAX_SPEED 10
+#define ACC_FAC 0.5
+#define ROLL_FAC 0.5
+
 using namespace std;
 
 class Entity {
 private:
     Object *obj;   // obj vertices
     glm::vec3 pos; // translation transform for current position
+    glm::vec3 vet; // Target velocity of the character
     glm::vec3 vel; // vx, vy, vz of the character in units/s
-    glm::vec3 ori;
+    glm::vec3 pyt; // Target Pitch Yaw (orientation) of the character
+    glm::vec3 ori; // Orientation dx, dy, dz
     glm::vec3 sca; // scale
+    float spd;
+    float spt;
     Material mat;
     uint8_t flgs = 0x0;
     
 public:
     // Constructor
     Entity(Object *, glm::vec3, glm::vec3, Material);
-    void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
 
     // Getters
     Object * getObject();
@@ -48,10 +56,16 @@ public:
     void setVelocity(glm::vec3);
     void setMaterial(Material material);
     void setOrientation(glm::vec3);
+    void setPitchYawTarget(glm::vec3);
     void setFlag(uint8_t flg);
 
     // Methods
+    void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
     void update(double);
+    void accelerate();
+    void decelerate();
+    void rollRight();
+    void rollLeft();
 };
 
 Entity::Entity(Object * object, glm::vec3 position, glm::vec3 scale, Material material) {
@@ -60,27 +74,44 @@ Entity::Entity(Object * object, glm::vec3 position, glm::vec3 scale, Material ma
     sca = glm::vec3(scale);
     mat = material;
     vel = glm::vec3(0);
-    ori = glm::vec3(0, 5, 0);
+    ori = glm::vec3(0, 1, 0);
+    spd = 0;
+    spt = 0;
+    pyt = glm::vec3(0, 1, 0);
     flgs = 0x00;
 }
 
 void Entity::update(double elapsed) {
-    if (flgs & C_FLAG) {
-        setMaterial(Materials::emerald);
-        setVelocity(glm::vec3(0));
-    }
-    else if (flgs & B_FLAG && !(flgs & R_FLAG)) {
-        setVelocity(glm::vec3(0) - vel);
-	flgs |= R_FLAG;
-    }
-    else {
-        if (flgs & R_FLAG && flgs & U_FLAG) {
-		flgs &= ~(R_FLAG | U_FLAG | B_FLAG);
-        }
-        pos.x += (vel.x ? (vel.x / elapsed) : 0);
-        pos.y += (vel.y ? (vel.y / elapsed) : 0);
-        pos.z += (vel.z ? (vel.z / elapsed) : 0);
-    }
+	static glm::vec3 lastPitchYawErr = pyt - ori;
+	static float lastSpdErr = spt - spd;
+	glm::vec3 pitchYawErr = pyt - ori;
+	float spdErr = spt - spd;
+
+	ori += pitchYawErr + ((lastPitchYawErr - pitchYawErr) / float(elapsed)); // PD control
+	spd += spdErr + ((lastSpdErr - spdErr) / float(elapsed)); // PD control
+
+	pos += glm::normalize(ori) * spd / float(elapsed);
+
+	lastPitchYawErr = pitchYawErr;
+	lastSpdErr = spdErr;
+}
+
+void Entity::accelerate() {
+	spt -= (spt > -MAX_SPEED ? ACC_FAC : 0);
+}
+
+void Entity::decelerate() {
+	spt += (spt < 0 ? ACC_FAC : 0);
+}
+
+void Entity::rollRight() {
+	glm::mat4 R = glm::rotate(float(ROLL_FAC), ori);
+	pyt += glm::vec3(R[2][0], R[2][1], R[2][2]);
+}
+
+void Entity::rollLeft() {
+	glm::mat4 R = glm::rotate(-float(ROLL_FAC), ori);
+	pyt += glm::vec3(R[2][0], R[2][1], R[2][2]);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {
@@ -121,6 +152,10 @@ Material Entity::getMaterial() {
 
 void Entity::setObject(Object *object) {
     obj = object;
+}
+
+void Entity::setPitchYawTarget(glm::vec3 rz) {
+	pyt = glm::vec3(rz);
 }
 
 void Entity::setPosition(glm::vec3 position) {
