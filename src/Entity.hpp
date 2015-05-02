@@ -6,184 +6,191 @@
 #define ENTITY_H
 
 #include <cstdlib>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 #include "Materials.hpp"
 #include "types.h"
 
-#define C_FLAG 0x01
-#define B_FLAG 0x02
-#define U_FLAG 0x04
-#define R_FLAG 0x08
-
-#define MAX_SPEED 10
-#define ACC_FAC 0.5
-#define ROLL_FAC 0.5
+enum EntityFlag { C_FLAG, U_FLAG, B_FLAG };
 
 using namespace std;
 
 class Entity {
 private:
-    Object *obj;   // obj vertices
-    glm::vec3 pos; // translation transform for current position
-    glm::vec3 vet; // Target velocity of the character
-    glm::vec3 vel; // vx, vy, vz of the character in units/s
-    glm::vec3 pyt; // Target Pitch Yaw (orientation) of the character
-    glm::vec3 ori; // Orientation dx, dy, dz
-    glm::vec3 sca; // scale
-    float spd;
-    float spt;
-    Material mat;
-    uint8_t flgs = 0x0;
+    Object     *object;  // obj vertices
+    Material   material; // Material of the entity
+
+    glm::vec3  position;      // translation transform for current position
+    glm::vec3  direction;     // Direction vector of the entity
+    glm::quat  rotation;      // Quaternion rotation of entity
+    glm::vec3  scale;         // scale
+
+    glm::vec3  velocity;      // x, y, z velocity of the entity u/s
+    glm::vec3  acceleration;  // x, y, z acceleration of the entity u/s^2
+
+    EntityFlag flag;     // Entity flags, use as needed
     
 public:
     // Constructor
-    Entity(Object *, glm::vec3, glm::vec3, Material);
+    Entity();
 
     // Getters
-    Object * getObject();
-    glm::vec3 getPosition();
-    glm::vec3 getScale();
-    glm::vec3 getVelocity();
-    glm::vec3 getOrientation();
-    Material getMaterial();
-    uint8_t getFlags();
+    Object *   getObject();
+    Material   getMaterial();
+
+    glm::vec3  getPosition();
+    glm::vec3  getScale();
+    glm::mat4  getRotationM();
+    glm::quat  getRotationQ();
+
+    glm::vec3  getVelocity();
+    glm::vec3  getAcceleration();
+
+    EntityFlag getFlag();
 
     // Setters
+    void setObject(Object *);
+    void setMaterial(Material material);
+
     void setPosition(glm::vec3);
     void setScale(glm::vec3);
-    void setObject(Object *);
+
     void setVelocity(glm::vec3);
-    void setMaterial(Material material);
-    void setOrientation(glm::vec3);
-    void setPitchYawTarget(glm::vec3);
-    void setFlag(uint8_t flg);
+
+    void setFlag(EntityFlag new_flag);
 
     // Methods
+    void update();
+
+    void pitch(float dy);
+    void turn(float dx);
+
+    void throttleUp();
+    void throttleDown();
+
+    void turnLeft();
+    void turnRight();
+
     void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
-    void update(double);
-    void accelerate();
-    void decelerate();
-    void rollRight();
-    void rollLeft();
 };
 
-Entity::Entity(Object * object, glm::vec3 position, glm::vec3 scale, Material material) {
-    obj = object;
-    pos = glm::vec3(position);
-    sca = glm::vec3(scale);
-    mat = material;
-    vel = glm::vec3(0);
-    ori = glm::vec3(0, 1, 0);
-    spd = 0;
-    spt = 0;
-    pyt = glm::vec3(0, 1, 0);
-    flgs = 0x00;
+Entity::Entity() {
+    object = NULL;
+    material = Material::Material();
+
+    position = glm::vec3(0, 0, 0);
+    scale = glm::vec3(1, 1, 1);
+    rotation = glm::quat(1, 0, 0, 0);
+
+    velocity = glm::vec3(0, 0, 0);
+    acceleration = glm::vec3(0, 0, 0);
+
+    flag = C_FLAG;
 }
 
-void Entity::update(double elapsed) {
-	static glm::vec3 lastPitchYawErr = pyt - ori;
-	static float lastSpdErr = spt - spd;
-	glm::vec3 pitchYawErr = pyt - ori;
-	float spdErr = spt - spd;
-
-	ori += pitchYawErr + ((lastPitchYawErr - pitchYawErr) / float(elapsed)); // PD control
-	spd += spdErr + ((lastSpdErr - spdErr) / float(elapsed)); // PD control
-
-	pos += glm::normalize(ori) * spd / float(elapsed);
-
-	lastPitchYawErr = pitchYawErr;
-	lastSpdErr = spdErr;
+void Entity::update() {
+	// TODO: Make movement velocity & acceleration based
+	// Update the position by moving velocity in direction
+	position += rotation * velocity;
 }
 
-void Entity::accelerate() {
-	spt -= (spt > -MAX_SPEED ? ACC_FAC : 0);
+void Entity::throttleUp() {
+	// TODO: Improve
+	velocity.z += 0.01;
 }
 
-void Entity::decelerate() {
-	spt += (spt < 0 ? ACC_FAC : 0);
+void Entity::throttleDown() {
+	// TODO: Improve
+	velocity.z -= 0.01;
 }
 
-void Entity::rollRight() {
-	glm::mat4 R = glm::rotate(float(ROLL_FAC), ori);
-	pyt += glm::vec3(R[2][0], R[2][1], R[2][2]);
+void Entity::pitch(float dy) {
+	// Build dy pitch rotation glm::quat around x axis
+	glm::quat rot = glm::angleAxis(dy / 360.f, glm::vec3(1, 0, 0));
+
+	// Apply pitch change to the current rotation.
+	rotation *= rot;
 }
 
-void Entity::rollLeft() {
-	glm::mat4 R = glm::rotate(-float(ROLL_FAC), ori);
-	pyt += glm::vec3(R[2][0], R[2][1], R[2][2]);
+void Entity::turn(float dx) {
+	// TODO: mix a roll into this as well
+	// Build dx yaw rotation glm::quat around y axis
+	glm::quat rot = glm::angleAxis(dx / 360.f, glm::vec3(0, 1, 0));
+
+	// Apply yaw change to the current rotation.
+	rotation *= rot;
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {
 	int iboIdx = 0;
-	for (size_t i=0; i < obj->shapes.size(); i++) {
-		pbo->insert(pbo->end(), obj->shapes[i].mesh.positions.begin(), obj->shapes[i].mesh.positions.end());
-		nbo->insert(nbo->end(), obj->shapes[i].mesh.normals.begin(), obj->shapes[i].mesh.normals.end());
-		for (size_t j=0; j < obj->shapes[i].mesh.indices.size(); j++)
-			ibo->push_back(iboIdx + obj->shapes[i].mesh.indices[j]);
+	for (size_t i=0; i < object->shapes.size(); i++) {
+		pbo->insert(pbo->end(), object->shapes[i].mesh.positions.begin(), object->shapes[i].mesh.positions.end());
+		nbo->insert(nbo->end(), object->shapes[i].mesh.normals.begin(), object->shapes[i].mesh.normals.end());
+		for (size_t j=0; j < object->shapes[i].mesh.indices.size(); j++)
+			ibo->push_back(iboIdx + object->shapes[i].mesh.indices[j]);
 
-		iboIdx += obj->shapes[i].mesh.indices.size();
+		iboIdx += object->shapes[i].mesh.indices.size();
 	}
 }
 
 Object * Entity::getObject() {
-    return obj;
-}
-
-glm::vec3 Entity::getPosition() {
-    return pos;
-}
-
-glm::vec3 Entity::getScale() {
-    return sca;
-}
-
-glm::vec3 Entity::getVelocity() {
-    return vel;
-}
-
-glm::vec3 Entity::getOrientation() {
-    return ori;
+    return object;
 }
 
 Material Entity::getMaterial() {
-    return mat;
+    return material;
 }
 
-void Entity::setObject(Object *object) {
-    obj = object;
+glm::vec3 Entity::getPosition() {
+    return position;
 }
 
-void Entity::setPitchYawTarget(glm::vec3 rz) {
-	pyt = glm::vec3(rz);
+glm::vec3 Entity::getScale() {
+    return scale;
 }
 
-void Entity::setPosition(glm::vec3 position) {
-    pos = glm::vec3(position);
+glm::mat4 Entity::getRotationM() {
+    return glm::toMat4(rotation);
 }
 
-void Entity::setScale(glm::vec3 scale) {
-    sca = glm::vec3(scale);
+glm::quat Entity::getRotationQ() {
+	return rotation;
 }
 
-void Entity::setVelocity(glm::vec3 velocity) {
-    vel = glm::vec3(velocity);
+glm::vec3 Entity::getVelocity() {
+    return velocity;
 }
 
-void Entity::setOrientation(glm::vec3 orientation) {
-    ori = glm::vec3(orientation);
+void Entity::setObject(Object *obj) {
+    object = obj;
 }
 
-void Entity::setMaterial(Material material) {
-    mat = material;
+void Entity::setPosition(glm::vec3 pos) {
+    pos = glm::vec3(pos);
 }
 
-void Entity::setFlag(uint8_t flag) {
-	flgs |= flag;
+void Entity::setScale(glm::vec3 sc) {
+    scale = glm::vec3(sc);
 }
 
-uint8_t Entity::getFlags() {
-	return flgs;
+void Entity::setVelocity(glm::vec3 vel) {
+    velocity = glm::vec3(vel);
+}
+
+void Entity::setMaterial(Material mat) {
+    material = mat;
+}
+
+void Entity::setFlag(EntityFlag f) {
+	flag = f;
+}
+
+EntityFlag Entity::getFlag() {
+	return flag;
 }
 
 #endif

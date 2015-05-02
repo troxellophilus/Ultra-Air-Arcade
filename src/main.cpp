@@ -65,6 +65,10 @@ Object skydome;
 
 Collision *sampler = new Collision();
 
+Camera camera = Camera();
+Entity player = Entity();
+vector<Entity> opponents;
+
 static float g_width, g_height;
 
 unsigned int frames = 0;
@@ -78,13 +82,48 @@ float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
 }
 
+// EVENT CALLBACKS
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
+    // Check escape key
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+
+    // Check movement keys
+    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+        camera.move(FORWARD);
+	player.throttleUp();
+    }
+    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+        camera.move(BACK);
+	player.throttleDown();
+    }
+    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        camera.move(LEFT);
+    }
+    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+        camera.move(RIGHT);
+    }
+    if (key == GLFW_MOD_SHIFT && action == GLFW_PRESS) {
+        camera.move(DOWN);
+    }
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+        camera.move(UP);
+    }
 }
 
 static void error_callback(int error, const char* description) {
-	fputs(description, stderr);
+    fputs(description, stderr);
+}
+
+static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
+    static double last_xpos = xpos;
+    static double last_ypos = ypos;
+
+    player.pitch(float(ypos - last_ypos));
+    player.turn(float(xpos - last_xpos));
+
+    last_xpos = xpos;
+    last_ypos = ypos;
 }
 
 /* model transforms */
@@ -195,9 +234,6 @@ void initSky() {
 }
 
 void initGround() {
-    //glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
-    //glEnable(GL_DEPTH_TEST);
-
     Terrain terrain = Terrain("../Assets/heightmap/Tamriel.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
@@ -289,11 +325,11 @@ bool installShaders(const string &vShaderName, const string &fShaderName) {
     h_uMatSpec = glGetUniformLocation(prog, "UsColor");
     h_uMatShine = glGetUniformLocation(prog, "Ushine");
 
-	// Shader vars for billboard
-	CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
-	CameraUp_worldspace_ID  = glGetUniformLocation(prog, "CameraUp_worldspace");
-	BillboardPosID = glGetUniformLocation(prog, "BillboardPos");
-	BillboardSizeID = glGetUniformLocation(prog, "BillboardSize");
+    // Shader vars for billboard
+    CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
+    CameraUp_worldspace_ID  = glGetUniformLocation(prog, "CameraUp_worldspace");
+    BillboardPosID = glGetUniformLocation(prog, "BillboardPos");
+    BillboardSizeID = glGetUniformLocation(prog, "BillboardSize");
     
     assert(glGetError() == GL_NO_ERROR);
     return true;
@@ -334,7 +370,11 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     glUniform1i(renderObj, 0);
 
     SetMaterial(entity->getMaterial());
-    SetModel(entity->getPosition(), entity->getOrientation(), entity->getScale());
+    glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
+    glm::mat4 Orient = entity->getRotationM();
+    glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
+    glm::mat4 com = Trans*Orient*Sc;
+    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
 
     glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
     
@@ -386,7 +426,7 @@ void drawSky() {
 }
 
 void drawGround() {
-	glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glUseProgram(prog);
     
     glEnableVertexAttribArray(aPos);
@@ -401,7 +441,7 @@ void drawGround() {
     
     glUniform1i(renderObj, 0);
     SetMaterial(Materials::wood);
-    SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
+    SetModel(glm::vec3(0), glm::vec3(0,0,0), vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
     
     GLSL::disableVertexAttribArray(aPos);
@@ -423,11 +463,11 @@ int main(int argc, char **argv) {
 
     glfwSetErrorCallback(error_callback);
 
-	int i;
-	for (i = 0; i < 100; i++) {
-		xtrans[i] = randNum();
-		ztrans[i] = randNum();
-	}    
+    int i;
+    for (i = 0; i < 100; i++) {
+        xtrans[i] = randNum();
+        ztrans[i] = randNum();
+    }    
 
     // Initialise GLFW
     if(!glfwInit()) {
@@ -442,8 +482,9 @@ int main(int argc, char **argv) {
     
     g_width = 640;
     g_height = 480;
+
     // Open a window and create its OpenGL context
-    window = glfwCreateWindow(g_width, g_height, "DTZW Code Base", NULL, NULL);
+    window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
     if( window == NULL ){
         glfwTerminate();
 	exit(EXIT_FAILURE);
@@ -451,19 +492,22 @@ int main(int argc, char **argv) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
+    // Set key and cursor callbacks
     glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
     
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    
+
+    // Load 3D models
     loadShapes("../Assets/models/sphere.obj", obj[0]);
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
     loadShapes("../Assets/models/Plane1.obj", obj[3]);
     loadShapes("../Assets/models/skydome.obj", skydome);
-    
     std::cout << " loaded the objects " << endl;
+
     // Initialize GLEW
     glewExperimental = GL_TRUE;
     if ( glewInit() != GLEW_OK ) {
@@ -471,9 +515,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    GLSL::printError(__FILE__,__LINE__);
-
-    /* get version info */
+    // Print opengl version & GPU info
     renderer = glGetString (GL_RENDERER);
     version = glGetString (GL_VERSION);
     printf ("Renderer: %s\n", renderer);
@@ -488,28 +530,42 @@ int main(int argc, char **argv) {
     initGround();
     initSky();
     
-    // Set up characters
-    vector<Entity> characters;
+    // Initialize player
+    player.setObject(&obj[3]);
+    player.setPosition(camera.getPosition());
+    player.setScale(glm::vec3(0.2,0.2,0.2));
+    player.setMaterial(Materials::emerald);
+    int pIndices = initVBO(&player, PLANE);
+
+    // Initialize camera
+    camera.setMode(TPC);
+    camera.setPosition(glm::vec3(0,0,-10));
+    camera.setClipping(0.1, 1500);
+    camera.setFOV(90);
+    camera.setPlayer(&player);
+
+    // Initialize opponents
+    int odx = 0;
+    while (odx < 5) {
+        Entity opp = Entity();
+	opp.setObject(&obj[3]);
+	opp.setPosition(player.getPosition() + odx * 5.f);
+	opp.setScale(glm::vec3(0.2,0.2,0.2));
+	opponents.push_back(opp);
+	odx++;
+    }
 
     float start = glfwGetTime();
     float elapsed = 0;
     float last = -1;
 
-    Camera camera((float)glfwGetTime(), g_width, g_height);
-
-    // Set up player
-    Object * plObj = &obj[3];
-    glm::vec3 plPos = camera.getPosition();
-    glm::vec3 plSca = glm::vec3(0.2,0.2,0.2);
-    Entity player = Entity(plObj, plPos, plSca, Materials::obsidian);
-    int pIndices = initVBO(&player, PLANE);
-
+    // Frame loop
     while (!glfwWindowShouldClose(window)) {
-	    float ratio;
-	    int width, height;
+        float ratio;
+        int width, height;
 
-	    glfwGetFramebufferSize(window, &width, &height);
-	    glViewport(0, 0, width, height);
+        //glfwGetFramebufferSize(window, &width, &height);
+        //glViewport(0, 0, width, height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -523,64 +579,25 @@ int main(int argc, char **argv) {
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
-	// Create new characters if necessary
-        if (int(elapsed) != int(last) && int(elapsed) % 5 == 0) {
-		Object * object = &obj[3];
-		glm::vec3 position = glm::vec3(rand() % 10 - 5, 0.3f, rand() % 10 - 5);
-		glm::vec3 scale = glm::vec3(0.3f,0.3f,0.3f);
-		Material material = Materials::emerald;
+        initBillboard();
+        drawBillboard(&camera);
 
-            glm::vec3 cVel = glm::vec3((rand() % 2 * 2 - 1) * 0.02f, 0.0f, (rand() % 2 * 2 - 1) * 0.02f);
-            
-            Entity c(object, position, scale, material);
-	    c.setVelocity(cVel);
-            characters.push_back(c);
-
-            numObj++;
-        }
-        
-	// Draw character
-		initBillboard();
-		drawBillboard(&camera);
-        for (auto &character : characters) {
-            drawVBO(&character, pIndices, PLANE);
-            character.update(glfwGetTime() - last);
-
-            if (character.getPosition().x < -10 || character.getPosition().z < -10 ||
-                character.getPosition().x > 10 || character.getPosition().z > 10)
-                character.setVelocity(glm::vec3(0) - character.getVelocity());
-
-            uint32_t flags = character.getFlags();
-            if (sampler->sample(camera.getPosition(), &character) == Collision::status::COLLISION && !(flags & C_FLAG)) {
-                numObj--;
-            }
-            
-            for (auto &character2 : characters) {
-                if (&character != &character2)
-                    sampler->sampleEntitys(&character, &character2);
-            }
-        }
-
-	// Draw player
-	//player.setPosition(glm::vec3(glm::inverse(view) * glm::vec4(0.0, 0.05, -1.0, 1.0)));
-	//player.setVelocity(glm::vec3(0,0,10));
-	player.setMaterial(Materials::emerald);
-	player.update(glfwGetTime() - last);
+	// Update & draw player
+	player.update();
 	drawVBO(&player, pIndices, PLANE);
+
+	// Update & draw opponents
+        for (auto &opponent : opponents) {
+            opponent.update();
+            drawVBO(&opponent, pIndices, PLANE);
+        }
         
-	// Draw terrain
+	// Draw environment
  	drawGround();
 	drawSky();
         
-	// Build keys array and update camera
-	bool keys[128];
-	keys['W'] = glfwGetKey(window, 'W') == GLFW_PRESS;
-	keys['A'] = glfwGetKey(window, 'A') == GLFW_PRESS;
-	keys['S'] = glfwGetKey(window, 'S') == GLFW_PRESS;
-	keys['D'] = glfwGetKey(window, 'D') == GLFW_PRESS;
-	double cx, cy;
-	glfwGetCursorPos(window, &cx, &cy);
-	camera.update(glfwGetTime(), &player, keys, cx, cy);
+	// Update camera
+	camera.update();
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

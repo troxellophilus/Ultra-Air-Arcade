@@ -72,7 +72,7 @@ bool Collision::detectCollision(vec3 player, vec3 object) {
 
 int Collision::sample(vec3 player, Entity* obj) {
     if (detectCollision(player, obj->getPosition())) {
-	    uint8_t flags = obj->getFlags();
+	    uint8_t flags = obj->getFlag();
         if (!cflag && !(flags & C_FLAG)) {
             cflag = true;
             obj->setFlag(C_FLAG);
@@ -89,7 +89,7 @@ int Collision::sample(vec3 player, Entity* obj) {
 
 int Collision::sampleEntitys(Entity* obj1, Entity* obj2) {
     if (detectCollision(obj1->getPosition(), obj2->getPosition())) {
-	    uint8_t flags = obj2->getFlags();
+	    uint8_t flags = obj2->getFlag();
         if (!bflag && !(flags & B_FLAG)) {
             bflag = true;
             obj2->setFlag(B_FLAG);

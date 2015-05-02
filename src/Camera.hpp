@@ -9,133 +9,113 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include "Entity.hpp"
 
 #define PI 3.14159265
 
-#define FLAG_RESET_CAM 0x01
+enum CameraMode { TPC, FREE };
+enum CameraFlag { CAM_FLAG };
 
-// Default values for Camera (uses these if not set to anything else)
-#define FOVY           75.0
-#define ZNEAR           0.1
-#define ZFAR        10000.0
-#ifdef __APPLE__
-#define SCROLL_SPEED    0.001
-#else
-#define SCROLL_SPEED	0.1
-#endif
-#define CAM_SPEED      30.0
+enum CameraDirection { FORWARD, BACK, LEFT, RIGHT, UP, DOWN };
 
 class Camera {
 private:
-	// Time
-	float lst; // Last time
-	float cur; // Current time
-
-	// Cursor
-	float cpx; // Cursor position x
-	float cpy; // Cursor position y
+	// Mode
+	CameraMode mode; // mode of the camera
 
 	// Window
-	float wdt; // Width of the window
-	float hgt; // Height of the window
+	float window_width; // Width of the window
+	float window_height; // Height of the window
+	float viewport_x;
+	float viewport_y;
+	float aspect;
 
 	// Perspective
-	float fov; // Field of view y
-	float asp; // Aspect ratio
-	float znr; // Z Near
-	float zfr; // Z Far
+	float field_of_view; // Field of view y
+	float aspect_ratio; // Aspect ratio
+	float z_near; // Z Near
+	float z_far; // Z Far
 
 	// View
-	glm::vec2 rot; // Mouse rotations tracker
-	float rfa; // rfactor
-	float tfa; // tfactor
-	glm::vec3 eye; // Position of the camera
+	glm::quat rotation; // Rotation of the camera as a glm::quaternion
+	glm::vec3 position; // Position of the camera
+
+	// Player
+	Entity *player;
 	
 	// Flags
-	uint8_t flg = 0x0;
+	CameraFlag flag;
 
 public:
 	// Constructors
-	Camera(float start, float width, float height);
+	Camera();
 
 	// Getters
 	glm::mat4 getProjectionMatrix();
 	glm::mat4 getViewMatrix();
 	glm::vec3 getPosition();
-	uint8_t getFlags();
+	CameraFlag getFlag();
 	
 	// Setters
-	void setFovy(float fovy);
-	void setNearZ(float zNear);
-	void setFarZ(float zFar);
+	void setFOV(float fov);
+	void setClipping(float zNear, float zFar);
 	void setPosition(glm::vec3 position);
-	void setUpAngle(glm::vec3 upAngle);
+	void setPlayer(Entity *player);
+	void setMode(CameraMode m);
 	
 	// Methods
-	void update(float time, Entity *player, bool *keys, float cursorX, float cursorY);
+	void update();
+	void move(CameraDirection dir);
 };
 
 // Constructors
+Camera::Camera() {
+	// Initialize camera mode
+	mode = TPC;
 
-Camera::Camera(float start, float width, float height) {
-	wdt = width;
-	hgt = height;
-	cpx = 0;
-	cpy = 0;
-	rot = glm::vec2(0.,-PI);
-	fov = FOVY;
-	asp = width / height;
-	znr = ZNEAR;
-	zfr = ZFAR;
-	rfa = SCROLL_SPEED;
-	tfa = CAM_SPEED;
-	eye = glm::vec3(0.f, 0.4f, 0.f);
-	lst = start;
+	// Initialize viewport
+	window_width = 640;
+	window_height = 480;
+	viewport_x = 0;
+	viewport_y = 0;
+
+	// Initialize perspective
+	field_of_view = 90;
+	aspect = window_width / window_height;
+	z_near = 0.1;
+	z_far = 1500;
+
+	// Initialize camera transforms
+	position = glm::vec3(0, 0, 1);
+	rotation = glm::quat(1, 0, 0, 0);
+
+	flag = CAM_FLAG;
 }
 
 // Methods
 
-void Camera::update(float time, Entity *player, bool *keys, float cursorX, float cursorY) {
-	cur = time;
-	float tDif = cur - lst;
+void Camera::update() {
+	if (mode == TPC)
+		position = player->getPosition();
 
-	glm::vec2 dv = glm::vec2(cursorX - cpx, cursorY - cpy);
+	rotation = player->getRotationQ();
+}
 
-	rot -= rfa * dv;
-
-	glm::mat4 R = glm::rotate(rot.x, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(rot.y, glm::vec3(1.0f,0.0f,0.0f));
-	glm::vec3 RZ = glm::vec3(R[2][0], R[2][1], R[2][2]); // rotation vec3 pointing down z axis
-	glm::vec3 RX = glm::vec3(R[0][0], R[0][1], R[0][2]); // rotation vec3 pointing down x axis
-
-	player->setPitchYawTarget(RZ);
-
-	if (keys['W'])
-		player->accelerate();
-	if (keys['S'])
-		player->decelerate();
-	if (keys['D'])
-		player->rollRight();
-	if (keys['A'])
-		player->rollLeft();
-
-	eye = player->getPosition();
-
-	lst = cur;
-
-	cpx = cursorX;
-	cpy = cursorY;
+void Camera::move(CameraDirection dir) {
+	// TODO
 }
 
 // Getters
 
 glm::mat4 Camera::getProjectionMatrix() {
-	return glm::perspective(fov, asp, znr, zfr);
+	return glm::perspective(field_of_view, aspect, z_near, z_far);
 }
 
 glm::mat4 Camera::getViewMatrix() {
-	glm::mat4 T = glm::translate(eye);
-	glm::mat4 R = glm::rotate(rot.x, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(rot.y, glm::vec3(1.0f,0.0f,0.0f));
+	glm::mat4 T = glm::translate(position);
+	glm::mat4 R = glm::toMat4(rotation);
 	glm::mat4 TP = glm::translate(glm::vec3(0, 0, 1));
 	
 	glm::mat4 C = T * R * TP;
@@ -144,29 +124,34 @@ glm::mat4 Camera::getViewMatrix() {
 }
 
 glm::vec3 Camera::getPosition() {
-	return glm::vec3(eye);
+	return glm::vec3(position);
 }
 
-uint8_t Camera::getFlags() {
-	return flg;
+CameraFlag Camera::getFlag() {
+	return flag;
 }
 
 // Setters
 
-void Camera::setFovy(float fovy) {
-	fov = fovy;
+void Camera::setFOV(float fov) {
+	field_of_view = fov;
 }
 
-void Camera::setNearZ(float zNear) {
-	znr = zNear;
+void Camera::setClipping(float zNear, float zFar) {
+	z_near = zNear;
+	z_far = zFar;
 }
 
-void Camera::setFarZ(float zFar) {
-	zfr = zFar;
+void Camera::setPosition(glm::vec3 pos) {
+	position = glm::vec3(pos);
 }
 
-void Camera::setPosition(glm::vec3 position) {
-	eye = glm::vec3(position);
+void Camera::setPlayer(Entity *entity) {
+	player = entity;
+}
+
+void Camera::setMode(CameraMode m) {
+	mode = m;
 }
 
 #endif
