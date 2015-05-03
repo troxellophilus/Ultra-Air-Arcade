@@ -57,6 +57,7 @@ public:
 	glm::mat4 getViewMatrix();
 	glm::vec3 getPosition();
 	CameraFlag getFlag();
+	CameraMode getMode();
 	
 	// Setters
 	void setFOV(float fov);
@@ -85,10 +86,10 @@ Camera::Camera() {
 	field_of_view = 90;
 	aspect = window_width / window_height;
 	z_near = 0.1;
-	z_far = 1500;
+	z_far = 10000;
 
 	// Initialize camera transforms
-	position = glm::vec3(0, 0, 1);
+	position = glm::vec3(0, 0, 0);
 	rotation = glm::quat(1, 0, 0, 0);
 
 	flag = CAM_FLAG;
@@ -97,14 +98,40 @@ Camera::Camera() {
 // Methods
 
 void Camera::update() {
-	if (mode == TPC)
+	if (mode == TPC) {
 		position = player->getPosition();
-
-	rotation = player->getRotationQ();
+		rotation = player->getRotationQ();
+	}
 }
 
 void Camera::move(CameraDirection dir) {
-	// TODO
+	glm::mat4 RM = glm::toMat4(rotation);
+	glm::vec3 RZ = glm::vec3(RM[2][0], RM[2][1], RM[2][2]);
+	glm::vec3 RX = glm::vec3(RM[0][0], RM[0][1], RM[0][2]);
+	glm::vec3 RY = glm::vec3(RM[1][0], RM[1][1], RM[1][2]);
+
+	if (mode == FREE) {
+		switch (dir) {
+			case FORWARD:
+				position -= RZ / 5.f;
+				break;
+			case BACK:
+				position += RZ / 5.f;
+				break;
+			case LEFT:
+				position -= RX / 5.f;
+				break;
+			case RIGHT:
+				position += RX / 5.f;
+				break;
+			case UP:
+				position -= RY / 5.f;
+				break;
+			case DOWN:
+				position += RY / 5.f;
+				break;
+		}
+	}
 }
 
 // Getters
@@ -116,7 +143,7 @@ glm::mat4 Camera::getProjectionMatrix() {
 glm::mat4 Camera::getViewMatrix() {
 	glm::mat4 T = glm::translate(position);
 	glm::mat4 R = glm::toMat4(rotation);
-	glm::mat4 TP = glm::translate(glm::vec3(0, 0, 1));
+	glm::mat4 TP = glm::translate(glm::vec3(0, 0.2, 0.3));
 	
 	glm::mat4 C = T * R * TP;
 
@@ -129,6 +156,10 @@ glm::vec3 Camera::getPosition() {
 
 CameraFlag Camera::getFlag() {
 	return flag;
+}
+
+CameraMode Camera::getMode() {
+	return mode;
 }
 
 // Setters

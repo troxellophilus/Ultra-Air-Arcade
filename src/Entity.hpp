@@ -68,12 +68,11 @@ public:
 
     void pitch(float dy);
     void turn(float dx);
+    void rollRight();
+    void rollLeft();
 
     void throttleUp();
     void throttleDown();
-
-    void turnLeft();
-    void turnRight();
 
     void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
 };
@@ -100,12 +99,12 @@ void Entity::update() {
 
 void Entity::throttleUp() {
 	// TODO: Improve
-	velocity.z += 0.01;
+	velocity.z -= 0.01;
 }
 
 void Entity::throttleDown() {
 	// TODO: Improve
-	velocity.z -= 0.01;
+	velocity.z += 0.01;
 }
 
 void Entity::pitch(float dy) {
@@ -116,13 +115,31 @@ void Entity::pitch(float dy) {
 	rotation *= rot;
 }
 
+void Entity::rollRight() {
+	// build roll quat
+	glm::quat rol = glm::angleAxis(-0.1f, glm::vec3(0, 0, 1));
+
+	// Apply roll change
+	rotation *= rol;
+}
+
+void Entity::rollLeft() {
+	// build roll quat
+	glm::quat rol = glm::angleAxis(0.1f, glm::vec3(0, 0, 1));
+
+	// Apply roll change
+	rotation *= rol;
+}
+
 void Entity::turn(float dx) {
-	// TODO: mix a roll into this as well
 	// Build dx yaw rotation glm::quat around y axis
-	glm::quat rot = glm::angleAxis(dx / 360.f, glm::vec3(0, 1, 0));
+	glm::quat rot = glm::angleAxis(-dx / 360.f, glm::vec3(0, 1, 0));
+
+	// Build dx roll rotation glm::quat around z axis
+	glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
 
 	// Apply yaw change to the current rotation.
-	rotation *= rot;
+	rotation *= glm::mix(rot, rol, 0.3f);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {

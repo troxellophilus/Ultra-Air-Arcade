@@ -89,25 +89,35 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GL_TRUE);
 
     // Check movement keys
-    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-        camera.move(FORWARD);
-	player.throttleUp();
-    }
-    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-        camera.move(BACK);
-	player.throttleDown();
-    }
-    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-        camera.move(LEFT);
-    }
-    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-        camera.move(RIGHT);
-    }
-    if (key == GLFW_MOD_SHIFT && action == GLFW_PRESS) {
-        camera.move(DOWN);
-    }
-    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-        camera.move(UP);
+    if (action == GLFW_REPEAT || action == GLFW_PRESS) {
+        if (key == GLFW_KEY_W) {
+            camera.move(FORWARD);
+	    player.throttleUp();
+        }
+        if (key == GLFW_KEY_S) {
+            camera.move(BACK);
+	    player.throttleDown();
+        }
+        if (key == GLFW_KEY_A) {
+            camera.move(LEFT);
+	    player.rollLeft();
+        }
+        if (key == GLFW_KEY_D) {
+            camera.move(RIGHT);
+	    player.rollRight();
+        }
+        if (mods == GLFW_MOD_SHIFT) {
+            camera.move(DOWN);
+        }
+        if (key == GLFW_KEY_SPACE) {
+            camera.move(UP);
+    	}
+	if (key == GLFW_KEY_M) {
+            if (camera.getMode() == TPC)
+	        camera.setMode(FREE);
+	    else
+	        camera.setMode(TPC);
+	}
     }
 }
 
@@ -234,7 +244,7 @@ void initSky() {
 }
 
 void initGround() {
-    Terrain terrain = Terrain("../Assets/heightmap/Tamriel.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    Terrain terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -441,7 +451,7 @@ void drawGround() {
     
     glUniform1i(renderObj, 0);
     SetMaterial(Materials::wood);
-    SetModel(glm::vec3(0), glm::vec3(0,0,0), vec3(1));
+    SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
     
     GLSL::disableVertexAttribArray(aPos);
@@ -527,8 +537,8 @@ int main(int argc, char **argv) {
 
     installShaders("shd/vert.glsl", "shd/frag.glsl");
     
-    initGround();
     initSky();
+    initGround();
     
     // Initialize player
     player.setObject(&obj[3]);
