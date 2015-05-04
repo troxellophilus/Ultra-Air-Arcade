@@ -29,6 +29,7 @@ private:
     glm::vec3  position;      // translation transform for current position
     glm::vec3  direction;     // Direction vector of the entity
     glm::quat  rotation;      // Quaternion rotation of entity
+    glm::quat  target_rotation; // Quaternion target rotation of entity
     glm::vec3  scale;         // scale
 
     glm::vec3  velocity;      // x, y, z velocity of the entity u/s
@@ -86,6 +87,7 @@ Entity::Entity() {
     position = glm::vec3(0, 0, 0);
     scale = glm::vec3(1, 1, 1);
     rotation = glm::quat(1, 0, 0, 0);
+    target_rotation = glm::quat(1, 0, 0, 0);
 
     velocity = glm::vec3(0, 0, 0);
     acceleration = glm::vec3(0, 0, 0.01);
@@ -94,11 +96,18 @@ Entity::Entity() {
 }
 
 void Entity::update() {
-	// TODO: Make movement velocity & acceleration based
+	// Obtain the angle between the two quats, use this for proportional control of craft
+	float dot = glm::dot(glm::normalize(rotation), glm::normalize(target_rotation));
+	dot = glm::abs(dot) > 30.f ? 30.f : glm::abs(dot);
+
+	// Control loop the rotation to the desired rotation
+	rotation = glm::mix(rotation, target_rotation, dot / 30.f);
+
 	// Update the position by moving velocity in direction
 	position += rotation * velocity;
 }
 
+// TODO: Improve throttle up and down, make controlled & adjust according to pitch
 void Entity::throttleUp() {
 	velocity.z -= 0.1;
 }
@@ -108,6 +117,7 @@ void Entity::throttleDown() {
 }
 
 void Entity::pitch(float dy) {
+	// Limit the pitch angle
 	dy = dy > 50.f ? 50.f : dy;
 	dy = dy < -50.f ? -50.f : dy;
 
@@ -115,7 +125,7 @@ void Entity::pitch(float dy) {
 	glm::quat rot = glm::angleAxis(dy / 360.f, glm::vec3(1, 0, 0));
 
 	// Apply pitch change to the current rotation.
-	rotation *= rot;
+	target_rotation *= rot;
 }
 
 void Entity::rollRight() {
@@ -123,7 +133,7 @@ void Entity::rollRight() {
 	glm::quat rol = glm::angleAxis(-0.1f, glm::vec3(0, 0, 1));
 
 	// Apply roll change
-	rotation *= rol;
+	target_rotation *= rol;
 }
 
 void Entity::rollLeft() {
@@ -131,10 +141,11 @@ void Entity::rollLeft() {
 	glm::quat rol = glm::angleAxis(0.1f, glm::vec3(0, 0, 1));
 
 	// Apply roll change
-	rotation *= rol;
+	target_rotation *= rol;
 }
 
 void Entity::turn(float dx) {
+	// Limit the turn angle
 	dx = dx > 50.f ? 50.f : dx;
 	dx = dx < -50.f ? -50.f : dx;
 
@@ -145,7 +156,7 @@ void Entity::turn(float dx) {
 	glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
 
 	// Apply yaw change to the current rotation.
-	rotation *= glm::mix(rot, rol, 0.8f);
+	target_rotation *= glm::mix(rot, rol, 0.8f);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {

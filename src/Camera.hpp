@@ -7,10 +7,13 @@
 #define CAMERA_H
 
 #include <glm/glm.hpp>
+
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+
 #include "Entity.hpp"
 
 #define PI 3.14159265
@@ -69,6 +72,8 @@ public:
 	// Methods
 	void update();
 	void move(CameraDirection dir);
+	void pitch(float dy);
+	void yaw(float dx);
 };
 
 // Constructors
@@ -131,6 +136,26 @@ void Camera::move(CameraDirection dir) {
 				position += RY / 5.f;
 				break;
 		}
+	}
+}
+
+void Camera::pitch(float dy) {
+	if (mode == FREE) {
+		// Build dy pitch rotation quat around x axis
+		glm::quat rot = glm::angleAxis(dy / 360.f, glm::vec3(1, 0, 0));
+
+		// Apply pitch change to the current rotation
+		rotation *= rot;
+	}
+}
+
+void Camera::yaw(float dx) {
+	if (mode == FREE) {
+		// Build dx yaw rotation quat around y axis
+		glm::quat rot = glm::angleAxis(dx / 360.f, glm::vec3(0, 1, 0));
+
+		// Apply yaw change to the current rotation
+		rotation *= rot;
 	}
 }
 

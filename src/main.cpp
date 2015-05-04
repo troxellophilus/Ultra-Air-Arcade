@@ -30,7 +30,7 @@
 //#define _DEBUG
 
 using namespace std;
-using namespace glm;
+//using namespace glm;
 
 enum { TERRAIN, SKY, PLANE, NUM_VBO };
 
@@ -130,7 +130,10 @@ static void cursor_position_callback(GLFWwindow *window, double xpos, double ypo
     static double last_ypos = ypos;
 
     player.pitch(float(ypos - last_ypos));
+    camera.pitch(float(ypos - last_ypos));
+
     player.turn(float(xpos - last_xpos));
+    camera.yaw(float(xpos - last_xpos));
 
     last_xpos = xpos;
     last_ypos = ypos;
