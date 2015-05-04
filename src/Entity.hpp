@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 
+#include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -86,7 +88,7 @@ Entity::Entity() {
     rotation = glm::quat(1, 0, 0, 0);
 
     velocity = glm::vec3(0, 0, 0);
-    acceleration = glm::vec3(0, 0, 0);
+    acceleration = glm::vec3(0, 0, 0.01);
 
     flag = C_FLAG;
 }
@@ -98,16 +100,17 @@ void Entity::update() {
 }
 
 void Entity::throttleUp() {
-	// TODO: Improve
-	velocity.z -= 0.01;
+	velocity.z -= 0.1;
 }
 
 void Entity::throttleDown() {
-	// TODO: Improve
-	velocity.z += 0.01;
+	velocity.z += 0.1;
 }
 
 void Entity::pitch(float dy) {
+	dy = dy > 50.f ? 50.f : dy;
+	dy = dy < -50.f ? -50.f : dy;
+
 	// Build dy pitch rotation glm::quat around x axis
 	glm::quat rot = glm::angleAxis(dy / 360.f, glm::vec3(1, 0, 0));
 
@@ -132,6 +135,9 @@ void Entity::rollLeft() {
 }
 
 void Entity::turn(float dx) {
+	dx = dx > 50.f ? 50.f : dx;
+	dx = dx < -50.f ? -50.f : dx;
+
 	// Build dx yaw rotation glm::quat around y axis
 	glm::quat rot = glm::angleAxis(-dx / 360.f, glm::vec3(0, 1, 0));
 
@@ -139,7 +145,7 @@ void Entity::turn(float dx) {
 	glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
 
 	// Apply yaw change to the current rotation.
-	rotation *= glm::mix(rot, rol, 0.3f);
+	rotation *= glm::mix(rot, rol, 0.8f);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {
