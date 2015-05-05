@@ -103,19 +103,28 @@ Camera::Camera() {
 // Methods
 
 void Camera::update() {
+	static glm::quat last = player->getRotationQ();
+	float mixFact = 1;
+
 	if (mode == TPC) {
 		position = player->getPosition();
-		rotation = player->getRotationQ();
+
+		if (player->getRotationQ() != last)
+			mixFact = 0.3f;
+
+		rotation = glm::mix(rotation, player->getRotationQ(), mixFact);
+
+		last = player->getRotationQ();
 	}
 }
 
 void Camera::move(CameraDirection dir) {
-	glm::mat4 RM = glm::toMat4(rotation);
-	glm::vec3 RZ = glm::vec3(RM[2][0], RM[2][1], RM[2][2]);
-	glm::vec3 RX = glm::vec3(RM[0][0], RM[0][1], RM[0][2]);
-	glm::vec3 RY = glm::vec3(RM[1][0], RM[1][1], RM[1][2]);
-
 	if (mode == FREE) {
+		glm::mat4 RM = glm::toMat4(rotation);
+		glm::vec3 RZ = glm::vec3(RM[2][0], RM[2][1], RM[2][2]);
+		glm::vec3 RX = glm::vec3(RM[0][0], RM[0][1], RM[0][2]);
+		glm::vec3 RY = glm::vec3(RM[1][0], RM[1][1], RM[1][2]);
+
 		switch (dir) {
 			case FORWARD:
 				position -= RZ / 5.f;
