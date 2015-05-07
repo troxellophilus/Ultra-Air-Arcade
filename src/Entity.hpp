@@ -17,41 +17,53 @@
 #include "Materials.hpp"
 #include "types.h"
 
+#define GAME_SCALE 0.01
+
 enum EntityFlag { C_FLAG, U_FLAG, B_FLAG };
 
 using namespace std;
 
 class Entity {
 private:
-    Object     *object;  // obj vertices
-    Material   material; // Material of the entity
+    // Object shape & color properties
+    Object    *object;  // obj vertices
+    Material  material; // Material of the entity
+    glm::vec3 scale;    // scale of the object model
+    
+    // Position & orientation properties
+    glm::vec3 position;        // translation transform for current position
+    glm::vec3 direction;       // Direction vector of the entity
+    glm::quat rotation;        // Quaternion rotation of entity
+    glm::quat target_rotation; // Quaternion target rotation of entity
 
-    glm::vec3  position;      // translation transform for current position
-    glm::vec3  direction;     // Direction vector of the entity
-    glm::quat  rotation;      // Quaternion rotation of entity
-    glm::quat  target_rotation; // Quaternion target rotation of entity
-    glm::vec3  scale;         // scale
+    // Physical properties
+    float     mass;  // mass of the plane
+    glm::vec3 force; // Force in Z direction correlated to thrust
+    float     drag;  // drag coefficient
+    float     carea; // cross sectional area
 
-    glm::vec3  velocity;      // x, y, z velocity of the entity u/s
-    glm::vec3  acceleration;  // x, y, z acceleration of the entity u/s^2
+    // Movement properties
+    float     thrust;   // thrust of the plane
+    glm::vec3 velocity; // x, y, z velocity of the entity u/s
 
-    EntityFlag flag;     // Entity flags, use as needed
+    // Flags if necessary
+    EntityFlag flag; // Entity flags, use as needed
     
 public:
     // Constructor
     Entity();
 
     // Getters
-    Object *   getObject();
-    Material   getMaterial();
+    Object * getObject();
+    Material getMaterial();
 
-    glm::vec3  getPosition();
-    glm::vec3  getScale();
-    glm::mat4  getRotationM();
-    glm::quat  getRotationQ();
+    glm::vec3 getPosition();
+    glm::vec3 getScale();
+    glm::mat4 getRotationM();
+    glm::quat getRotationQ();
 
-    glm::vec3  getVelocity();
-    glm::vec3  getAcceleration();
+    glm::vec3 getVelocity();
+    float getThrust();
 
     EntityFlag getFlag();
 
@@ -63,6 +75,7 @@ public:
     void setScale(glm::vec3);
 
     void setVelocity(glm::vec3);
+    void setThrust(float a);
 
     void setFlag(EntityFlag new_flag);
 
@@ -85,35 +98,50 @@ Entity::Entity() {
     material = Material::Material();
 
     position = glm::vec3(0, 0, 0);
-    scale = glm::vec3(1, 1, 1);
     rotation = glm::quat(1, 0, 0, 0);
     target_rotation = glm::quat(1, 0, 0, 0);
 
+    scale = glm::vec3(1, 1, 1);
+    mass = 2000.0f;
+    force = glm::vec3(0, 0, 0);
+    drag = 0.47f; // sphere for now
+    carea = 20.f;
+
+    thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
-    acceleration = glm::vec3(0, 0, 0.01);
 
     flag = C_FLAG;
 }
 
 void Entity::update() {
+	float dt = 1 / 60.f; // fixed time step
+	float dot;
+	glm::vec3 vn;
+	glm::vec3 fd;
+
 	// Obtain the angle between the two quats, use this for proportional control of craft
-	float dot = glm::dot(glm::normalize(rotation), glm::normalize(target_rotation));
+       	dot = glm::dot(glm::normalize(rotation), glm::normalize(target_rotation));
 	dot = glm::abs(dot) > 30.f ? 30.f : glm::abs(dot);
 
 	// Control loop the rotation to the desired rotation
 	rotation = glm::mix(rotation, target_rotation, dot / 30.f);
 
 	// Update the position by moving velocity in direction
-	position += rotation * velocity;
+	position += (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0, 0);
+	vn = glm::vec3(0, 0, 1);
+	fd = -0.5f * glm::vec3(0, 0, -1) * 1.293f * drag * carea * velocity * velocity;
+	force = thrust * vn * mass;
+	velocity += (force + fd) * (1.f / mass) * dt;
 }
 
-// TODO: Improve throttle up and down, make controlled & adjust according to pitch
 void Entity::throttleUp() {
-	velocity.z -= 0.1;
+	// limit the maximum thrust
+	thrust -= thrust > -5.f ? 0.1f : 0.f;
 }
 
 void Entity::throttleDown() {
-	velocity.z += 0.1;
+	// limit the minimum thrust
+	thrust += thrust < 0 ? 0.1f : 0.f;
 }
 
 void Entity::pitch(float dy) {
@@ -130,7 +158,7 @@ void Entity::pitch(float dy) {
 
 void Entity::rollRight() {
 	// build roll quat
-	glm::quat rol = glm::angleAxis(-0.1f, glm::vec3(0, 0, 1));
+	glm::quat rol = glm::angleAxis(-0.2f, glm::vec3(0, 0, 1));
 
 	// Apply roll change
 	target_rotation *= rol;
@@ -138,7 +166,7 @@ void Entity::rollRight() {
 
 void Entity::rollLeft() {
 	// build roll quat
-	glm::quat rol = glm::angleAxis(0.1f, glm::vec3(0, 0, 1));
+	glm::quat rol = glm::angleAxis(0.2f, glm::vec3(0, 0, 1));
 
 	// Apply roll change
 	target_rotation *= rol;

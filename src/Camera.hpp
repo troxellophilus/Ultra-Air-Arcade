@@ -19,7 +19,6 @@
 #define PI 3.14159265
 
 enum CameraMode { TPC, FREE };
-enum CameraFlag { CAM_FLAG };
 
 enum CameraDirection { FORWARD, BACK, LEFT, RIGHT, UP, DOWN };
 
@@ -47,9 +46,6 @@ private:
 
 	// Player
 	Entity *player;
-	
-	// Flags
-	CameraFlag flag;
 
 public:
 	// Constructors
@@ -59,7 +55,6 @@ public:
 	glm::mat4 getProjectionMatrix();
 	glm::mat4 getViewMatrix();
 	glm::vec3 getPosition();
-	CameraFlag getFlag();
 	CameraMode getMode();
 	
 	// Setters
@@ -96,8 +91,6 @@ Camera::Camera() {
 	// Initialize camera transforms
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::quat(1, 0, 0, 0);
-
-	flag = CAM_FLAG;
 }
 
 // Methods
@@ -110,7 +103,7 @@ void Camera::update() {
 		position = player->getPosition();
 
 		if (player->getRotationQ() != last)
-			mixFact = 0.3f;
+			mixFact = 0.1f;
 
 		rotation = glm::mix(rotation, player->getRotationQ(), mixFact);
 
@@ -125,24 +118,27 @@ void Camera::move(CameraDirection dir) {
 		glm::vec3 RX = glm::vec3(RM[0][0], RM[0][1], RM[0][2]);
 		glm::vec3 RY = glm::vec3(RM[1][0], RM[1][1], RM[1][2]);
 
+		float spd = 1.0f;
+		float dt = 1 / 60.f;
+
 		switch (dir) {
 			case FORWARD:
-				position -= RZ / 5.f;
+				position -= spd * RZ * dt;
 				break;
 			case BACK:
-				position += RZ / 5.f;
+				position += spd * RZ * dt;
 				break;
 			case LEFT:
-				position -= RX / 5.f;
+				position -= spd * RX * dt;
 				break;
 			case RIGHT:
-				position += RX / 5.f;
+				position += spd * RX * dt;
 				break;
 			case UP:
-				position -= RY / 5.f;
+				position -= spd * RY * dt;
 				break;
 			case DOWN:
-				position += RY / 5.f;
+				position += spd * RY * dt;
 				break;
 		}
 	}
@@ -186,10 +182,6 @@ glm::mat4 Camera::getViewMatrix() {
 
 glm::vec3 Camera::getPosition() {
 	return glm::vec3(position);
-}
-
-CameraFlag Camera::getFlag() {
-	return flag;
 }
 
 CameraMode Camera::getMode() {
