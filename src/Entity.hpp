@@ -48,6 +48,10 @@ private:
     
     // Flags if necessary
     EntityFlag flag; // Entity flags, use as needed
+
+    // Bounding sphere radius
+    float radius;
+    float calculateBoundingSphereRadius();
     
 public:
     // Constructor
@@ -66,6 +70,8 @@ public:
     float getThrust();
     
     EntityFlag getFlag();
+
+    float getRadius();
     
     // Setters
     void setObject(Object *);
@@ -111,6 +117,8 @@ Entity::Entity() {
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
+
+    radius = calculateBoundingSphereRadius();
 }
 
 void Entity::update() {
@@ -253,6 +261,16 @@ void Entity::setFlag(EntityFlag f) {
 
 EntityFlag Entity::getFlag() {
     return flag;
+}
+
+float Entity::getRadius() {
+    return radius;
+}
+
+float Entity::calculateBoundingSphereRadius() {
+    return 0.5f;
+
+    // TODO add algorithm for determining bounding sphere radius
 }
 
 #endif

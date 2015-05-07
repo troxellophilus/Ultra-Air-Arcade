@@ -63,7 +63,7 @@ vector<unsigned int> terIndBuf;
 Object obj[NUMSHAPES];
 Object skydome;
 
-Collision *sampler = new Collision();
+Collision collision = Collision();
 
 Camera camera = Camera();
 Entity player = Entity();
@@ -612,10 +612,22 @@ int main(int argc, char **argv) {
     	player.update();
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     	drawVBO(&player, pIndices, PLANE);
+        if (collision.detectTerrainCollision(player, NULL)) {
+            printf("Detected player collision with terrain\n");
+        }
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
 	   // Update & draw opponents
         for (auto &opponent : opponents) {
             opponent.update();
+
+            if (collision.detectEntityCollision(player, opponent)) {
+                printf("Detected collision with enemy.\n");
+            }
+            if (collision.detectTerrainCollision(opponent, NULL)) {
+                printf("Detected opponent collision with terrain\n");
+            }
+
             drawVBO(&opponent, pIndices, PLANE);
             assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         }
