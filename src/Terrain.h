@@ -3,21 +3,19 @@
 #define __476__TERRAIN__
 
 #include <stdio.h>
-#include <Eigen/Dense>
-#include "imageloader.h"
+#include "ext/imageloader.h"
 #include <vector>
 #include <iostream>
 #ifdef __APPLE__
-#include <GLUT/glut.h>
+#include <eigen3/Eigen/Dense>
 #endif
 #ifdef __unix__
-#include <GL/glut.h>
+#include <eigen3/Eigen/Dense>
 #endif
 #ifdef _WIN32
 #define GLFW_INCLUDE_GLCOREARB
 #include <GL/glew.h>
 #include <cstdlib>
-#include <glut.h>
 #include <stdlib.h>
 #include <vector>
 #endif
@@ -37,18 +35,18 @@ class Terrain
 
    public:
       //Determine how large terrain will be. 
-      double *heights;
+      float *heights;
       Eigen::Vector3f *normals;
       
-      Terrain(const char* fileName, double baseHeight, vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
+      Terrain(const char* fileName, float baseHeight, vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
       //Get the width of terrain.
       int getWidth(){return width;}
       //Get the length of the terrain.
       int getLength(){return length;}
       //Set the height of the terrain, may be made private.
-      void setHeight(int w, int l, double h);
+      void setHeight(int w, int l, float h);
       //Load in image and then pass grayscale value to setHeight.
-      void loadTerrain(string *fileName, double baseHeight);
+      void loadTerrain(string *fileName, float baseHeight);
 		void createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
       void loadTextures();
 };
