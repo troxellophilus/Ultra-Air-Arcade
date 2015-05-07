@@ -138,7 +138,7 @@ void Entity::update() {
     rotation = glm::mix(rotation, target_rotation, dot / 30.f);
     
     // Update the position by moving velocity in direction
-    position += (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0, 0);
+    position += (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0.0001f, 0);
     vn = glm::vec3(0, 0, 1);
     fd = -0.5f * glm::vec3(0, 0, -1) * 1.293f * drag * carea * velocity * velocity;
     force = thrust * vn * mass;
