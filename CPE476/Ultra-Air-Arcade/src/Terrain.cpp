@@ -90,9 +90,9 @@ void Terrain::computeNormals(){
 void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf){
    for(int z = 0; z < length; z++){
       for(int x = 0; x < width; x++){
-         posBuf.push_back(x*2);
+         posBuf.push_back(x);
          posBuf.push_back(heights[z * width + x]);
-         posBuf.push_back(z*2);
+         posBuf.push_back(z);
          
          norBuf.push_back(normals[z * width + x](0));
          norBuf.push_back(normals[z * width + x](1));
