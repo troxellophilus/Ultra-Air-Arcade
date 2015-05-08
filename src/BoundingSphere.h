@@ -1,22 +1,54 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <cassert>
-#include <cmath>
-#include <stdio.h>
-#include "GLSL.h"
-#include "glm/glm.hpp"
+#pragma once
+#ifndef __476__TERRAIN__
+#define __476__TERRAIN__
 
-using namespace glm;
+#include <stdio.h>
+#include "ext/imageloader.h"
+#include <vector>
+#include <iostream>
+#ifdef __APPLE__
+#include <Eigen/Dense>
+#endif
+#ifdef __unix__
+#include <Eigen/Dense>
+#endif
+#ifdef _WIN32
+#define GLFW_INCLUDE_GLCOREARB
+#include <GL/glew.h>
+#include <cstdlib>
+#include <stdlib.h>
+#include <vector>
+#endif
+#include <string>
+
 using namespace std;
 
-class BoundingSphere {
-public:
-   vec3 center;
-   vec3 radius;
+class Terrain
+{
+   private:
+      //VARIABLES
+      int length;
+      int width;
+      
+      //Find the normals after calculating heights
+      void computeNormals();
 
-   BoundingSphere();
-   BoundingSphere(vec3 c, vec3 r);
-   virtual ~BoundingSphere();
-   bool testCollision(BoundingSphere a);
+   public:
+      //Determine how large terrain will be. 
+      float *heights;
+      Eigen::Vector3f *normals;
+      Terrain(const char* fileName, float baseHeight, vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
+      //Get the width of terrain.
+      int getWidth(){return width;}
+      //Get the length of the terrain.
+      int getLength(){return length;}
+      //Set the height of the terrain, may be made private.
+      bool detectCollision(Eigen::Vector3f objVector);
+      void setHeight(int w, int l, float h);
+      //Load in image and then pass grayscale value to setHeight.
+      void loadTerrain(string *fileName, float baseHeight);
+		void createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
+      void loadTextures();
 };
+
+#endif
