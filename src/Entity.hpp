@@ -14,6 +14,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+//#include "Miniball.hpp"
 #include "Materials.hpp"
 #include "types.h"
 
@@ -51,7 +52,6 @@ private:
 
     // Bounding sphere radius
     float radius;
-    float calculateBoundingSphereRadius();
     
 public:
     // Constructor
@@ -97,6 +97,8 @@ public:
     void throttleDown();
     
     void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
+
+    void calculateBoundingSphereRadius();
 };
 
 Entity::Entity() {
@@ -118,7 +120,7 @@ Entity::Entity() {
     
     flag = C_FLAG;
 
-    radius = calculateBoundingSphereRadius();
+    radius = 0.f;
 }
 
 void Entity::update() {
@@ -267,10 +269,40 @@ float Entity::getRadius() {
     return radius;
 }
 
-float Entity::calculateBoundingSphereRadius() {
-    return 0.5f;
+void Entity::calculateBoundingSphereRadius() {
+    radius = 0.5f;
 
+    /*
     // TODO add algorithm for determining bounding sphere radius
+    int idx1, idx2, idx3;
+    glm::vec3 v1, v2, v3;
+
+    for (int i = 0; i < object.shapes[0].mesh.indices.size()/3; i++) {
+        idx1 = object.shapes[0].mesh.indices[3*i+0];
+        idx2 = object.shapes[0].mesh.indices[3*i+1];
+        idx3 = object.shapes[0].mesh.indices[3*i+2];
+        v1 = glm::vec3(object.shapes[0].mesh.positions[3*idx1 +0], object.shapes[0].mesh.positions[3*idx1 +1], object.shapes[0].mesh.positions[3*idx1 +2]);
+        v2 = glm::vec3(object.shapes[0].mesh.positions[3*idx2 +0], object.shapes[0].mesh.positions[3*idx2 +1], object.shapes[0].mesh.positions[3*idx2 +2]);
+        v3 = glm::vec3(object.shapes[0].mesh.positions[3*idx3 +0], object.shapes[0].mesh.positions[3*idx3 +1], object.shapes[0].mesh.positions[3*idx3 +2]);
+    }
+
+    Miniball<3> boundingSphere;
+
+    for (int vertexId = 0; vertexId < model.getNumVertices(); ++vertexId) {
+       
+       Point<3> v;
+       for (int dim = 0; dim < 3; ++dim) {
+          v[dim] = model.getVertex(vertexId)[dim];
+          v[dim] = object.shapes[0].mesh.positions[3*idx1 +0]
+       }
+       
+       boundingSphere.check_in(v);
+    }
+
+    boundingSphere.build();
+
+    return (float)boundingSphere.squared_radius();
+    */
 }
 
 #endif

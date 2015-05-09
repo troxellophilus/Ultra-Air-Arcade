@@ -556,6 +556,7 @@ int main(int argc, char **argv) {
     player.setPosition(camera.getPosition() + glm::vec3(0.0f,1.0f,0.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
+    player.calculateBoundingSphereRadius();
     int pIndices = initVBO(&player, PLANE);
 
     // Initialize camera
@@ -569,11 +570,12 @@ int main(int argc, char **argv) {
     int odx = 0;
     while (odx < 5) {
         Entity opp = Entity();
-	opp.setObject(&obj[3]);
-	opp.setPosition(player.getPosition() + odx * 5.f);
-	opp.setScale(glm::vec3(0.2,0.2,0.2));
-	opponents.push_back(opp);
-	odx++;
+        opp.setObject(&obj[3]);
+        opp.setPosition(player.getPosition() + odx * 5.f);
+        opp.setScale(glm::vec3(0.2,0.2,0.2));
+        opp.calculateBoundingSphereRadius();
+        opponents.push_back(opp);
+        odx++;
     }
 
     float start = glfwGetTime();
