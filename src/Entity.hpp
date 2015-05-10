@@ -303,8 +303,8 @@ void Entity::calculateBoundingSphereRadius() {
         }
     }
 
-    printf("Radius: %.4f\n", calculatedRadius);
-    printf("Scaled Radius: %.4f\n", calculatedRadius * scale.x);
+    // printf("Radius: %.4f\n", calculatedRadius);
+    // printf("Scaled Radius: %.4f\n", calculatedRadius * scale.x);
 
     radius = calculatedRadius * scale.x;
 }

@@ -62,10 +62,10 @@ bool Collision::detectEntityCollision(Entity player, Entity object) {
 }
 
 bool Collision::detectTerrainCollision(Entity object, Terrain *terrain) {
-    return false;
+    //return false;
 
-    // Eigen::Vector3f convertedVector = Eigen::Vector3f(object.getPosition().x, object.getPosition().y, object.getPosition().z);
-    // return terrain->detectCollision(convertedVector);
+    Eigen::Vector3f convertedVector = Eigen::Vector3f(object.getPosition().x, object.getPosition().y, object.getPosition().z);
+    return terrain->detectCollision(convertedVector, object.getRadius());
 }
 
 #endif

@@ -64,6 +64,7 @@ Object obj[NUMSHAPES];
 Object skydome;
 
 Collision collision = Collision();
+Terrain *terrain;
 
 Camera camera = Camera();
 Entity player = Entity();
@@ -249,7 +250,9 @@ void initSky() {
 }
 
 void initGround() {
-    Terrain terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+
+    terrain = (Terrain *)malloc(sizeof(Terrain));
+    *terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -624,9 +627,9 @@ int main(int argc, char **argv) {
 	// Update & draw player
 	player.update();
 	drawVBO(&player, pIndices, PLANE);
-    if (collision.detectTerrainCollision(player, NULL)) {
+    if (collision.detectTerrainCollision(player, terrain)) {
         collisionCount++;
-        printf("Detected player collision with terrain: %d\n", collisionCount);
+        //printf("Detected player collision with terrain: %d\n", collisionCount);
     }
 
 	// Update & draw opponents
@@ -637,9 +640,9 @@ int main(int argc, char **argv) {
                 collisionCount++;
                 //printf("Detected collision with enemy: %d\n", collisionCount);
             }
-            if (collision.detectTerrainCollision(opponent, NULL)) {
+            if (collision.detectTerrainCollision(opponent, terrain)) {
                 collisionCount++;
-                printf("Detected opponent collision with terrain: %d\n", collisionCount);
+                //printf("Detected opponent collision with terrain: %d\n", collisionCount);
             }
 
             drawVBO(&opponent, pIndices, PLANE);
