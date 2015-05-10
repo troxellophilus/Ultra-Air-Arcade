@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 #ifdef __APPLE__
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #endif
 #ifdef __unix__
 #include <eigen3/Eigen/Dense>
