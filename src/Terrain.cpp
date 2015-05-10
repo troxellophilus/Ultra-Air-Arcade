@@ -85,36 +85,14 @@ void Terrain::computeNormals(){
          normals[y * width + x] = sum;
       }
    }
-   
-   for(int y = 0; y < length; y++){
-      for(int x = 0; x < width; x++){   
-         //Smooth out edges
-         if(x > 0){
-            sum << sum + normals[y * width + (x-1)] * .5;
-         }
-         if(x < width - 1){
-            sum << sum + normals[y * width + (x+1)] * .5;
-         }
-         if(y > 0){
-            sum << sum + normals[(y-1) * width + x] * .5;
-         }
-         if(y < length - 1){
-            sum << sum + normals[(y+1) * width + x] * .5;
-         }
-         
-         if(sum.norm() == 0){
-            sum << 0.0, 1.0, 0.0;
-         }
-      }
-   }            
 }
 
 void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf){
    for(int z = 0; z < length; z++){
       for(int x = 0; x < width; x++){
-         posBuf.push_back(x);
+         posBuf.push_back(x*2);
          posBuf.push_back(heights[z * width + x]);
-         posBuf.push_back(z);
+         posBuf.push_back(z*2);
          
          norBuf.push_back(normals[z * width + x](0));
          norBuf.push_back(normals[z * width + x](1));
@@ -137,12 +115,13 @@ void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf,
    }
 }
 
-void Terrain::loadTextures(){
-      
+bool Terrain::detectCollision(Eigen::Vector3f objVector){
+   float curTerrainHeight = heights[(int)objVector(2) * width + (int)objVector(0)];
 
+   if(objVector(1) <= curTerrainHeight){
+      return true;
+   }
 
-
-
+   return false;
 }
-
 

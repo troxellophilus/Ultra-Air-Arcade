@@ -493,8 +493,16 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    g_width = 640;
-    g_height = 480;
+    if(argc == 3)
+    {
+        g_width = atoi(argv[1]);
+        g_height = atoi(argv[2]);
+    }
+    else
+    {
+        g_width = 640;
+        g_height = 480;
+    }
 
     // Open a window and create its OpenGL context
     window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
@@ -545,7 +553,7 @@ int main(int argc, char **argv) {
     
     // Initialize player
     player.setObject(&obj[3]);
-    player.setPosition(camera.getPosition());
+    player.setPosition(camera.getPosition() + glm::vec3(0.0f,1.0f,0.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
     int pIndices = initVBO(&player, PLANE);
