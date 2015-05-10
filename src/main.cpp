@@ -78,6 +78,8 @@ unsigned int collisions = 0;
 float xtrans[100];
 float ztrans[100];
 
+int collisionCount = 0;
+
 float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
 }
@@ -619,15 +621,25 @@ int main(int argc, char **argv) {
         }
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-	   // Update & draw opponents
+	// Update & draw player
+	player.update();
+	drawVBO(&player, pIndices, PLANE);
+    if (collision.detectTerrainCollision(player, NULL)) {
+        collisionCount++;
+        printf("Detected player collision with terrain: %d\n", collisionCount);
+    }
+
+	// Update & draw opponents
         for (auto &opponent : opponents) {
             opponent.update();
 
             if (collision.detectEntityCollision(player, opponent)) {
-                printf("Detected collision with enemy.\n");
+                collisionCount++;
+                //printf("Detected collision with enemy: %d\n", collisionCount);
             }
             if (collision.detectTerrainCollision(opponent, NULL)) {
-                printf("Detected opponent collision with terrain\n");
+                collisionCount++;
+                printf("Detected opponent collision with terrain: %d\n", collisionCount);
             }
 
             drawVBO(&opponent, pIndices, PLANE);

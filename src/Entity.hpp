@@ -23,6 +23,7 @@
 enum EntityFlag { C_FLAG, U_FLAG, B_FLAG };
 
 using namespace std;
+//using namespace Miniball;
 
 class Entity {
 private:
@@ -270,39 +271,42 @@ float Entity::getRadius() {
 }
 
 void Entity::calculateBoundingSphereRadius() {
-    radius = 0.5f;
+    //radius = 0.05f;
 
-    /*
-    // TODO add algorithm for determining bounding sphere radius
-    int idx1, idx2, idx3;
-    glm::vec3 v1, v2, v3;
+    glm::vec3 center = glm::vec3(0.f, 0.f, 0.f);
+    float calculatedRadius = 0.000000000001f;
+    glm::vec3 pos, diff;
+    float length, alpha, alphaSq;
 
-    for (int i = 0; i < object.shapes[0].mesh.indices.size()/3; i++) {
-        idx1 = object.shapes[0].mesh.indices[3*i+0];
-        idx2 = object.shapes[0].mesh.indices[3*i+1];
-        idx3 = object.shapes[0].mesh.indices[3*i+2];
-        v1 = glm::vec3(object.shapes[0].mesh.positions[3*idx1 +0], object.shapes[0].mesh.positions[3*idx1 +1], object.shapes[0].mesh.positions[3*idx1 +2]);
-        v2 = glm::vec3(object.shapes[0].mesh.positions[3*idx2 +0], object.shapes[0].mesh.positions[3*idx2 +1], object.shapes[0].mesh.positions[3*idx2 +2]);
-        v3 = glm::vec3(object.shapes[0].mesh.positions[3*idx3 +0], object.shapes[0].mesh.positions[3*idx3 +1], object.shapes[0].mesh.positions[3*idx3 +2]);
+    for (int i = 0; i < 2; i++){
+        for (int vertex = 0; vertex < object->shapes[0].mesh.indices.size()/3; vertex++) {
+            int index = object->shapes[0].mesh.indices[3 * vertex];
+            pos = glm::vec3(object->shapes[0].mesh.positions[3 * index + 0], object->shapes[0].mesh.positions[3 * index + 1], object->shapes[0].mesh.positions[3 * index + 2]);
+            length = glm::distance(pos, center);
+            if (length > calculatedRadius) {
+                alpha = length / calculatedRadius;
+                alphaSq = alpha * alpha;
+                calculatedRadius = 0.5f * (alpha + 1 / alpha) * calculatedRadius;
+                center = 0.5f * ((1 + 1 / alphaSq) * center + (1 - 1 / alphaSq) * pos);
+            }
+        }
     }
 
-    Miniball<3> boundingSphere;
-
-    for (int vertexId = 0; vertexId < model.getNumVertices(); ++vertexId) {
-       
-       Point<3> v;
-       for (int dim = 0; dim < 3; ++dim) {
-          v[dim] = model.getVertex(vertexId)[dim];
-          v[dim] = object.shapes[0].mesh.positions[3*idx1 +0]
-       }
-       
-       boundingSphere.check_in(v);
+    for (int vertex = 0; vertex < object->shapes[0].mesh.indices.size()/3; vertex++) {
+        int index = object->shapes[0].mesh.indices[3 * vertex];
+        pos = glm::vec3(object->shapes[0].mesh.positions[3 * index + 0], object->shapes[0].mesh.positions[3 * index + 1], object->shapes[0].mesh.positions[3 * index + 2]);
+        diff = pos - center;
+        length = glm::distance(pos, center);
+        if (length > calculatedRadius){
+            calculatedRadius = (calculatedRadius + length) / 2.0f;
+            center = center + ((length - calculatedRadius) / length * diff);
+        }
     }
 
-    boundingSphere.build();
+    printf("Radius: %.4f\n", calculatedRadius);
+    printf("Scaled Radius: %.4f\n", calculatedRadius * scale.x);
 
-    return (float)boundingSphere.squared_radius();
-    */
+    radius = calculatedRadius * scale.x;
 }
 
 #endif
