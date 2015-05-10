@@ -25,7 +25,7 @@
 #include "Terrain.h"
 
 #include "helper.h"
-#include "GLSL.h"
+#include "GLSLProgram.h"
 
 //#define _DEBUG
 
@@ -34,7 +34,8 @@ using namespace std;
 
 enum { TERRAIN, SKY, PLANE, NUM_VBO };
 
-GLuint prog;
+GLSLProgram program;
+
 GLuint vao;
 GLuint pbo[NUM_VBO];
 GLuint nbo[NUM_VBO];
@@ -42,18 +43,6 @@ GLuint ibo[NUM_VBO];
 
 GLint aPos = 0;
 GLint aNor = 0;
-GLint lPos = 0;
-GLint uViewMatrix = 0;
-GLint uModelMatrix = 0;
-GLint uProjMatrix = 0;
-GLint renderObj = 0;
-GLint h_uMatAmb, h_uMatDif, h_uMatSpec, h_uMatShine;
-
-// Billboard vars
-GLuint CameraRight_worldspace_ID;
-GLuint CameraUp_worldspace_ID;
-GLuint BillboardPosID;
-GLuint BillboardSizeID;
 GLuint billboard_vertex_buffer;
 
 vector<float> terPosBuf;
@@ -145,11 +134,11 @@ void SetModel(vec3 trans, glm::vec3 rot, vec3 sc) {
     glm::mat4 Orient = glm::orientation(rot, glm::vec3(0, 1, 0));
     glm::mat4 Sc = glm::scale(glm::mat4(1.0f), sc);
     glm::mat4 com = Trans*Orient*Sc;
-    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
+    program.setUniform("M", com);
 }
 
 int initVBO(Entity *e, int whichbo) {
-    vector<float> posBuf, norBuf;
+     vector<float> posBuf, norBuf;
     vector<unsigned int> indBuf;
 
     e->packVertices(&posBuf, &norBuf, &indBuf);
@@ -172,8 +161,6 @@ int initVBO(Entity *e, int whichbo) {
     // Unbind the arrays
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    GLSL::checkVersion();
-    assert(glGetError() == GL_NO_ERROR);
 
     return (int)indBuf.size();
 }
@@ -195,17 +182,20 @@ void initBillboard() {
 void drawBillboard(Camera *camera) {
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glUniform1i(renderObj, 2);
+	//glUniform1i(renderObj, 2);
+    program.setUniform("renderObj", 2);
 	glm::mat4 ViewMatrix = camera->getViewMatrix();
-	glUniform3f(CameraRight_worldspace_ID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
-	glUniform3f(CameraUp_worldspace_ID   , ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
+    program.setUniform("V", ViewMatrix);
+	//glUniform3f(CameraRight_worldspace_ID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
+    program.setUniform("CameraRight_worldspace", ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
+	//glUniform3f(CameraUp_worldspace_ID   , ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
+    program.setUniform("CameraUp_worldspace", ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
 
 	int i;
 
 	for (i = 0; i < 100; i++) {
-		glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]); // The billboard will be just above the cube
-		glUniform2f(BillboardSizeID, 20.0f, 20.0f);     // and 1m*12cm, because it matches its 256*32 resolution =)
-
+        program.setUniform("BillboardPos", 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]);
+        program.setUniform("BillboardSize", 20.0f, 20.0f);
 		// Enable and bind position array for drawing
 		glEnableVertexAttribArray(aPos);
 		glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
@@ -219,8 +209,8 @@ void drawBillboard(Camera *camera) {
 }
 
 void initSky() {
-	// glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
-    //glEnable(GL_DEPTH_TEST);
+	glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
 
     const vector<float> &posBuf = skydome.shapes[0].mesh.positions;
     glGenBuffers(1, &pbo[SKY]);
@@ -242,8 +232,6 @@ void initSky() {
     // Unbind the arrays
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    GLSL::checkVersion();
-    assert(glGetError() == GL_NO_ERROR);
 }
 
 void initGround() {
@@ -266,104 +254,49 @@ void initGround() {
 }
 
 bool installShaders(const string &vShaderName, const string &fShaderName) {
-    GLint rc;
-    GLSL::printError(__FILE__,__LINE__);
 
     // Create Vertex Array Object
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     
-    // Create shader handles
-    GLuint VS = glCreateShader(GL_VERTEX_SHADER);
-    GLuint FS = glCreateShader(GL_FRAGMENT_SHADER);
-    GLSL::printError(__FILE__,__LINE__);
-    
-    // Read shader sources
-    const char *vshader = GLSL::textFileRead(vShaderName.c_str());
-    const char *fshader = GLSL::textFileRead(fShaderName.c_str());
-    glShaderSource(VS, 1, &vshader, NULL);
-    glShaderSource(FS, 1, &fshader, NULL);
-    GLSL::printError(__FILE__,__LINE__);
-    
-    // Compile vertex shader
-    glCompileShader(VS);
-    GLSL::printError(__FILE__,__LINE__);
-    glGetShaderiv(VS, GL_COMPILE_STATUS, &rc);
-    GLSL::printShaderInfoLog(VS);
-    if(!rc) {
-        printf("Error compiling vertex shader %s\n", vShaderName.c_str());
-        return false;
+    //new shader setup
+    try
+    {
+        program.compileShader(vShaderName.c_str(),GLSLShader::VERTEX);
+        program.compileShader(fShaderName.c_str(),GLSLShader::FRAGMENT);
+        program.link();
+        program.validate();
+        program.use();
+    }
+    catch(GLSLProgramException & e) {
+        cerr << e.what() << endl;
+        exit( EXIT_FAILURE );
     }
 
-    // Compile fragment shader
-    glCompileShader(FS);
-    GLSL::printError(__FILE__,__LINE__);
-    glGetShaderiv(FS, GL_COMPILE_STATUS, &rc);
-    GLSL::printShaderInfoLog(FS);
-    if(!rc) {
-        printf("Error compiling fragment shader %s\n", fShaderName.c_str());
-        return false;
-    }
-    
-    // Create the program and link
-    prog = glCreateProgram();
-    glAttachShader(prog, VS);
-    glAttachShader(prog, FS);
+    glBindFragDataLocation(program.getHandle(), 0, "outColor");
 
-    glBindFragDataLocation(prog, 0, "outColor");
+    aPos = glGetAttribLocation(program.getHandle(), "aPos");
+    aNor = glGetAttribLocation(program.getHandle(), "aNor");
 
-    glLinkProgram(prog);
-    GLSL::printError(__FILE__,__LINE__);
-    glGetProgramiv(prog, GL_LINK_STATUS, &rc);
-    GLSL::printProgramInfoLog(prog);
-    if(!rc) {
-        printf("Error linking shaders %s and %s\n", vShaderName.c_str(), fShaderName.c_str());
-        return false;
-    }
-
-    glUseProgram(prog);
-    
-    // Set up the shader variables
-    aPos = glGetAttribLocation(prog, "aPos");
-    aNor = glGetAttribLocation(prog, "aNor");
-    
-    uViewMatrix = glGetUniformLocation(prog, "V");
-    uModelMatrix = glGetUniformLocation(prog, "M");
-    uProjMatrix = glGetUniformLocation(prog, "P");
-    lPos = glGetUniformLocation(prog, "lPos");
-    renderObj = glGetUniformLocation(prog, "renderObj");
-    
-    h_uMatAmb = glGetUniformLocation(prog, "UaColor");
-    h_uMatDif = glGetUniformLocation(prog, "UdColor");
-    h_uMatSpec = glGetUniformLocation(prog, "UsColor");
-    h_uMatShine = glGetUniformLocation(prog, "Ushine");
-
-    // Shader vars for billboard
-    CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
-    CameraUp_worldspace_ID  = glGetUniformLocation(prog, "CameraUp_worldspace");
-    BillboardPosID = glGetUniformLocation(prog, "BillboardPos");
-    BillboardSizeID = glGetUniformLocation(prog, "BillboardSize");
-    
-    assert(glGetError() == GL_NO_ERROR);
     return true;
 }
 
 void SetMaterial(Material mat) {
-    glUseProgram(prog);
+    //glUseProgram(prog);
     
     glm::vec3 amb = mat.getAmbient();
     glm::vec3 dif = mat.getDiffuse();
     glm::vec3 spc = mat.getSpecular();
     float shn = mat.getShininess();
 
-    glUniform3f(h_uMatAmb, amb.x, amb.y, amb.z);
-    glUniform3f(h_uMatDif, dif.x, dif.y, dif.z);
-    glUniform3f(h_uMatSpec, spc.x, spc.y, spc.z);
-    glUniform1f(h_uMatShine, shn);
+    program.setUniform("UaColor",  amb.x, amb.y, amb.z);
+    program.setUniform("UdColor", dif.x, dif.y, dif.z);
+    program.setUniform("UsColor", spc.x, spc.y, spc.z);
+    program.setUniform("Ushine", shn);
 }
 
 void drawVBO(Entity *entity, int nIndices, int whichbo) {
-    glUseProgram(prog);
+    //glUseProgram(prog);
  
     // Enable and bind position array for drawing
     glEnableVertexAttribArray(aPos);
@@ -378,32 +311,28 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Bind index array for drawing
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform3f(lPos, 1000, 500, 1000);
+    program.setUniform("lPos",1000,500,1000);
 
-    glUniform1i(renderObj, 0);
+    program.setUniform("renderObj", 0);
 
     SetMaterial(entity->getMaterial());
     glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
     glm::mat4 Orient = entity->getRotationM();
     glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
     glm::mat4 com = Trans*Orient*Sc;
-    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
+
+    program.setUniform("M", com);
 
     glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
     
     // Disable and unbind
-    GLSL::disableVertexAttribArray(aPos);
-    GLSL::disableVertexAttribArray(aNor);
+    program.disableVertexAttribArray(aPos);
+    program.disableVertexAttribArray(aNor);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    // Last lines
-    glUseProgram(0);
-    assert(glGetError() == GL_NO_ERROR);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);    
 }
 
 void drawSky() {
-	glUseProgram(prog);
 	int nIndices = (int)skydome.shapes[0].mesh.indices.size();
 
 	glEnableVertexAttribArray(aPos);
@@ -423,47 +352,40 @@ void drawSky() {
 	glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(512.0f, 0.0f, 512.0f));
 
 	glm::mat4 com = trans * scale;
-	glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
-	glUniform1i(renderObj, 1);
+    program.setUniform("M", com);
+    program.setUniform("renderObj", 1);
 	glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
 
 	// Disable and unbind
-	GLSL::disableVertexAttribArray(aPos);
-	GLSL::disableVertexAttribArray(aNor);
+	program.disableVertexAttribArray(aPos);
+	program.disableVertexAttribArray(aNor);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	// Last lines
-	glUseProgram(0);
-	assert(glGetError() == GL_NO_ERROR);
 }
 
 void drawGround() {
     glEnable(GL_CULL_FACE);
-    glUseProgram(prog);
     
     glEnableVertexAttribArray(aPos);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
     glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    GLSL::enableVertexAttribArray(aNor);
+    program.enableVertexAttribArray(aNor);
     glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
     glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
     
-    glUniform1i(renderObj, 0);
+    program.setUniform("renderObj", 0);
     SetMaterial(Materials::wood);
     SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
     
-    GLSL::disableVertexAttribArray(aPos);
-    GLSL::disableVertexAttribArray(aNor);
+    program.disableVertexAttribArray(aPos);
+    program.disableVertexAttribArray(aNor);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    glUseProgram(0);
-    assert(glGetError() == GL_NO_ERROR);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);    
 }
 
 int main(int argc, char **argv) {
@@ -546,7 +468,7 @@ int main(int argc, char **argv) {
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
 
-    installShaders("shd/vert.glsl", "shd/frag.glsl");
+    installShaders("shd/basic.vert", "shd/basic.frag");
     
     initSky();
     initGround();
@@ -590,15 +512,15 @@ int main(int argc, char **argv) {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(prog);
+	   //glUseProgram(prog);
 
         // Set projection matrix
         glm::mat4 projection = camera.getProjectionMatrix();
-        glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
+        program.setUniform("P", camera.getProjectionMatrix());
 
         // Set view matrix
         glm::mat4 view = camera.getViewMatrix();
-        glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
+        program.setUniform("V", view);
 
         initBillboard();
         drawBillboard(&camera);
@@ -627,7 +549,8 @@ int main(int argc, char **argv) {
         glfwPollEvents();
         frames++;
     }
-    
+    program.printActiveUniforms();
+    program.printActiveAttribs();
     glfwTerminate();
     
     return 0;
