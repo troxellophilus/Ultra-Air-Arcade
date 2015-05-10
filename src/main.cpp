@@ -235,7 +235,7 @@ void initSky() {
 }
 
 void initGround() {
-    Terrain terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    Terrain terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
