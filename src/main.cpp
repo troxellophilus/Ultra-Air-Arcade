@@ -471,6 +471,24 @@ void drawGround() {
     assert(glGetError() == GL_NO_ERROR);
 }
 
+void checkPlayerCollisions() {
+    if (collision.detectTerrainCollision(player, terrain)) {
+        collisionCount++;
+        //printf("Detected player collision with terrain: %d\n", collisionCount);
+    }
+}
+
+void checkOpponentCollisions(Entity &opponent) {
+    if (collision.detectEntityCollision(player, opponent)) {
+        collisionCount++;
+        //printf("Detected collision with enemy: %d\n", collisionCount);
+    }
+    if (collision.detectTerrainCollision(opponent, terrain)) {
+        collisionCount++;
+        //printf("Detected opponent collision with terrain: %d\n", collisionCount);
+    }
+}
+
 int main(int argc, char **argv) {
     const GLubyte* renderer;
     const GLubyte* version;
@@ -615,39 +633,20 @@ int main(int argc, char **argv) {
         drawBillboard(&camera);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-    	// Update & draw player
-    	player.update();
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-    	drawVBO(&player, pIndices, PLANE);
-        if (collision.detectTerrainCollision(player, NULL)) {
-            printf("Detected player collision with terrain\n");
-        }
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-
 	// Update & draw player
 	player.update();
+    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 	drawVBO(&player, pIndices, PLANE);
-    if (collision.detectTerrainCollision(player, terrain)) {
-        collisionCount++;
-        //printf("Detected player collision with terrain: %d\n", collisionCount);
-    }
+    checkPlayerCollisions();
+    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Update & draw opponents
-        for (auto &opponent : opponents) {
-            opponent.update();
-
-            if (collision.detectEntityCollision(player, opponent)) {
-                collisionCount++;
-                //printf("Detected collision with enemy: %d\n", collisionCount);
-            }
-            if (collision.detectTerrainCollision(opponent, terrain)) {
-                collisionCount++;
-                //printf("Detected opponent collision with terrain: %d\n", collisionCount);
-            }
-
-            drawVBO(&opponent, pIndices, PLANE);
-            assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-        }
+    for (auto &opponent : opponents) {
+        opponent.update();
+        drawVBO(&opponent, pIndices, PLANE);
+        checkOpponentCollisions(opponent);
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+    }
         
 	   // Draw environment
  	    drawGround();
