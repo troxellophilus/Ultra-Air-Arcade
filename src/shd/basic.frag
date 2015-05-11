@@ -32,11 +32,11 @@ vec3 toonShade()
     float cosine = dot(lightVector, vNor);
     vec3 diffuse = UdColor * floor( cosine * levels ) * scaleFactor;
 
-    if (dot(vPos, vNor) < mix(2,2, max( 0.0, dot(vPos, lightVector)) )  )
-    {
-    	ambient = vec3(0.0f,0.0f,0.0f);
-    	diffuse = vec3(0.0f,0.0f,0.0f);
-    }
+    // if (dot(vPos, vNor) < mix(2,2, max( 0.0, dot(vPos, lightVector)) )  )
+    // {
+    // 	ambient = vec3(0.0f,0.0f,0.0f);
+    // 	diffuse = vec3(0.0f,0.0f,0.0f);
+    // }
 
     return ambient + diffuse;
 }
