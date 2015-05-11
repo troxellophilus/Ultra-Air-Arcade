@@ -7,7 +7,6 @@
 #include <cassert>
 #include <cmath>
 #include <stdio.h>
-#include "GLSL.h"
 
 #include <glm/glm.hpp>
 #include <eigen3/Eigen/Dense>
