@@ -90,6 +90,8 @@ class GLSLProgram
     void vertexAttribPointer(const GLint handle, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 
     const char * getTypeString( GLenum type );
+
+    static int checkForOpenGLError(const char * file, int line); 
 };
 
 #endif // GLSLPROGRAM_H
