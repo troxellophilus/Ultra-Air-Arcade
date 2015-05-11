@@ -28,7 +28,7 @@
 #include "GLSL.h"
 #include "GLSLProgram.h"
 
-//#define _DEBUG
+//#define DEBUG
 
 using namespace std;
 //using namespace glm;
@@ -386,7 +386,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Bind index array for drawing
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform3f(lPos, 1000, 500, 1000);
+    glUniform3f(lPos, 500, 1500, 500);
 
     glUniform1i(renderObj, 0);
 
@@ -583,7 +583,7 @@ int main(int argc, char **argv) {
     
     // Initialize player
     player.setObject(&obj[3]);
-    player.setPosition(camera.getPosition() + glm::vec3(0.0f,1.0f,0.0f));
+    player.setPosition(glm::vec3(200.0f,0.05f,200.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
@@ -600,12 +600,12 @@ int main(int argc, char **argv) {
     int odx = 0;
     while (odx < 5) {
         Entity opp = Entity();
-        opp.setObject(&obj[3]);
-        opp.setPosition(player.getPosition() + odx * 5.f);
-        opp.setScale(glm::vec3(0.2,0.2,0.2));
+	opp.setObject(&obj[3]);
+	opp.setPosition(player.getPosition() + odx * 0.2f);
+	opp.setScale(glm::vec3(0.2,0.2,0.2));
         opp.calculateBoundingSphereRadius();
-        opponents.push_back(opp);
-        odx++;
+	opponents.push_back(opp);
+	odx++;
     }
 
     float start = glfwGetTime();
@@ -664,6 +664,13 @@ int main(int argc, char **argv) {
 	   // Update camera
 	   camera.update();
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+	// Print DEBUG messages
+#ifdef DEBUG
+	if (frames % 5 == 0) {
+		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+	}
+#endif
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

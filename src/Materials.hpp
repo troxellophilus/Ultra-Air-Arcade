@@ -69,9 +69,9 @@ public:
 	static Material greenPlastic;
 };
 
-Material Materials::emerald(glm::vec3(0.0215, 0.2745, 0.0215),
+Material Materials::emerald(glm::vec3(0.0315, 0.3745, 0.0315),
 			glm::vec3(0.07568, 0.61424, 0.7568),
-			glm::vec3(0.633, 0.727811, 0.633),
+			glm::vec3(0.833, 0.927811, 0.733),
 			150.8);
 
 Material Materials::jade = Material(glm::vec3(0.135, 0.2225, 0.1575),
