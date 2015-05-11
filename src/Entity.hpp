@@ -14,7 +14,6 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-//#include "Miniball.hpp"
 #include "Materials.hpp"
 #include "types.h"
 
@@ -23,7 +22,6 @@
 enum EntityFlag { C_FLAG, U_FLAG, B_FLAG };
 
 using namespace std;
-//using namespace Miniball;
 
 class Entity {
 private:
@@ -243,7 +241,7 @@ void Entity::setObject(Object *obj) {
 }
 
 void Entity::setPosition(glm::vec3 pos) {
-    pos = glm::vec3(pos);
+    position = glm::vec3(pos);
 }
 
 void Entity::setScale(glm::vec3 sc) {
@@ -273,7 +271,7 @@ float Entity::getRadius() {
 void Entity::calculateBoundingSphereRadius() {
     //radius = 0.05f;
 
-    glm::vec3 center = glm::vec3(0.f, 0.f, 0.f);
+    glm::vec3 center = glm::vec3(object->shapes[0].mesh.positions[0], object->shapes[0].mesh.positions[1], object->shapes[0].mesh.positions[2]);
     float calculatedRadius = 0.000000000001f;
     glm::vec3 pos, diff;
     float length, alpha, alphaSq;

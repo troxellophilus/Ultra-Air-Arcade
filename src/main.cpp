@@ -474,6 +474,9 @@ void drawGround() {
 void checkPlayerCollisions() {
     if (collision.detectTerrainCollision(player, terrain)) {
         collisionCount++;
+        // glm::vec3 oldPos = player.getPosition();
+
+        // player.setPosition(glm::vec3(oldPos.x, oldPos.y + 50.f, oldPos.z));
         //printf("Detected player collision with terrain: %d\n", collisionCount);
     }
 }
