@@ -1,5 +1,6 @@
 /* 
- * Ultra Air Arcade Code Base
+ * Drew Troxell & Zachary Weisman
+ * Code Base
  * CPE 476
  */
 
@@ -16,25 +17,24 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-#include <eigen3/Eigen/Dense>
 
 #include "Entity.hpp"
 #include "Collision.hpp"
 #include "Camera.hpp"
 #include "Materials.hpp"
 #include "Terrain.h"
-#include "Rules.hpp"
+#include "Projectile.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
 #include "GLSLProgram.h"
 
-//#define DEBUG
+//#define _DEBUG
 
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, SKY, PLANE, NUM_VBO };
+enum { TERRAIN, SKY, PLANE, MISSLE, NUM_VBO };
 
 GLuint passThroughShaders;
 GLuint vao;
@@ -81,10 +81,17 @@ unsigned int pIndices = 0;
 
 float xtrans[100];
 float ztrans[100];
+float missleTime;
 
 bool collisionDetectedTerrain = false;
 bool collisionDetectedOpponent = false;
 int collisionCount = 0;
+
+bool beginProjectile = false;
+Projectile *missle;
+Entity projectileEntity = Entity();
+float start;
+float elapsed;
 
 float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
@@ -137,6 +144,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	    pIndices = initVBO(&player, PLANE);
 	}
     }
+      if(key == GLFW_KEY_X){
+           if(!beginProjectile){
+              beginProjectile = true;
+              missle = new Projectile(projectileEntity, true, player.getPosition(), opponents[1].getPosition());
+              missleTime = elapsed;
+              //cout << "New Projectile" << endl;
+           }
+      }
+
+   }
 }
 
 static void error_callback(int error, const char* description) {
@@ -267,7 +284,7 @@ void initSky() {
 void initGround() {
 
     terrain = (Terrain *)malloc(sizeof(Terrain));
-    *terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    *terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -400,7 +417,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Bind index array for drawing
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform3f(lPos, 200, 1000, 200);
+    glUniform3f(lPos, 1000, 500, 1000);
 
     glUniform1i(renderObj, 0);
 
@@ -494,16 +511,11 @@ void checkPlayerCollisions() {
         if (!collisionDetectedTerrain) {
             collisionCount++;
             collisionDetectedTerrain = !collisionDetectedTerrain;
-            //printf("Detected player collision with terrain: %d\n", collisionCount);
-
-            glm::vec3 playerPos = player.getPosition();
-            Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
-            Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
-            glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
-            player.setPosition(playerPos + (convertedNor * 3.f));
-            player.setThrust(0.f);
-            player.setVelocity(glm::vec3(0.f, 0.f, 0.f));
+            printf("Detected player collision with terrain: %d\n", collisionCount);
         }
+        // glm::vec3 oldPos = player.getPosition();
+
+        // player.setPosition(glm::vec3(oldPos.x, oldPos.y + 50.f, oldPos.z));
     }
     else {
         collisionDetectedTerrain =  false;
@@ -516,8 +528,6 @@ void checkOpponentCollisions(Entity &opponent) {
             collisionCount++;
             collisionDetectedOpponent = !collisionDetectedOpponent;
             printf("Detected collision with enemy: %d\n", collisionCount);
-
-            player.setVelocity(player.getVelocity() * -0.25f);
         }
     }
     else {
@@ -588,6 +598,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
     loadShapes("../Assets/models/Plane1.obj", obj[3]);
+    loadShapes("../Assets/models/missile.obj", obj[4]);
     loadShapes("../Assets/models/skydome.obj", skydome);
     std::cout << " loaded the objects " << endl;
 
@@ -616,42 +627,61 @@ int main(int argc, char **argv) {
     initSky();
     initGround();
     
+    //Initialize Camera
+    camera.setMode(TPC);
+    camera.setPosition(glm::vec3(100,100,200));
+    camera.setClipping(0.1, 1500);
+    camera.setFOV(90);
+    camera.setPlayer(&player);
+
     // Initialize player
     player.setObject(&obj[3]);
-    player.setPosition(glm::vec3(200.0f,35.f,200.0f));
+    player.setPosition(glm::vec3(200.0f,35.0f,200.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
     pIndices = initVBO(&player, PLANE);
 
-    // Initialize camera
+    //Initialize Camera
     camera.setMode(TPC);
     camera.setPosition(glm::vec3(0,0,-10));
     camera.setClipping(0.1, 1500);
     camera.setFOV(90);
     camera.setPlayer(&player);
-
+ 
+    //cout << "Init\n";
+    projectileEntity.setObject(&obj[4]);
+    projectileEntity.setPosition(glm::vec3(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]));
+    projectileEntity.setScale(glm::vec3(2.0, 2.0, 2.0));
+    projectileEntity.setMaterial(Materials::emerald);
+    int mIndices = initVBO(&projectileEntity, MISSLE);
+    projectileEntity.calculateBoundingSphereRadius();
+   
     // Initialize opponents
-    int odx = 1;
-    while (odx < 6) {
+    int odx = 0;
+    while (odx < 5) {
         Entity opp = Entity();
-	opp.setObject(&obj[3]);
-	glm::vec3 epos = player.getPosition();
-	opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
-	opp.setScale(glm::vec3(0.2,0.2,0.2));
+        opp.setObject(&obj[3]);
+        opp.setPosition(player.getPosition() + (odx + 1) * 5.f);
+        opp.setScale(glm::vec3(0.2,0.2,0.2));
         opp.calculateBoundingSphereRadius();
-	opponents.push_back(opp);
-	odx++;
+        opponents.push_back(opp);
+        odx++;
     }
 
-    // Initialize game rules
-    Rules rules = Rules();
-    rules.setAgents(&opponents);
+    Entity bigOpp = Entity();
+    bigOpp.setObject(&obj[3]);
+    bigOpp.setPosition(player.getPosition() + odx * 5.f);
+    bigOpp.setMaterial(Materials::jade);
+    bigOpp.setScale(glm::vec3(20.0,20.0,20.0));
+    bigOpp.calculateBoundingSphereRadius();
 
-    float start = glfwGetTime();
-    float elapsed = 0;
+    start = glfwGetTime();
+    elapsed = 0;
     float last = -1;
-
+   
+    Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
+    bool color = false;
     // Frame loop
     while (!glfwWindowShouldClose(window)) {
         float ratio;
@@ -664,7 +694,7 @@ int main(int argc, char **argv) {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(passThroughShaders);
+	     glUseProgram(passThroughShaders);
 
         // Set projection matrix
         glm::mat4 projection = camera.getProjectionMatrix();
@@ -674,14 +704,11 @@ int main(int argc, char **argv) {
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
-
+        
         initBillboard();
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         drawBillboard(&camera);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-
-	// Update the rules and game state
-	rules.update();
 
 	// Update & draw player
 	player.update();
@@ -691,12 +718,19 @@ int main(int argc, char **argv) {
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Update & draw opponents
-    for (auto &opponent : opponents) {
+    /*for (auto &opponent : opponents) {
         opponent.update();
         drawVBO(&opponent, pIndices, PLANE);
         checkOpponentCollisions(opponent);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-    }
+    }*/
+
+       for(int i = 0; i < opponents.size(); i++){
+          opponents[i].update();
+          drawVBO(&opponents[i], pIndices, PLANE);
+          checkOpponentCollisions(opponents[i]);
+          assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+       } 
         
 	   // Draw environment
  	    drawGround();
@@ -706,12 +740,43 @@ int main(int argc, char **argv) {
         
 	   // Update camera
 	   camera.update();
-       assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+       
+      pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
+      Entity *check = pathPlane.getEntity();
 
-	// Print DEBUG messages
-	if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
-		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
-	}
+      drawVBO(check, pIndices, PLANE);
+
+      if(beginProjectile == true){
+         
+         int isDone = missle->runProjectile(false, elapsed - missleTime,
+          player.getPosition(), check->getPosition());
+
+         Entity* ent = missle->getEntity();
+
+         drawVBO(ent, mIndices, MISSLE);
+
+         if(collision.detectEntityCollision(*check, *ent)){
+            //Material m = check->getMaterial();
+            if(color == false){
+               //cout << "IN\n" << endl;
+               check->setMaterial(Materials::wood);
+               color = true;
+               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
+            }
+            else if(color == true){
+               //cout << "OUT\n" << endl;
+               check->setMaterial(Materials::jade);
+               color = false;
+               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
+            }
+
+            missleTime = 0;
+            beginProjectile = false;
+            delete missle;
+         }
+      }
+
+     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
         last = elapsed;
         elapsed = glfwGetTime() - start;
