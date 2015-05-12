@@ -253,7 +253,7 @@ void initSky() {
 void initGround() {
 
     terrain = (Terrain *)malloc(sizeof(Terrain));
-    *terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    *terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -480,18 +480,18 @@ void checkPlayerCollisions() {
         // glm::vec3 oldPos = player.getPosition();
 
         // player.setPosition(glm::vec3(oldPos.x, oldPos.y + 50.f, oldPos.z));
-        //printf("Detected player collision with terrain: %d\n", collisionCount);
+        printf("Detected player collision with terrain: %d\n", collisionCount);
     }
 }
 
 void checkOpponentCollisions(Entity &opponent) {
     if (collision.detectEntityCollision(player, opponent)) {
         collisionCount++;
-        //printf("Detected collision with enemy: %d\n", collisionCount);
+        printf("Detected collision with enemy: %d\n", collisionCount);
     }
     if (collision.detectTerrainCollision(opponent, terrain)) {
         collisionCount++;
-        //printf("Detected opponent collision with terrain: %d\n", collisionCount);
+        printf("Detected opponent collision with terrain: %d\n", collisionCount);
     }
 }
 
@@ -583,7 +583,7 @@ int main(int argc, char **argv) {
     
     // Initialize player
     player.setObject(&obj[3]);
-    player.setPosition(glm::vec3(90.0f,35.f,150.0f));
+    player.setPosition(glm::vec3(200.0f,35.f,200.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
