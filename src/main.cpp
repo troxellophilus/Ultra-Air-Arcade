@@ -573,7 +573,7 @@ int main(int argc, char **argv) {
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
     
-    installShaders("shd/vert.glsl", "shd/frag.glsl");
+    installShaders("shd/basic.vert", "shd/basic.frag");
     
     initSky();
     initGround();
