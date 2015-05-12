@@ -26,6 +26,7 @@
 
 #include "helper.h"
 #include "GLSL.h"
+#include "GLSLProgram.h"
 
 //#define _DEBUG
 
@@ -63,7 +64,8 @@ vector<unsigned int> terIndBuf;
 Object obj[NUMSHAPES];
 Object skydome;
 
-Collision *sampler = new Collision();
+Collision collision = Collision();
+Terrain *terrain;
 
 Camera camera = Camera();
 Entity player = Entity();
@@ -77,6 +79,8 @@ unsigned int collisions = 0;
 
 float xtrans[100];
 float ztrans[100];
+
+int collisionCount = 0;
 
 float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
@@ -247,7 +251,9 @@ void initSky() {
 }
 
 void initGround() {
-    Terrain terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+
+    terrain = (Terrain *)malloc(sizeof(Terrain));
+    *terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -466,6 +472,27 @@ void drawGround() {
     assert(glGetError() == GL_NO_ERROR);
 }
 
+void checkPlayerCollisions() {
+    if (collision.detectTerrainCollision(player, terrain)) {
+        collisionCount++;
+        // glm::vec3 oldPos = player.getPosition();
+
+        // player.setPosition(glm::vec3(oldPos.x, oldPos.y + 50.f, oldPos.z));
+        //printf("Detected player collision with terrain: %d\n", collisionCount);
+    }
+}
+
+void checkOpponentCollisions(Entity &opponent) {
+    if (collision.detectEntityCollision(player, opponent)) {
+        collisionCount++;
+        //printf("Detected collision with enemy: %d\n", collisionCount);
+    }
+    if (collision.detectTerrainCollision(opponent, terrain)) {
+        collisionCount++;
+        //printf("Detected opponent collision with terrain: %d\n", collisionCount);
+    }
+}
+
 int main(int argc, char **argv) {
     const GLubyte* renderer;
     const GLubyte* version;
@@ -492,7 +519,6 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
     if(argc == 3)
     {
         g_width = atoi(argv[1]);
@@ -512,15 +538,14 @@ int main(int argc, char **argv) {
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-
+    GLSLProgram::checkForOpenGLError(__FILE__,__LINE__);
     // Set key and cursor callbacks
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
-    
+    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
     // Load 3D models
     loadShapes("../Assets/models/sphere.obj", obj[0]);
     loadShapes("../Assets/models/cube.obj", obj[1]);
@@ -536,16 +561,18 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    GLSLProgram::checkForOpenGLError(__FILE__,__LINE__);
     // Print opengl version & GPU info
     renderer = glGetString (GL_RENDERER);
     version = glGetString (GL_VERSION);
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported: %s\n", version);
    
+   assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     /* tell GL to only draw onto a pixel if the shape is closer to the viewer */
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
-
+    
     installShaders("shd/vert.glsl", "shd/frag.glsl");
     
     initSky();
@@ -556,6 +583,7 @@ int main(int argc, char **argv) {
     player.setPosition(camera.getPosition() + glm::vec3(0.0f,1.0f,0.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
+    player.calculateBoundingSphereRadius();
     int pIndices = initVBO(&player, PLANE);
 
     // Initialize camera
@@ -569,11 +597,12 @@ int main(int argc, char **argv) {
     int odx = 0;
     while (odx < 5) {
         Entity opp = Entity();
-	opp.setObject(&obj[3]);
-	opp.setPosition(player.getPosition() + odx * 5.f);
-	opp.setScale(glm::vec3(0.2,0.2,0.2));
-	opponents.push_back(opp);
-	odx++;
+        opp.setObject(&obj[3]);
+        opp.setPosition(player.getPosition() + odx * 5.f);
+        opp.setScale(glm::vec3(0.2,0.2,0.2));
+        opp.calculateBoundingSphereRadius();
+        opponents.push_back(opp);
+        odx++;
     }
 
     float start = glfwGetTime();
@@ -585,6 +614,8 @@ int main(int argc, char **argv) {
         float ratio;
         int width, height;
 
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+        
         //glfwGetFramebufferSize(window, &width, &height);
         //glViewport(0, 0, width, height);
 
@@ -600,25 +631,36 @@ int main(int argc, char **argv) {
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
+
         initBillboard();
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         drawBillboard(&camera);
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Update & draw player
 	player.update();
+    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 	drawVBO(&player, pIndices, PLANE);
+    checkPlayerCollisions();
+    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Update & draw opponents
-        for (auto &opponent : opponents) {
-            opponent.update();
-            drawVBO(&opponent, pIndices, PLANE);
-        }
+    for (auto &opponent : opponents) {
+        opponent.update();
+        drawVBO(&opponent, pIndices, PLANE);
+        checkOpponentCollisions(opponent);
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+    }
         
-	// Draw environment
- 	drawGround();
-	drawSky();
+	   // Draw environment
+ 	    drawGround();
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+	    drawSky();
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         
-	// Update camera
-	camera.update();
+	   // Update camera
+	   camera.update();
+       assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

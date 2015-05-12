@@ -48,6 +48,9 @@ private:
     
     // Flags if necessary
     EntityFlag flag; // Entity flags, use as needed
+
+    // Bounding sphere radius
+    float radius;
     
 public:
     // Constructor
@@ -66,6 +69,8 @@ public:
     float getThrust();
     
     EntityFlag getFlag();
+
+    float getRadius();
     
     // Setters
     void setObject(Object *);
@@ -91,6 +96,8 @@ public:
     void throttleDown();
     
     void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
+
+    void calculateBoundingSphereRadius();
 };
 
 Entity::Entity() {
@@ -111,6 +118,8 @@ Entity::Entity() {
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
+
+    radius = 0.f;
 }
 
 void Entity::update() {
@@ -232,7 +241,7 @@ void Entity::setObject(Object *obj) {
 }
 
 void Entity::setPosition(glm::vec3 pos) {
-    pos = glm::vec3(pos);
+    position = glm::vec3(pos);
 }
 
 void Entity::setScale(glm::vec3 sc) {
@@ -253,6 +262,49 @@ void Entity::setFlag(EntityFlag f) {
 
 EntityFlag Entity::getFlag() {
     return flag;
+}
+
+float Entity::getRadius() {
+    return radius;
+}
+
+void Entity::calculateBoundingSphereRadius() {
+    //radius = 0.05f;
+
+    glm::vec3 center = glm::vec3(object->shapes[0].mesh.positions[0], object->shapes[0].mesh.positions[1], object->shapes[0].mesh.positions[2]);
+    float calculatedRadius = 0.000000000001f;
+    glm::vec3 pos, diff;
+    float length, alpha, alphaSq;
+
+    for (int i = 0; i < 2; i++){
+        for (int vertex = 0; vertex < object->shapes[0].mesh.indices.size()/3; vertex++) {
+            int index = object->shapes[0].mesh.indices[3 * vertex];
+            pos = glm::vec3(object->shapes[0].mesh.positions[3 * index + 0], object->shapes[0].mesh.positions[3 * index + 1], object->shapes[0].mesh.positions[3 * index + 2]);
+            length = glm::distance(pos, center);
+            if (length > calculatedRadius) {
+                alpha = length / calculatedRadius;
+                alphaSq = alpha * alpha;
+                calculatedRadius = 0.5f * (alpha + 1 / alpha) * calculatedRadius;
+                center = 0.5f * ((1 + 1 / alphaSq) * center + (1 - 1 / alphaSq) * pos);
+            }
+        }
+    }
+
+    for (int vertex = 0; vertex < object->shapes[0].mesh.indices.size()/3; vertex++) {
+        int index = object->shapes[0].mesh.indices[3 * vertex];
+        pos = glm::vec3(object->shapes[0].mesh.positions[3 * index + 0], object->shapes[0].mesh.positions[3 * index + 1], object->shapes[0].mesh.positions[3 * index + 2]);
+        diff = pos - center;
+        length = glm::distance(pos, center);
+        if (length > calculatedRadius){
+            calculatedRadius = (calculatedRadius + length) / 2.0f;
+            center = center + ((length - calculatedRadius) / length * diff);
+        }
+    }
+
+    // printf("Radius: %.4f\n", calculatedRadius);
+    // printf("Scaled Radius: %.4f\n", calculatedRadius * scale.x);
+
+    radius = calculatedRadius * scale.x;
 }
 
 #endif
