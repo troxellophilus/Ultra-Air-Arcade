@@ -80,6 +80,8 @@ unsigned int collisions = 0;
 float xtrans[100];
 float ztrans[100];
 
+bool collisionDetectedTerrain = false;
+bool collisionDetectedOpponent = false;
 int collisionCount = 0;
 
 float randNum() {
@@ -476,21 +478,35 @@ void drawGround() {
 
 void checkPlayerCollisions() {
     if (collision.detectTerrainCollision(player, terrain)) {
-        collisionCount++;
+        
+        if (!collisionDetectedTerrain) {
+            collisionCount++;
+            collisionDetectedTerrain = !collisionDetectedTerrain;
+            printf("Detected player collision with terrain: %d\n", collisionCount);
+        }
         // glm::vec3 oldPos = player.getPosition();
 
         // player.setPosition(glm::vec3(oldPos.x, oldPos.y + 50.f, oldPos.z));
-        //printf("Detected player collision with terrain: %d\n", collisionCount);
+    }
+    else {
+        collisionDetectedTerrain =  false;
     }
 }
 
 void checkOpponentCollisions(Entity &opponent) {
     if (collision.detectEntityCollision(player, opponent)) {
-        collisionCount++;
-        //printf("Detected collision with enemy: %d\n", collisionCount);
+        if (!collisionDetectedOpponent) {
+            collisionCount++;
+            collisionDetectedOpponent = !collisionDetectedOpponent;
+            printf("Detected collision with enemy: %d\n", collisionCount);
+        }
     }
+    else {
+        collisionDetectedOpponent = !collisionDetectedOpponent;
+    }
+
     if (collision.detectTerrainCollision(opponent, terrain)) {
-        collisionCount++;
+        //collisionCount++;
         //printf("Detected opponent collision with terrain: %d\n", collisionCount);
     }
 }
