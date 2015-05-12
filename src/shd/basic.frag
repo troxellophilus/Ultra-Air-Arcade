@@ -8,6 +8,9 @@ uniform vec3 UsColor;
 uniform vec3 UdColor;
 uniform float Ushine;
 
+in vec3 silh_vPos;
+in vec3 silh_vNor;
+
 in vec3 vCol;
 in vec3 vNor;
 in vec3 vPos;
@@ -31,6 +34,12 @@ vec3 toonShade()
     vec3 ambient = UaColor;
     float cosine = dot(lightVector, vNor);
     vec3 diffuse = UdColor * floor( cosine * levels ) * scaleFactor;
+
+    vec3 n = normalize(silh_vNor);
+    vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
+
+    if (dot(n, e) < 0.2)
+        return vec3(0.0, 0.0, 0.0);
 
     // if (dot(vPos, vNor) < mix(2,2, max( 0.0, dot(vPos, lightVector)) )  )
     // {

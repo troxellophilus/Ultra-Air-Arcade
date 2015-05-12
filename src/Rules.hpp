@@ -25,6 +25,7 @@ private:
     GameMode mode; // mode of the camera
     
     // Players
+    Entity *player; // Pointer to the player entity
     vector<Entity> *agents; // Pointer to the vector of opponents in main
     unsigned int lap[MAX_PLAYERS]; // Array of current lap # per racer
 
