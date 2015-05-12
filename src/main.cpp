@@ -24,6 +24,7 @@
 #include "Materials.hpp"
 #include "Terrain.h"
 #include "Rules.hpp"
+ #include "Projectile.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -34,7 +35,7 @@
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, SKY, PLANE, NUM_VBO };
+enum { TERRAIN, SKY, PLANE, MISSLE, NUM_VBO };
 
 GLuint passThroughShaders;
 GLuint vao;
@@ -81,10 +82,17 @@ unsigned int pIndices = 0;
 
 float xtrans[100];
 float ztrans[100];
+float missleTime;
 
 bool collisionDetectedTerrain = false;
 bool collisionDetectedOpponent = false;
 int collisionCount = 0;
+
+bool beginProjectile = false;
+Projectile *missle;
+Entity projectileEntity = Entity();
+float start;
+float elapsed;
 
 float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
@@ -136,6 +144,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	    
 	    pIndices = initVBO(&player, PLANE);
 	}
+    if(key == GLFW_KEY_X){
+           if(!beginProjectile){
+              beginProjectile = true;
+              missle = new Projectile(projectileEntity, true, player.getPosition(), opponents[1].getPosition());
+              missleTime = elapsed;
+              //cout << "New Projectile" << endl;
+           }
+      }
     }
 }
 
@@ -232,7 +248,6 @@ void drawBillboard(Camera *camera) {
 		// This draws a triangle_strip which looks like a quad.
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
-
 	glDisableVertexAttribArray(0);
 }
 
@@ -588,6 +603,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
     loadShapes("../Assets/models/Plane1.obj", obj[3]);
+    loadShapes("../Assets/models/missile.obj", obj[4]);
     loadShapes("../Assets/models/skydome.obj", skydome);
     std::cout << " loaded the objects " << endl;
 
@@ -631,6 +647,14 @@ int main(int argc, char **argv) {
     camera.setFOV(90);
     camera.setPlayer(&player);
 
+    //cout << "Init\n";
+    projectileEntity.setObject(&obj[4]);
+    projectileEntity.setPosition(glm::vec3(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]));
+    projectileEntity.setScale(glm::vec3(2.0, 2.0, 2.0));
+    projectileEntity.setMaterial(Materials::emerald);
+    int mIndices = initVBO(&projectileEntity, MISSLE);
+    projectileEntity.calculateBoundingSphereRadius();
+
     // Initialize opponents
     int odx = 1;
     while (odx < 6) {
@@ -648,10 +672,19 @@ int main(int argc, char **argv) {
     Rules rules = Rules();
     rules.setAgents(&opponents);
 
+    Entity bigOpp = Entity();
+    bigOpp.setObject(&obj[3]);
+    bigOpp.setPosition(player.getPosition() + odx * 5.f);
+    bigOpp.setMaterial(Materials::jade);
+    bigOpp.setScale(glm::vec3(20.0,20.0,20.0));
+    bigOpp.calculateBoundingSphereRadius();
+
     float start = glfwGetTime();
     float elapsed = 0;
     float last = -1;
 
+    Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
+    bool color = false;
     // Frame loop
     while (!glfwWindowShouldClose(window)) {
         float ratio;
@@ -707,6 +740,43 @@ int main(int argc, char **argv) {
 	   // Update camera
 	   camera.update();
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+        pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
+      Entity *check = pathPlane.getEntity();
+
+      drawVBO(check, pIndices, PLANE);
+
+      if(beginProjectile == true){
+         
+         int isDone = missle->runProjectile(false, elapsed - missleTime,
+          player.getPosition(), check->getPosition());
+
+         Entity* ent = missle->getEntity();
+
+         drawVBO(ent, mIndices, MISSLE);
+
+         if(collision.detectEntityCollision(*check, *ent)){
+            //Material m = check->getMaterial();
+            if(color == false){
+               //cout << "IN\n" << endl;
+               check->setMaterial(Materials::wood);
+               color = true;
+               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
+            }
+            else if(color == true){
+               //cout << "OUT\n" << endl;
+               check->setMaterial(Materials::jade);
+               color = false;
+               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
+            }
+
+            missleTime = 0;
+            beginProjectile = false;
+            delete missle;
+         }
+      }
+
+     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Print DEBUG messages
 	if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
