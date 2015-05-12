@@ -30,16 +30,16 @@ vec4 calcColor(vec3 fadeTo, vec3 fadeFrom, float dist, float bottom) {
 
 vec3 toonShade()
 {
-    vec3 lightVector = normalize(lPos - vPos);
-    vec3 ambient = UaColor;
-    float cosine = dot(lightVector, vNor);
-    vec3 diffuse = UdColor * floor( cosine * levels ) * scaleFactor;
-
     vec3 n = normalize(silh_vNor);
     vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
     if (dot(n, e) < 0.2)
         return vec3(0.0, 0.0, 0.0);
+
+    vec3 lightVector = normalize(lPos - vPos);
+    vec3 ambient = UaColor;
+    float cosine = dot(lightVector, vNor);
+    vec3 diffuse = UdColor * floor( cosine * levels ) * scaleFactor;
 
     // if (dot(vPos, vNor) < mix(2,2, max( 0.0, dot(vPos, lightVector)) )  )
     // {
