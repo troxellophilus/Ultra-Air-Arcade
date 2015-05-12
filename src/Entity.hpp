@@ -95,7 +95,7 @@ public:
 
 Entity::Entity() {
     object = NULL;
-    material = Material::Material();
+    material = Material();
     
     position = glm::vec3(0, 0, 0);
     rotation = glm::quat(1, 0, 0, 0);
