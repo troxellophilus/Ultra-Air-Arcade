@@ -16,6 +16,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <eigen3/Eigen/Dense>
 
 #include "Entity.hpp"
 #include "Collision.hpp"
@@ -482,11 +483,16 @@ void checkPlayerCollisions() {
         if (!collisionDetectedTerrain) {
             collisionCount++;
             collisionDetectedTerrain = !collisionDetectedTerrain;
-            printf("Detected player collision with terrain: %d\n", collisionCount);
-        }
-        // glm::vec3 oldPos = player.getPosition();
+            //printf("Detected player collision with terrain: %d\n", collisionCount);
 
-        // player.setPosition(glm::vec3(oldPos.x, oldPos.y + 50.f, oldPos.z));
+            glm::vec3 playerPos = player.getPosition();
+            Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
+            Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
+            glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
+            player.setPosition(playerPos + (convertedNor * 3.f));
+            player.setThrust(0.f);
+            player.setVelocity(glm::vec3(0.f, 0.f, 0.f));
+        }
     }
     else {
         collisionDetectedTerrain =  false;
@@ -499,6 +505,8 @@ void checkOpponentCollisions(Entity &opponent) {
             collisionCount++;
             collisionDetectedOpponent = !collisionDetectedOpponent;
             printf("Detected collision with enemy: %d\n", collisionCount);
+
+            player.setVelocity(player.getVelocity() * -0.25f);
         }
     }
     else {

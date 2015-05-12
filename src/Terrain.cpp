@@ -126,3 +126,7 @@ bool Terrain::detectCollision(Eigen::Vector3f objVector, float radius){
    return false;
 }
 
+Eigen::Vector3f Terrain::getNormal(Eigen::Vector3f objVector) {
+   return normals[(int)objVector(2) * width + (int)objVector(0)];
+}
+

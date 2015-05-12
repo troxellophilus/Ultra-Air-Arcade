@@ -259,6 +259,10 @@ void Entity::setVelocity(glm::vec3 vel) {
     velocity = glm::vec3(vel);
 }
 
+void Entity::setThrust(float th) {
+    thrust = th;
+}
+
 void Entity::setMaterial(Material mat) {
     material = mat;
 }

@@ -44,10 +44,11 @@ class Terrain
       int getLength(){return length;}
       //Set the height of the terrain, may be made private.
       bool detectCollision(Eigen::Vector3f objVector, float radius);
+      Eigen::Vector3f getNormal(Eigen::Vector3f objVector);
       void setHeight(int w, int l, float h);
       //Load in image and then pass grayscale value to setHeight.
       void loadTerrain(string *fileName, float baseHeight);
-		void createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
+	void createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
       void loadTextures();
 };
 
