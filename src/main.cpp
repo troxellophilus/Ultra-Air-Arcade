@@ -23,6 +23,7 @@
 #include "Camera.hpp"
 #include "Materials.hpp"
 #include "Terrain.h"
+#include "Rules.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -609,6 +610,10 @@ int main(int argc, char **argv) {
 	odx++;
     }
 
+    // Initialize game rules
+    Rules rules = Rules();
+    rules.setAgents(&opponents);
+
     float start = glfwGetTime();
     float elapsed = 0;
     float last = -1;
@@ -640,6 +645,9 @@ int main(int argc, char **argv) {
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         drawBillboard(&camera);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+	// Update the rules and game state
+	rules.update();
 
 	// Update & draw player
 	player.update();
