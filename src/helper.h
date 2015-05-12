@@ -5,6 +5,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <glm/glm.hpp>
+#include <GL/glew.h>
 #include "types.h"
 
 using namespace std;
@@ -12,7 +13,7 @@ using namespace std;
 #ifndef HELPER_H
 #define HELPER_H
 
-bool installShaders(const std::string &vShaderName, const std::string &fShaderName);
+GLuint installShaders(const std::string &vShaderName, const std::string &fShaderName);
 float randNum();
 float randAngle();
 void calcTime();

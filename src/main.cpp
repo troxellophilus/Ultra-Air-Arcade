@@ -35,7 +35,7 @@ using namespace std;
 
 enum { TERRAIN, SKY, PLANE, NUM_VBO };
 
-GLuint prog;
+GLuint passThroughShaders;
 GLuint vao;
 GLuint pbo[NUM_VBO];
 GLuint nbo[NUM_VBO];
@@ -271,7 +271,31 @@ void initGround() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-bool installShaders(const string &vShaderName, const string &fShaderName) {
+void initShaderVars() {
+	// Set up the shader variables
+    aPos = glGetAttribLocation(passThroughShaders, "aPos");
+    aNor = glGetAttribLocation(passThroughShaders, "aNor");
+    
+    uViewMatrix = glGetUniformLocation(passThroughShaders, "V");
+    uModelMatrix = glGetUniformLocation(passThroughShaders, "M");
+    uProjMatrix = glGetUniformLocation(passThroughShaders, "P");
+    lPos = glGetUniformLocation(passThroughShaders, "lPos");
+    renderObj = glGetUniformLocation(passThroughShaders, "renderObj");
+    
+    h_uMatAmb = glGetUniformLocation(passThroughShaders, "UaColor");
+    h_uMatDif = glGetUniformLocation(passThroughShaders, "UdColor");
+    h_uMatSpec = glGetUniformLocation(passThroughShaders, "UsColor");
+    h_uMatShine = glGetUniformLocation(passThroughShaders, "Ushine");
+
+    // Shader vars for billboard
+    CameraRight_worldspace_ID  = glGetUniformLocation(passThroughShaders, "CameraRight_worldspace");
+    CameraUp_worldspace_ID  = glGetUniformLocation(passThroughShaders, "CameraUp_worldspace");
+    BillboardPosID = glGetUniformLocation(passThroughShaders, "BillboardPos");
+    BillboardSizeID = glGetUniformLocation(passThroughShaders, "BillboardSize");
+}
+
+GLuint installShaders(const string &vShaderName, const string &fShaderName) {
+	GLuint prog;
     GLint rc;
     GLSL::printError(__FILE__,__LINE__);
 
@@ -328,34 +352,12 @@ bool installShaders(const string &vShaderName, const string &fShaderName) {
     }
 
     glUseProgram(prog);
-    
-    // Set up the shader variables
-    aPos = glGetAttribLocation(prog, "aPos");
-    aNor = glGetAttribLocation(prog, "aNor");
-    
-    uViewMatrix = glGetUniformLocation(prog, "V");
-    uModelMatrix = glGetUniformLocation(prog, "M");
-    uProjMatrix = glGetUniformLocation(prog, "P");
-    lPos = glGetUniformLocation(prog, "lPos");
-    renderObj = glGetUniformLocation(prog, "renderObj");
-    
-    h_uMatAmb = glGetUniformLocation(prog, "UaColor");
-    h_uMatDif = glGetUniformLocation(prog, "UdColor");
-    h_uMatSpec = glGetUniformLocation(prog, "UsColor");
-    h_uMatShine = glGetUniformLocation(prog, "Ushine");
-
-    // Shader vars for billboard
-    CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
-    CameraUp_worldspace_ID  = glGetUniformLocation(prog, "CameraUp_worldspace");
-    BillboardPosID = glGetUniformLocation(prog, "BillboardPos");
-    BillboardSizeID = glGetUniformLocation(prog, "BillboardSize");
-    
     assert(glGetError() == GL_NO_ERROR);
-    return true;
+    return prog;
 }
 
 void SetMaterial(Material mat) {
-    glUseProgram(prog);
+    glUseProgram(passThroughShaders);
     
     glm::vec3 amb = mat.getAmbient();
     glm::vec3 dif = mat.getDiffuse();
@@ -369,7 +371,7 @@ void SetMaterial(Material mat) {
 }
 
 void drawVBO(Entity *entity, int nIndices, int whichbo) {
-    glUseProgram(prog);
+    glUseProgram(passThroughShaders);
  
     // Enable and bind position array for drawing
     glEnableVertexAttribArray(aPos);
@@ -409,7 +411,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
 }
 
 void drawSky() {
-	glUseProgram(prog);
+	glUseProgram(passThroughShaders);
 	int nIndices = (int)skydome.shapes[0].mesh.indices.size();
 
 	glEnableVertexAttribArray(aPos);
@@ -446,7 +448,7 @@ void drawSky() {
 
 void drawGround() {
     glEnable(GL_CULL_FACE);
-    glUseProgram(prog);
+    glUseProgram(passThroughShaders);
     
     glEnableVertexAttribArray(aPos);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -573,8 +575,9 @@ int main(int argc, char **argv) {
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
     
-    installShaders("shd/basic.vert", "shd/basic.frag");
-    
+    passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
+	initShaderVars();    
+
     initSky();
     initGround();
     
@@ -621,7 +624,7 @@ int main(int argc, char **argv) {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(prog);
+	glUseProgram(passThroughShaders);
 
         // Set projection matrix
         glm::mat4 projection = camera.getProjectionMatrix();
