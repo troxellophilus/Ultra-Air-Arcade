@@ -1,4 +1,4 @@
-/* 
+/*
  * Ultra Air Arcade Code Base
  * CPE 476
  */
@@ -270,23 +270,23 @@ void initSky() {
 }
 
 void initGround() {
-    terrain = (Terrain *)malloc(sizeof(Terrain));
-    *terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+   terrain = (Terrain *)malloc(sizeof(Terrain));
+   *terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
-    glGenBuffers(1, &pbo[TERRAIN]);
-    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-    glBufferData(GL_ARRAY_BUFFER, terPosBuf.size()*sizeof(float), &terPosBuf[0], GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &nbo[TERRAIN]);
-    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-    glBufferData(GL_ARRAY_BUFFER, terNorBuf.size()*sizeof(float), &terNorBuf[0], GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &ibo[TERRAIN]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, terIndBuf.size()*sizeof(unsigned int), &terIndBuf[0], GL_STATIC_DRAW);
+   glGenBuffers(1, &pbo[TERRAIN]);
+   glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+   glBufferData(GL_ARRAY_BUFFER, terPosBuf.size()*sizeof(float), &terPosBuf[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+   glGenBuffers(1, &nbo[TERRAIN]);
+   glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
+   glBufferData(GL_ARRAY_BUFFER, terNorBuf.size()*sizeof(float), &terNorBuf[0], GL_STATIC_DRAW);
+
+   glGenBuffers(1, &ibo[TERRAIN]);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, terIndBuf.size()*sizeof(unsigned int), &terIndBuf[0], GL_STATIC_DRAW);
+
+   glBindBuffer(GL_ARRAY_BUFFER, 0);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void initShaderVars() {
@@ -393,43 +393,43 @@ void SetMaterial(Material mat) {
 }
 
 void drawVBO(Entity *entity, int nIndices, int whichbo) {
-    glUseProgram(passThroughShaders);
- 
-    // Enable and bind position array for drawing
-    glEnableVertexAttribArray(aPos);
-    glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
-    glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    
-    // Enable and bind normal array for drawing
-    glEnableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
-    glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    
-    // Bind index array for drawing
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
-    
-    glUniform3f(lPos, 200, 1000, 200);
+   glUseProgram(passThroughShaders);
 
-    glUniform1i(renderObj, 0);
+   // Enable and bind position array for drawing
+   glEnableVertexAttribArray(aPos);
+   glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
+   glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    SetMaterial(entity->getMaterial());
-    glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
-    glm::mat4 Orient = entity->getRotationM();
-    glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
-    glm::mat4 com = Trans*Orient*Sc;
-    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
+   // Enable and bind normal array for drawing
+   glEnableVertexAttribArray(aNor);
+   glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
+   glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-    
-    // Disable and unbind
-    GLSL::disableVertexAttribArray(aPos);
-    GLSL::disableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    // Last lines
-    glUseProgram(0);
-    assert(glGetError() == GL_NO_ERROR);
+   // Bind index array for drawing
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
+
+   glUniform3f(lPos, 200, 1000, 200);
+
+   glUniform1i(renderObj, 0);
+
+   SetMaterial(entity->getMaterial());
+   glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
+   glm::mat4 Orient = entity->getRotationM();
+   glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
+   glm::mat4 com = Trans * Orient * Sc;
+   glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
+
+   glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
+
+   // Disable and unbind
+   GLSL::disableVertexAttribArray(aPos);
+   GLSL::disableVertexAttribArray(aNor);
+   glBindBuffer(GL_ARRAY_BUFFER, 0);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+   // Last lines
+   glUseProgram(0);
+   assert(glGetError() == GL_NO_ERROR);
 }
 
 void drawSky() {
@@ -469,7 +469,7 @@ void drawSky() {
 }
 
 void drawGround() {
-   glEnable(GL_CULL_FACE);
+   // glEnable(GL_CULL_FACE);
    glUseProgram(passThroughShaders);
 
    glEnableVertexAttribArray(aPos);
@@ -492,12 +492,9 @@ void drawGround() {
    glBindBuffer(GL_ARRAY_BUFFER, 0);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-   glDisable(GL_CULL_FACE);
-<<<<<<< HEAD
-
-=======
->>>>>>> HUD Update
+   // glDisable(GL_CULL_FACE);
    glUseProgram(0);
+   GLSL::printError(__FILE__, __LINE__);
    assert(glGetError() == GL_NO_ERROR);
 }
 
@@ -524,7 +521,7 @@ void drawHUD(int fps) {
    len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText.addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
+   drawText.addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(45), 1));
 
    drawText.addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText.getFontSize(90), 2));
    drawText.addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText.getFontSize(90), 2));
@@ -543,181 +540,180 @@ void drawHUD(int fps) {
 }
 
 void crash(float timePrint) {
-    float start = glfwGetTime();
-    float elapsed = 0;
-    char text[2];
-    float numText;
+   float start = glfwGetTime();
+   float elapsed = 0;
+   char text[2];
+   float numText;
 
-    // printf("Start: %f\n", start);
-    while (elapsed < timePrint) {
-         elapsed = glfwGetTime() - start;
+   // printf("Start: %f\n", start);
+   while (elapsed < timePrint) {
+      elapsed = glfwGetTime() - start;
 
-         drawText.addText(Text("Crash", g_width/2, g_height/2, 0, 3, 50, 1));
-         drawText.drawText();
-         glfwSwapBuffers(window);
-        }
-    }
+      drawText.addText(Text("Crash", g_width / 2, g_height / 2, 0, 3, 50, 1));
+      drawText.drawText();
+      glfwSwapBuffers(window);
+   }
 }
 
 void checkPlayerCollisions() {
-    if (collision.detectTerrainCollision(player, terrain)) {
-        
-        if (!collisionDetectedTerrain) {
-            collisionCount++;
-            collisionDetectedTerrain = !collisionDetectedTerrain;
-            //printf("Detected player collision with terrain: %d\n", collisionCount);
+   if (collision.detectTerrainCollision(player, terrain)) {
 
-            glm::vec3 playerPos = player.getPosition();
-            Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
-            Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
-            glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
-            player.setPosition(playerPos + (convertedNor * 3.f));
-            player.setThrust(0.f);
-            player.setVelocity(glm::vec3(0.f, 0.f, 0.f));
-        }
-    }
-    else {
-        collisionDetectedTerrain =  false;
-    }
+      if (!collisionDetectedTerrain) {
+         collisionCount++;
+         collisionDetectedTerrain = !collisionDetectedTerrain;
+         //printf("Detected player collision with terrain: %d\n", collisionCount);
+
+         glm::vec3 playerPos = player.getPosition();
+         Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
+         Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
+         glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
+         player.setPosition(playerPos + (convertedNor * 3.f));
+         player.setThrust(0.f);
+         player.setVelocity(glm::vec3(0.f, 0.f, 0.f));
+      }
+   }
+   else {
+      collisionDetectedTerrain =  false;
+   }
 }
 
 void checkOpponentCollisions(Entity &opponent) {
-    if (collision.detectEntityCollision(player, opponent)) {
-        if (!collisionDetectedOpponent) {
-            collisionCount++;
-            collisionDetectedOpponent = !collisionDetectedOpponent;
-            printf("Detected collision with enemy: %d\n", collisionCount);
+   if (collision.detectEntityCollision(player, opponent)) {
+      if (!collisionDetectedOpponent) {
+         collisionCount++;
+         collisionDetectedOpponent = !collisionDetectedOpponent;
+         printf("Detected collision with enemy: %d\n", collisionCount);
 
-            player.setVelocity(player.getVelocity() * -0.25f);
-        }
-    }
-    else {
-        collisionDetectedOpponent = !collisionDetectedOpponent;
-    }
+         player.setVelocity(player.getVelocity() * -0.25f);
+      }
+   }
+   else {
+      collisionDetectedOpponent = !collisionDetectedOpponent;
+   }
 
-    if (collision.detectTerrainCollision(opponent, terrain)) {
-        //collisionCount++;
-        //printf("Detected opponent collision with terrain: %d\n", collisionCount);
-    }
+   if (collision.detectTerrainCollision(opponent, terrain)) {
+      //collisionCount++;
+      //printf("Detected opponent collision with terrain: %d\n", collisionCount);
+   }
 }
 
 int main(int argc, char **argv) {
-    const GLubyte* renderer;
-    const GLubyte* version;
-    
-    srand(time(NULL));
+   const GLubyte* renderer;
+   const GLubyte* version;
 
-    glfwSetErrorCallback(error_callback);
+   srand(time(NULL));
 
-    int i;
-    for (i = 0; i < 100; i++) {
-        xtrans[i] = randNum();
-        ztrans[i] = randNum();
-    }    
+   glfwSetErrorCallback(error_callback);
 
-    // Initialise GLFW
-    if(!glfwInit()) {
-	    exit(EXIT_FAILURE);
-    }
-    
-    //glfwWindowHint(GLFW_SAMPLES, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if(argc == 3)
-    {
-        g_width = atoi(argv[1]);
-        g_height = atoi(argv[2]);
-    }
-    else
-    {
-        g_width = 640;
-        g_height = 480;
-    }
+   int i;
+   for (i = 0; i < 100; i++) {
+      xtrans[i] = randNum();
+      ztrans[i] = randNum();
+   }
 
-    // Open a window and create its OpenGL context
-    window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
-    if( window == NULL ){
-        glfwTerminate();
-	exit(EXIT_FAILURE);
-    }
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-    GLSLProgram::checkForOpenGLError(__FILE__,__LINE__);
-    // Set key and cursor callbacks
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, cursor_position_callback);
-    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-    // Ensure we can capture the escape key being pressed below
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // Load 3D models
-    loadShapes("../Assets/models/sphere.obj", obj[0]);
-    loadShapes("../Assets/models/cube.obj", obj[1]);
-    loadShapes("../Assets/models/Pyro.obj", obj[2]);
-    loadShapes("../Assets/models/Plane1.obj", obj[3]);
-    loadShapes("../Assets/models/skydome.obj", skydome);
-    std::cout << " loaded the objects " << endl;
+   // Initialise GLFW
+   if (!glfwInit()) {
+      exit(EXIT_FAILURE);
+   }
 
-    // Initialize GLEW
-    glewExperimental = GL_TRUE;
-    if ( glewInit() != GLEW_OK ) {
-        fprintf(stderr, "Failed to initialize GLEW\n");
-        return -1;
-    }
+   //glfwWindowHint(GLFW_SAMPLES, 4);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+   // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+   if (argc == 3)
+   {
+      g_width = atoi(argv[1]);
+      g_height = atoi(argv[2]);
+   }
+   else
+   {
+      g_width = 640;
+      g_height = 480;
+   }
 
-    GLSLProgram::checkForOpenGLError(__FILE__,__LINE__);
-    // Print opengl version & GPU info
-    renderer = glGetString (GL_RENDERER);
-    version = glGetString (GL_VERSION);
-    printf ("Renderer: %s\n", renderer);
-    printf ("OpenGL version supported: %s\n", version);
-   
-   assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-    /* tell GL to only draw onto a pixel if the shape is closer to the viewer */
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_LESS);
-    
-    passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
-    textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
+   // Open a window and create its OpenGL context
+   window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
+   if ( window == NULL ) {
+      glfwTerminate();
+      exit(EXIT_FAILURE);
+   }
+   glfwMakeContextCurrent(window);
+   glfwSwapInterval(1);
+   GLSLProgram::checkForOpenGLError(__FILE__, __LINE__);
+   // Set key and cursor callbacks
+   glfwSetKeyCallback(window, key_callback);
+   glfwSetCursorPosCallback(window, cursor_position_callback);
+   assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+   // Ensure we can capture the escape key being pressed below
+   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+   // Load 3D models
+   loadShapes("../Assets/models/sphere.obj", obj[0]);
+   loadShapes("../Assets/models/cube.obj", obj[1]);
+   loadShapes("../Assets/models/Pyro.obj", obj[2]);
+   loadShapes("../Assets/models/Plane1.obj", obj[3]);
+   loadShapes("../Assets/models/skydome.obj", skydome);
+   std::cout << " loaded the objects " << endl;
 
-    initShaderVars();    
+   // Initialize GLEW
+   glewExperimental = GL_TRUE;
+   if ( glewInit() != GLEW_OK ) {
+      fprintf(stderr, "Failed to initialize GLEW\n");
+      return -1;
+   }
 
-    initSky();
-    initGround();
-    
-    // Initialize player
-    player.setObject(&obj[3]);
-    player.setPosition(glm::vec3(200.0f,35.f,200.0f));
-    player.setScale(glm::vec3(0.2,0.2,0.2));
-    player.setMaterial(Materials::emerald);
-    player.calculateBoundingSphereRadius();
-    int pIndices = initVBO(&player, PLANE);
+   GLSLProgram::checkForOpenGLError(__FILE__, __LINE__);
+   // Print opengl version & GPU info
+   renderer = glGetString (GL_RENDERER);
+   version = glGetString (GL_VERSION);
+   printf ("Renderer: %s\n", renderer);
+   printf ("OpenGL version supported: %s\n", version);
 
-    // Initialize camera
-    camera.setMode(TPC);
-    camera.setPosition(glm::vec3(0,0,-10));
-    camera.setClipping(0.1, 1500);
-    camera.setFOV(90);
-    camera.setPlayer(&player);
+   assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+   /* tell GL to only draw onto a pixel if the shape is closer to the viewer */
+   glEnable (GL_DEPTH_TEST);
+   glDepthFunc (GL_LESS);
 
-    // Initialize opponents
-    int odx = 1;
-    while (odx < 6) {
-        Entity opp = Entity();
-	opp.setObject(&obj[3]);
-	glm::vec3 epos = player.getPosition();
-	opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
-	opp.setScale(glm::vec3(0.2,0.2,0.2));
-        opp.calculateBoundingSphereRadius();
-	opponents.push_back(opp);
-	odx++;
-    }
+   passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
+   textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
 
-    // Initialize game rules
-    Rules rules = Rules();
-    rules.setAgents(&opponents);
+   initShaderVars();
+
+   initSky();
+   initGround();
+
+   // Initialize player
+   player.setObject(&obj[3]);
+   player.setPosition(glm::vec3(200.0f, 35.f, 200.0f));
+   player.setScale(glm::vec3(0.2, 0.2, 0.2));
+   player.setMaterial(Materials::emerald);
+   player.calculateBoundingSphereRadius();
+   int pIndices = initVBO(&player, PLANE);
+
+   // Initialize camera
+   camera.setMode(TPC);
+   camera.setPosition(glm::vec3(0, 0, -10));
+   camera.setClipping(0.1, 1500);
+   camera.setFOV(90);
+   camera.setPlayer(&player);
+
+   // Initialize opponents
+   int odx = 1;
+   while (odx < 6) {
+      Entity opp = Entity();
+      opp.setObject(&obj[3]);
+      glm::vec3 epos = player.getPosition();
+      opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+      opp.setScale(glm::vec3(0.2, 0.2, 0.2));
+      opp.calculateBoundingSphereRadius();
+      opponents.push_back(opp);
+      odx++;
+   }
+
+   // Initialize game rules
+   Rules rules = Rules();
+   rules.setAgents(&opponents);
 
    drawText.initResources(g_width, g_height, h_aCoord, h_uText, h_uColor);
 
@@ -725,10 +721,10 @@ int main(int argc, char **argv) {
    double lastTime = glfwGetTime();
    int fps = 0;
 
-    // Frame loop
-    while (!glfwWindowShouldClose(window)) {
-        float ratio;
-        int width, height;
+   // Frame loop
+   while (!glfwWindowShouldClose(window)) {
+      float ratio;
+      int width, height;
 
       double currentTime = glfwGetTime();
       frames++;
@@ -739,72 +735,71 @@ int main(int argc, char **argv) {
          lastTime += 1.0;
       }
 
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-        
-        //glfwGetFramebufferSize(window, &width, &height);
-        //glViewport(0, 0, width, height);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      //glfwGetFramebufferSize(window, &width, &height);
+      //glViewport(0, 0, width, height);
 
-	glUseProgram(passThroughShaders);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Set projection matrix
-        glm::mat4 projection = camera.getProjectionMatrix();
-        glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
+      glUseProgram(passThroughShaders);
 
-        // Set view matrix
-        glm::mat4 view = camera.getViewMatrix();
-        glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
+      // Set projection matrix
+      glm::mat4 projection = camera.getProjectionMatrix();
+      glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
+
+      // Set view matrix
+      glm::mat4 view = camera.getViewMatrix();
+      glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
 
-        initBillboard();
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-        drawBillboard(&camera);
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+      initBillboard();
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+      drawBillboard(&camera);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-	// Update the rules and game state
-	rules.update();
+      // Update the rules and game state
+      rules.update();
 
-	// Update & draw player
-	player.update();
-    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-	drawVBO(&player, pIndices, PLANE);
-    checkPlayerCollisions();
-    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+      // Update & draw player
+      player.update();
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+      drawVBO(&player, pIndices, PLANE);
+      checkPlayerCollisions();
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-	// Update & draw opponents
-    for (auto &opponent : opponents) {
-        opponent.update();
-        drawVBO(&opponent, pIndices, PLANE);
-        checkOpponentCollisions(opponent);
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-    }
-        
-    //Draw HUD
+      // Update & draw opponents
+      for (auto &opponent : opponents) {
+         opponent.update();
+         drawVBO(&opponent, pIndices, PLANE);
+         checkOpponentCollisions(opponent);
+         assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+      }
+
+      //Draw HUD
       drawHUD(fps);
 
-	   // Draw environment
- 	    drawGround();
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-	    drawSky();
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-        
-	   // Update camera
-	   camera.update();
-       assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+      // Draw environment
+      drawGround();
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+      drawSky();
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-	// Print DEBUG messages
-	if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
-		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
-	}
+      // Update camera
+      camera.update();
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-        
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-    
-    glfwTerminate();
-    
-    return 0;
+      // Print DEBUG messages
+      if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
+         printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+      }
+
+
+      glfwSwapBuffers(window);
+      glfwPollEvents();
+   }
+
+   glfwTerminate();
+
+   return 0;
 }
-
