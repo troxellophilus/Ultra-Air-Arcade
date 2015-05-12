@@ -6,13 +6,13 @@
 #include <GL/glew.h>
 
 #ifdef __APPLE__
-    #define GLFW_INCLUDE_GLCOREARB
+#define GLFW_INCLUDE_GLCOREARB
 #endif
 
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
- 
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -27,13 +27,19 @@
 #include "Projectile.hpp"
 #include "Skybox.hpp"
 #include "RacerAI.hpp"
-
+#include "DrawText.h"
 #include "helper.h"
 #include "GLSL.h"
 #include "GLSLProgram.h"
 
 //#define DEBUG
 #define NUM_OPPONENTS 15
+
+#include <string>
+#include <iostream>
+#include <vector>
+
+//#define _DEBUG
 
 using namespace std;
 //using namespace glm;
@@ -45,6 +51,9 @@ GLuint passThroughShaders;
 GLuint depthCalcShaders;
 GLuint renderSceneShaders;
 GLuint skyBoxShaders;
+GLuint textShaders;
+
+GLFWwindow* window;
 
 GLuint vao;
 GLuint pbo[NUM_VBO];
@@ -97,6 +106,11 @@ GLuint shadowModelMatrix;
 GLuint shadowProjMatrix;
 // End
 
+// HUD vars
+GLint h_aCoord;
+GLint h_uText;
+GLint h_uColor;
+
 vector<float> terPosBuf;
 vector<float> terNorBuf;
 vector<unsigned int> terIndBuf;
@@ -106,6 +120,7 @@ Object obj[NUMSHAPES];
 Collision collision = Collision();
 Terrain terrain = Terrain();
 Skybox *skybox;
+DrawText drawText = DrawText();
 
 Rules rules = Rules();
 RacerAI playerAI = RacerAI();
@@ -115,7 +130,6 @@ vector<Entity> opponents;
 
 static float g_width, g_height;
 
-unsigned int frames = 0;
 unsigned int numObj = 0;
 unsigned int collisions = 0;
 unsigned int pIndices = 0;
@@ -137,7 +151,7 @@ float start;
 float elapsed;
 
 float randNum() {
-    return ((float) rand() / (RAND_MAX)) * 600.0;
+   return ((float) rand() / (RAND_MAX)) * 600.0;
 }
 
 int initVBO(Entity *e, int i);
@@ -219,30 +233,30 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 static void error_callback(int error, const char* description) {
-    fputs(description, stderr);
+   fputs(description, stderr);
 }
 
 static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
-    static double last_xpos = xpos;
-    static double last_ypos = ypos;
+   static double last_xpos = xpos;
+   static double last_ypos = ypos;
 
-    player.pitch(float(ypos - last_ypos));
-    camera.pitch(float(ypos - last_ypos));
+   player.pitch(float(ypos - last_ypos));
+   camera.pitch(float(ypos - last_ypos));
 
-    player.turn(float(xpos - last_xpos));
-    camera.yaw(float(xpos - last_xpos));
+   player.turn(float(xpos - last_xpos));
+   camera.yaw(float(xpos - last_xpos));
 
-    last_xpos = xpos;
-    last_ypos = ypos;
+   last_xpos = xpos;
+   last_ypos = ypos;
 }
 
 /* model transforms */
 void SetModel(vec3 trans, glm::vec3 rot, vec3 sc) {
-    glm::mat4 Trans = glm::translate( glm::mat4(1.0f), trans);
-    glm::mat4 Orient = glm::orientation(rot, glm::vec3(0, 1, 0));
-    glm::mat4 Sc = glm::scale(glm::mat4(1.0f), sc);
-    glm::mat4 com = Trans*Orient*Sc;
-    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
+   glm::mat4 Trans = glm::translate( glm::mat4(1.0f), trans);
+   glm::mat4 Orient = glm::orientation(rot, glm::vec3(0, 1, 0));
+   glm::mat4 Sc = glm::scale(glm::mat4(1.0f), sc);
+   glm::mat4 com = Trans * Orient * Sc;
+   glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
 }
 
 int initVBO(Entity *e, int whichbo) {
@@ -277,16 +291,16 @@ int initVBO(Entity *e, int whichbo) {
 
 void initBillboard() {
 // Set up billboard
-	static const GLfloat g_vertex_buffer_data[] = { 
-		 -0.5f, -0.5f, 0.0f,
-		  0.5f, -0.5f, 0.0f,
-		 -0.5f, 0.5f, 0.0f,
-		  0.5f, 0.5f, 0.0f,
-	};
+   static const GLfloat g_vertex_buffer_data[] = {
+      -0.5f, -0.5f, 0.0f,
+      0.5f, -0.5f, 0.0f,
+      -0.5f, 0.5f, 0.0f,
+      0.5f, 0.5f, 0.0f,
+   };
 
-	glGenBuffers(1, &billboard_vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+   glGenBuffers(1, &billboard_vertex_buffer);
+   glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 }
 
 void drawBillboard(Camera *camera) {
@@ -318,20 +332,29 @@ void initGround() {
 
     terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
-    glGenBuffers(1, &pbo[TERRAIN]);
-    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-    glBufferData(GL_ARRAY_BUFFER, terPosBuf.size()*sizeof(float), &terPosBuf[0], GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &nbo[TERRAIN]);
-    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-    glBufferData(GL_ARRAY_BUFFER, terNorBuf.size()*sizeof(float), &terNorBuf[0], GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &ibo[TERRAIN]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, terIndBuf.size()*sizeof(unsigned int), &terIndBuf[0], GL_STATIC_DRAW);
+   glEnable(GL_BLEND);
+   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glUniform1i(renderObj, 2);
+   glm::mat4 ViewMatrix = camera.getViewMatrix();
+   glUniform3f(CameraRight_worldspace_ID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
+   glUniform3f(CameraUp_worldspace_ID   , ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+   int i;
+
+   for (i = 0; i < 100; i++) {
+      glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]); // The billboard will be just above the cube
+      glUniform2f(BillboardSizeID, 20.0f, 20.0f);     // and 1m*12cm, because it matches its 256*32 resolution =)
+
+      // Enable and bind position array for drawing
+      glEnableVertexAttribArray(aPos);
+      glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+      glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+      // Draw the billboard !
+      // This draws a triangle_strip which looks like a quad.
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+   }
+
+   glDisableVertexAttribArray(0);
 }
 
 void initCollisions() {
@@ -368,7 +391,12 @@ void initShaderVars() {
 	shadowLPos = glGetUniformLocation(renderSceneShaders, "lPos");
 	
 	depthMatrixID = glGetUniformLocation(depthCalcShaders, "depthMVP");
-	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+	
+   h_aCoord = glGetAttribLocation(textShaders, "coord");
+   h_uText = glGetUniformLocation(textShaders, "tex");
+   h_uColor = glGetUniformLocation(textShaders, "color");
+
+   assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 }
 
 GLuint installShaders(const string &vShaderName, const string &fShaderName) {
@@ -437,17 +465,17 @@ GLuint installShaders(const string &vShaderName, const string &fShaderName) {
 }
 
 void SetMaterial(Material mat) {
-    glUseProgram(passThroughShaders);
-    
-    glm::vec3 amb = mat.getAmbient();
-    glm::vec3 dif = mat.getDiffuse();
-    glm::vec3 spc = mat.getSpecular();
-    float shn = mat.getShininess();
+   glUseProgram(passThroughShaders);
 
-    glUniform3f(h_uMatAmb, amb.x, amb.y, amb.z);
-    glUniform3f(h_uMatDif, dif.x, dif.y, dif.z);
-    glUniform3f(h_uMatSpec, spc.x, spc.y, spc.z);
-    glUniform1f(h_uMatShine, shn);
+   glm::vec3 amb = mat.getAmbient();
+   glm::vec3 dif = mat.getDiffuse();
+   glm::vec3 spc = mat.getSpecular();
+   float shn = mat.getShininess();
+
+   glUniform3f(h_uMatAmb, amb.x, amb.y, amb.z);
+   glUniform3f(h_uMatDif, dif.x, dif.y, dif.z);
+   glUniform3f(h_uMatSpec, spc.x, spc.y, spc.z);
+   glUniform1f(h_uMatShine, shn);
 }
 
 void drawVBO(Entity *entity, int nIndices, int whichbo) {
@@ -494,31 +522,58 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
 }
 
 void drawGround() {
-    glEnable(GL_CULL_FACE);
-    glUseProgram(passThroughShaders);
-    
-    glEnableVertexAttribArray(aPos);
-    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-    glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+   glEnable(GL_CULL_FACE);
+   glUseProgram(passThroughShaders);
 
-    GLSL::enableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-    glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+   glEnableVertexAttribArray(aPos);
+   glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+   glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
-    
-    glUniform1i(renderObj, 0);
-    SetMaterial(Materials::wood);
-    SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
-    glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
-    
-    GLSL::disableVertexAttribArray(aPos);
-    GLSL::disableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    glUseProgram(0);
-    assert(glGetError() == GL_NO_ERROR);
+   GLSL::enableVertexAttribArray(aNor);
+   glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
+   glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
+
+   glUniform1i(renderObj, 0);
+   SetMaterial(Materials::wood);
+   SetModel(glm::vec3(0), glm::vec3(0, 1, 0), vec3(1));
+   glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
+
+   GLSL::disableVertexAttribArray(aPos);
+   GLSL::disableVertexAttribArray(aNor);
+   glBindBuffer(GL_ARRAY_BUFFER, 0);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+   glDisable(GL_CULL_FACE);
+
+   glUseProgram(0);
+   assert(glGetError() == GL_NO_ERROR);
+}
+
+void drawHUD(int fps) {
+   char buffer[256];
+
+   drawText.addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText.getFontSize(45), 2));
+   drawText.addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2, 0, 1, drawText.getFontSize(45), 2));
+
+   drawText.addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText.getFontSize(90), 2));
+   drawText.addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText.getFontSize(90), 2));
+   drawText.addText(Text("100", 0.145 * g_width, 0.55 * g_height, 0, 0, drawText.getFontSize(90), 1));
+
+   drawText.addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText.getFontSize(30), 1));
+   drawText.addText(Text("Thrust: 25%", 0.025 * g_width, 0.98 * g_height, 0, 0, drawText.getFontSize(90), 1));
+   drawText.addText(Text("Weapon: Gun", 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
+
+   drawText.addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText.getFontSize(90), 2));
+   drawText.addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText.getFontSize(90), 2));
+   drawText.addText(Text("2592m", 0.81 * g_width, 0.55 * g_height, 0, 0, drawText.getFontSize(90), 1));
+
+   snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
+   drawText.addText(Text(buffer, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText.getFontSize(90), 1));
+
+   glUseProgram(textShaders);
+   drawText.drawText();
 }
 
 int main(int argc, char **argv) {
@@ -533,7 +588,6 @@ int main(int argc, char **argv) {
     	else renderShadows = false;
     } else renderShadows = false;
     
-    GLFWwindow* window;
 
     glfwSetErrorCallback(error_callback);
 
@@ -604,9 +658,13 @@ int main(int argc, char **argv) {
     renderSceneShaders = installShaders("shd/renderscene_vert.glsl", "shd/renderscene_frag.glsl");
     passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
 	skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
+    textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
+
 	initShaderVars();
 	skybox = new Skybox(skyBoxShaders);
 	skybox->initShaderVars();    
+
+
 
     initGround();
     initCollisions();
@@ -686,9 +744,11 @@ int main(int argc, char **argv) {
     rules.setPlayer(&player);
     rules.setAgents(&opponents);
 
-    float start = glfwGetTime();
-    elapsed = 0;
-    float last = -1;
+   drawText.initResources(g_width, g_height, h_aCoord, h_uText, h_uColor);
+
+   unsigned int frames = 0;
+   double lastTime = glfwGetTime();
+   int fps = 0;
 
     Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
     bool color = false;
@@ -696,6 +756,17 @@ int main(int argc, char **argv) {
     while (!glfwWindowShouldClose(window)) {
         float ratio;
         int width, height;
+
+      double currentTime = glfwGetTime();
+      frames++;
+      if ( currentTime - lastTime >= 1.0 ) {
+
+         fps = frames;
+         frames = 0;
+         lastTime += 1.0;
+      }
+
+      drawHUD(fps);
 
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         
@@ -798,16 +869,14 @@ int main(int argc, char **argv) {
 		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
 	}*/
 
-        last = elapsed;
-        elapsed = glfwGetTime() - start;
         
         glfwSwapBuffers(window);
         glfwPollEvents();
-        frames++;
     }
     
     glfwTerminate();
     
     return 0;
+
 }
 
