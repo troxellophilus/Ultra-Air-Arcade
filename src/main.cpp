@@ -46,6 +46,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 //#define _DEBUG
 
@@ -582,7 +583,7 @@ void drawHUD(int fps) {
    len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText.addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(45), 1));
+   drawText.addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
 
    drawText.addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText.getFontSize(90), 2));
    drawText.addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText.getFontSize(90), 2));
@@ -599,7 +600,6 @@ void drawHUD(int fps) {
    glUseProgram(textShaders);
    drawText.drawText();
 }
-
 
 int main(int argc, char **argv) {
    const GLubyte* renderer;
