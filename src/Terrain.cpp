@@ -90,9 +90,9 @@ void Terrain::computeNormals(){
 void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf){
    for(int z = 0; z < length; z++){
       for(int x = 0; x < width; x++){
-         posBuf.push_back(x*2);
+         posBuf.push_back(x);
          posBuf.push_back(heights[z * width + x]);
-         posBuf.push_back(z*2);
+         posBuf.push_back(z);
          
          norBuf.push_back(normals[z * width + x](0));
          norBuf.push_back(normals[z * width + x](1));
@@ -115,10 +115,11 @@ void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf,
    }
 }
 
-bool Terrain::detectCollision(Eigen::Vector3f objVector){
+bool Terrain::detectCollision(Eigen::Vector3f objVector, float radius){
    float curTerrainHeight = heights[(int)objVector(2) * width + (int)objVector(0)];
 
-   if(objVector(1) <= curTerrainHeight){
+   //printf("Player: %.3f Terrain: %.3f\n", (objVector(1) - radius), curTerrainHeight);
+   if((objVector(1) - radius) <= curTerrainHeight){
       return true;
    }
 
