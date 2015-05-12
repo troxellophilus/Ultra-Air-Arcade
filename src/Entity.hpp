@@ -102,7 +102,9 @@ public:
 
 Entity::Entity() {
     object = NULL;
-    material = Material::Material();
+	// Zach - removed Material:: from the call to the Material constructor - 
+	// Would not allow my version to compile
+    material = Material();
     
     position = glm::vec3(0, 0, 0);
     rotation = glm::quat(1, 0, 0, 0);
