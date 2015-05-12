@@ -25,6 +25,7 @@
 #include "Terrain.h"
 
 #include "helper.h"
+#include "GLSL.h"
 #include "GLSLProgram.h"
 
 //#define _DEBUG
