@@ -116,6 +116,10 @@ void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf,
 }
 
 bool Terrain::detectCollision(Eigen::Vector3f objVector, float radius){
+   if ((((int)objVector(2) * width + (int)objVector(0)) > ((width * length) - 1)) || (((int)objVector(2) * width + (int)objVector(0)) < 0)) {
+      return false;
+   }
+
    float curTerrainHeight = heights[(int)objVector(2) * width + (int)objVector(0)];
 
    //printf("Player: %.3f Terrain: %.3f\n", (objVector(1) - radius), curTerrainHeight);
