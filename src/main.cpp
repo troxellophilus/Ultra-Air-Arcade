@@ -28,6 +28,7 @@
 #include "Skybox.hpp"
 #include "RacerAI.hpp"
 #include "DrawText.h"
+
 #include "helper.h"
 #include "GLSL.h"
 #include "GLSLProgram.h"
@@ -39,6 +40,12 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+
+//#define _DEBUG
+
+#include <string>
+#include <iostream>
+#include <vector>
 
 //#define _DEBUG
 
@@ -480,74 +487,76 @@ void SetMaterial(Material mat) {
 }
 
 void drawVBO(Entity *entity, int nIndices, int whichbo) {
-   glUseProgram(passThroughShaders);
+    glUseProgram(passThroughShaders);
+ 
+    // Enable and bind position array for drawing
+    glEnableVertexAttribArray(aPos);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
+    glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    
+    // Enable and bind normal array for drawing
+    glEnableVertexAttribArray(aNor);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
+    glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    
+    // Bind index array for drawing
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
+    
+    glUniform3f(lPos, 200, 1000, 200);
 
-   // Enable and bind position array for drawing
-   glEnableVertexAttribArray(aPos);
-   glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
-   glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glUniform1i(renderObj, 0);
 
-   // Enable and bind normal array for drawing
-   glEnableVertexAttribArray(aNor);
-   glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
-   glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    if (whichbo == CHECKPOINT)
+   glUniform1i(renderObj, 3);
 
-   // Bind index array for drawing
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
+    SetMaterial(entity->getMaterial());
+    glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
+    glm::mat4 Orient = entity->getRotationM();
+    glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
+    glm::mat4 com = Trans*Orient*Sc;
+    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
 
-   glUniform3f(lPos, 200, 1000, 200);
-
-   glUniform1i(renderObj, 0);
-
-   if (whichbo == CHECKPOINT)
-      glUniform1i(renderObj, 3);
-
-   SetMaterial(entity->getMaterial());
-   glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
-   glm::mat4 Orient = entity->getRotationM();
-   glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
-   glm::mat4 com = Trans * Orient * Sc;
-   glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
-
-   glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-
-   // Disable and unbind
-   GLSL::disableVertexAttribArray(aPos);
-   GLSL::disableVertexAttribArray(aNor);
-   glBindBuffer(GL_ARRAY_BUFFER, 0);
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-   // Last lines
-   glUseProgram(0);
-   assert(glGetError() == GL_NO_ERROR);
+    glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
+    
+    // Disable and unbind
+    GLSL::disableVertexAttribArray(aPos);
+    GLSL::disableVertexAttribArray(aNor);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
+    // Last lines
+    glUseProgram(0);
+    assert(glGetError() == GL_NO_ERROR);
 }
 
 void drawGround() {
-   glEnable(GL_CULL_FACE);
-   glUseProgram(passThroughShaders);
+    glEnable(GL_CULL_FACE);
+    glUseProgram(passThroughShaders);
+    
+    glEnableVertexAttribArray(aPos);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+    glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-   glEnableVertexAttribArray(aPos);
-   glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-   glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    GLSL::enableVertexAttribArray(aNor);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
+    glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-   GLSL::enableVertexAttribArray(aNor);
-   glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-   glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
+    
+    glUniform1i(renderObj, 0);
+    SetMaterial(Materials::wood);
+    SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
+    glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
+    
+    GLSL::disableVertexAttribArray(aPos);
+    GLSL::disableVertexAttribArray(aNor);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
+   glDisable(GL_CULL_FACE);
 
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
-
-   glUniform1i(renderObj, 0);
-   SetMaterial(Materials::wood);
-   SetModel(glm::vec3(0), glm::vec3(0, 1, 0), vec3(1));
-   glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
-
-   GLSL::disableVertexAttribArray(aPos);
-   GLSL::disableVertexAttribArray(aNor);
-   glBindBuffer(GL_ARRAY_BUFFER, 0);
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-   glUseProgram(0);
-   assert(glGetError() == GL_NO_ERROR);
+    glUseProgram(0);
+    assert(glGetError() == GL_NO_ERROR);
 }
 
 void drawHUD(int fps) {
@@ -786,7 +795,6 @@ int main(int argc, char **argv) {
          frames = 0;
          lastTime += 1.0;
       }
-
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
