@@ -77,6 +77,7 @@ static float g_width, g_height;
 unsigned int frames = 0;
 unsigned int numObj = 0;
 unsigned int collisions = 0;
+unsigned int pIndices = 0;
 
 float xtrans[100];
 float ztrans[100];
@@ -88,6 +89,8 @@ int collisionCount = 0;
 float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
 }
+
+int initVBO(Entity *e, int i);
 
 // EVENT CALLBACKS
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -124,6 +127,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	        camera.setMode(FREE);
 	    else
 	        camera.setMode(TPC);
+	}
+	if (key == GLFW_KEY_P) {
+            if (player.getObject() == &obj[3])
+                player.setObject(&obj[2]);
+	    else
+		player.setObject(&obj[3]);
+	    
+	    pIndices = initVBO(&player, PLANE);
 	}
     }
 }
@@ -611,7 +622,7 @@ int main(int argc, char **argv) {
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
-    int pIndices = initVBO(&player, PLANE);
+    pIndices = initVBO(&player, PLANE);
 
     // Initialize camera
     camera.setMode(TPC);
