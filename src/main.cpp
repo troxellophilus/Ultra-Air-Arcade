@@ -602,7 +602,7 @@ int main(int argc, char **argv) {
         Entity opp = Entity();
 	opp.setObject(&obj[3]);
 	glm::vec3 epos = player.getPosition();
-	opp.setPosition(glm::vec3(epos.x + odx * 0.2f, epos.y, epos.z + odx * 0.1f));
+	opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
 	opp.setScale(glm::vec3(0.2,0.2,0.2));
         opp.calculateBoundingSphereRadius();
 	opponents.push_back(opp);
