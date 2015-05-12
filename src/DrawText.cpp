@@ -204,7 +204,7 @@ void DrawText::drawText() {
 	float sy = 2.0 / height;
 
 	/* Black background */
-	glClearColor(0, 0, 0, 1);
+	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Enable blending, necessary for our alpha texture */
