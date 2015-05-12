@@ -339,31 +339,22 @@ void drawBillboard(Camera *camera) {
 
 void initGround() {
 
-   terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
-   glEnable(GL_BLEND);
-   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glUniform1i(renderObj, 2);
-   glm::mat4 ViewMatrix = camera.getViewMatrix();
-   glUniform3f(CameraRight_worldspace_ID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
-   glUniform3f(CameraUp_worldspace_ID   , ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
+    glGenBuffers(1, &pbo[TERRAIN]);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+    glBufferData(GL_ARRAY_BUFFER, terPosBuf.size()*sizeof(float), &terPosBuf[0], GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &nbo[TERRAIN]);
+    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
+    glBufferData(GL_ARRAY_BUFFER, terNorBuf.size()*sizeof(float), &terNorBuf[0], GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &ibo[TERRAIN]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, terIndBuf.size()*sizeof(unsigned int), &terIndBuf[0], GL_STATIC_DRAW);
 
-   int i;
-
-   for (i = 0; i < 100; i++) {
-      glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]); // The billboard will be just above the cube
-      glUniform2f(BillboardSizeID, 20.0f, 20.0f);     // and 1m*12cm, because it matches its 256*32 resolution =)
-
-      // Enable and bind position array for drawing
-      glEnableVertexAttribArray(aPos);
-      glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-      glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-      // Draw the billboard !
-      // This draws a triangle_strip which looks like a quad.
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-   }
-
-   glDisableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void initCollisions() {
@@ -583,7 +574,7 @@ void drawHUD(int fps) {
    len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText.addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
+   drawText.addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(45), 1));
 
    drawText.addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText.getFontSize(90), 2));
    drawText.addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText.getFontSize(90), 2));
@@ -782,6 +773,7 @@ int main(int argc, char **argv) {
 
    Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
    bool color = false;
+
    // Frame loop
    while (!glfwWindowShouldClose(window)) {
       float ratio;
@@ -890,7 +882,7 @@ int main(int argc, char **argv) {
          }
       }
 
-      drawHUD(fps);
+      // drawHUD(fps);
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
