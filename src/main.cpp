@@ -386,7 +386,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Bind index array for drawing
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform3f(lPos, 500, 1500, 500);
+    glUniform3f(lPos, 200, 1000, 200);
 
     glUniform1i(renderObj, 0);
 
@@ -461,7 +461,7 @@ void drawGround() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
     
     glUniform1i(renderObj, 0);
-    SetMaterial(Materials::wood);
+    SetMaterial(Materials::stone);
     SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
     glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
     
@@ -583,7 +583,7 @@ int main(int argc, char **argv) {
     
     // Initialize player
     player.setObject(&obj[3]);
-    player.setPosition(glm::vec3(200.0f,0.05f,200.0f));
+    player.setPosition(glm::vec3(90.0f,35.f,150.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
@@ -597,11 +597,12 @@ int main(int argc, char **argv) {
     camera.setPlayer(&player);
 
     // Initialize opponents
-    int odx = 0;
-    while (odx < 5) {
+    int odx = 1;
+    while (odx < 6) {
         Entity opp = Entity();
 	opp.setObject(&obj[3]);
-	opp.setPosition(player.getPosition() + odx * 0.2f);
+	glm::vec3 epos = player.getPosition();
+	opp.setPosition(glm::vec3(epos.x + odx * 0.2f, epos.y, epos.z + odx * 0.1f));
 	opp.setScale(glm::vec3(0.2,0.2,0.2));
         opp.calculateBoundingSphereRadius();
 	opponents.push_back(opp);
@@ -666,11 +667,9 @@ int main(int argc, char **argv) {
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Print DEBUG messages
-#ifdef DEBUG
-	if (frames % 5 == 0) {
+	if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
 		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
 	}
-#endif
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

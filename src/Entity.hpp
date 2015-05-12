@@ -147,12 +147,12 @@ void Entity::update() {
 
 void Entity::throttleUp() {
     // limit the maximum thrust
-    thrust -= thrust > -1.f ? 0.05f : 0.f;
+    thrust -= thrust >= -1.f ? 0.05f : 0.f;
 }
 
 void Entity::throttleDown() {
     // limit the minimum thrust
-    thrust += thrust < 0 ? 0.05f : 0.f;
+    thrust += thrust <= 0 ? 0.05f : 0.f;
 }
 
 void Entity::pitch(float dy) {
