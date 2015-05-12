@@ -1,6 +1,5 @@
 /* 
- * Drew Troxell & Zachary Weisman
- * Code Base
+ * Ultra Air Arcade Code Base
  * CPE 476
  */
 
