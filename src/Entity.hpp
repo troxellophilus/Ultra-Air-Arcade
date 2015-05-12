@@ -78,6 +78,7 @@ public:
     
     void setPosition(glm::vec3);
     void setScale(glm::vec3);
+    void setTargetRotation(glm::mat4);
     
     void setVelocity(glm::vec3);
     void setThrust(float a);
@@ -147,12 +148,12 @@ void Entity::update() {
 
 void Entity::throttleUp() {
     // limit the maximum thrust
-    thrust -= thrust > -5.f ? 0.1f : 0.f;
+    thrust -= thrust >= -1.f ? 0.05f : 0.f;
 }
 
 void Entity::throttleDown() {
     // limit the minimum thrust
-    thrust += thrust < 0 ? 0.1f : 0.f;
+    thrust += thrust <= 0 ? 0.05f : 0.f;
 }
 
 void Entity::pitch(float dy) {
@@ -248,6 +249,10 @@ void Entity::setPosition(glm::vec3 pos) {
 
 void Entity::setScale(glm::vec3 sc) {
     scale = glm::vec3(sc);
+}
+
+void Entity::setTargetRotation(glm::mat4 r) {
+    target_rotation = glm::quat_cast(r);
 }
 
 void Entity::setVelocity(glm::vec3 vel) {

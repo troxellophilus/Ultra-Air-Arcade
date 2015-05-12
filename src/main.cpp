@@ -1,6 +1,5 @@
 /* 
- * Drew Troxell & Zachary Weisman
- * Code Base
+ * Ultra Air Arcade Code Base
  * CPE 476
  */
 
@@ -23,12 +22,13 @@
 #include "Camera.hpp"
 #include "Materials.hpp"
 #include "Terrain.h"
+#include "Rules.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
 #include "GLSLProgram.h"
 
-//#define _DEBUG
+//#define DEBUG
 
 using namespace std;
 //using namespace glm;
@@ -255,7 +255,7 @@ void initSky() {
 void initGround() {
 
     terrain = (Terrain *)malloc(sizeof(Terrain));
-    *terrain = Terrain("../Assets/heightmap/Debug.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    *terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -388,7 +388,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Bind index array for drawing
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform3f(lPos, 1000, 500, 1000);
+    glUniform3f(lPos, 200, 1000, 200);
 
     glUniform1i(renderObj, 0);
 
@@ -599,7 +599,7 @@ int main(int argc, char **argv) {
     
     // Initialize player
     player.setObject(&obj[3]);
-    player.setPosition(camera.getPosition() + glm::vec3(0.0f,1.0f,0.0f));
+    player.setPosition(glm::vec3(200.0f,35.f,200.0f));
     player.setScale(glm::vec3(0.2,0.2,0.2));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
@@ -613,16 +613,21 @@ int main(int argc, char **argv) {
     camera.setPlayer(&player);
 
     // Initialize opponents
-    int odx = 0;
-    while (odx < 5) {
+    int odx = 1;
+    while (odx < 6) {
         Entity opp = Entity();
-        opp.setObject(&obj[3]);
-        opp.setPosition(player.getPosition() + odx * 5.f);
-        opp.setScale(glm::vec3(0.2,0.2,0.2));
+	opp.setObject(&obj[3]);
+	glm::vec3 epos = player.getPosition();
+	opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+	opp.setScale(glm::vec3(0.2,0.2,0.2));
         opp.calculateBoundingSphereRadius();
-        opponents.push_back(opp);
-        odx++;
+	opponents.push_back(opp);
+	odx++;
     }
+
+    // Initialize game rules
+    Rules rules = Rules();
+    rules.setAgents(&opponents);
 
     float start = glfwGetTime();
     float elapsed = 0;
@@ -656,6 +661,9 @@ int main(int argc, char **argv) {
         drawBillboard(&camera);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
+	// Update the rules and game state
+	rules.update();
+
 	// Update & draw player
 	player.update();
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
@@ -680,6 +688,11 @@ int main(int argc, char **argv) {
 	   // Update camera
 	   camera.update();
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+	// Print DEBUG messages
+	if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
+		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+	}
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

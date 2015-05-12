@@ -83,7 +83,7 @@ Camera::Camera() {
     viewport_y = 0;
     
     // Initialize perspective
-    field_of_view = 90;
+    field_of_view = 75;
     aspect = window_width / window_height;
     z_near = 0.1;
     z_far = 10000;
@@ -173,7 +173,7 @@ glm::mat4 Camera::getProjectionMatrix() {
 glm::mat4 Camera::getViewMatrix() {
     glm::mat4 T = glm::translate(position);
     glm::mat4 R = glm::toMat4(rotation);
-    glm::mat4 TP = glm::translate(glm::vec3(0, 0.2, 0.3));
+    glm::mat4 TP = glm::translate(glm::vec3(0, 0.2, 0.2));
     
     glm::mat4 C = T * R * TP;
     

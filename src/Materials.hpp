@@ -65,13 +65,14 @@ public:
 	static Material emerald;
 	static Material jade;
 	static Material wood;
+	static Material stone;
 	static Material obsidian;
 	static Material greenPlastic;
 };
 
-Material Materials::emerald(glm::vec3(0.0215, 0.2745, 0.0215),
+Material Materials::emerald(glm::vec3(0.0315, 0.3745, 0.0315),
 			glm::vec3(0.07568, 0.61424, 0.7568),
-			glm::vec3(0.633, 0.727811, 0.633),
+			glm::vec3(0.833, 0.927811, 0.733),
 			150.8);
 
 Material Materials::jade = Material(glm::vec3(0.135, 0.2225, 0.1575),
@@ -83,6 +84,11 @@ Material Materials::wood = Material(glm::vec3(0.3, 0.2, 0.05),
 			glm::vec3(0.6, 0.41, 0.29),
 			glm::vec3(0.0, 0.0, 0.0),
 			3.0);
+
+Material Materials::stone = Material(glm::vec3(0.25, 0.25, 0.2),
+				glm::vec3(0.4, 0.4, 0.35),
+				glm::vec3(0,0,0),
+				1000.0);
 
 Material Materials::obsidian = Material(glm::vec3(0.05375, 0.05, 0.06626),
 			glm::vec3(0.18275, 0.17, 0.22525),
