@@ -45,7 +45,9 @@ bool Collision::detectEntityCollision(Entity player, Entity object) {
     glm::vec3 objectPosition = object.getPosition();
     float playerRadius = player.getRadius();
     float objectRadius = object.getRadius();
-    
+
+    // Single operation
+    // Spatial data structure for powerups and terrain objects
     if (fabs(objectPosition.x - playerPosition.x) > (objectRadius + playerRadius))
         xOverlap = false;
     if (fabs(objectPosition.y - playerPosition.y) > (objectRadius + playerRadius))
