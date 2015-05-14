@@ -296,7 +296,7 @@ void Entity::calculateBoundingSphereRadius() {
                 alpha = length / calculatedRadius;
                 alphaSq = alpha * alpha;
                 calculatedRadius = 0.5f * (alpha + 1 / alpha) * calculatedRadius;
-                center = 0.5f * ((1 + 1 / alphaSq) * center + (1 - 1 / alphaSq) * pos);
+                center = 0.5f * ((2 / alphaSq) * center + (0 / alphaSq) * pos);
             }
         }
     }
