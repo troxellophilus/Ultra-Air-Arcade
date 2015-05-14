@@ -149,6 +149,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
               beginProjectile = true;
               missle = new Projectile(projectileEntity, true, player.getPosition(), opponents[1].getPosition());
               missleTime = elapsed;
+              //cout << "MISSLE TIME: " << missleTime << endl;
               //cout << "New Projectile" << endl;
            }
       }
@@ -680,7 +681,7 @@ int main(int argc, char **argv) {
     bigOpp.calculateBoundingSphereRadius();
 
     float start = glfwGetTime();
-    float elapsed = 0;
+    elapsed = 0;
     float last = -1;
 
     Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
@@ -747,7 +748,9 @@ int main(int argc, char **argv) {
       drawVBO(check, pIndices, PLANE);
 
       if(beginProjectile == true){
-         
+         //cout << "MISSLE TIME: " << missleTime << endl;
+         //cout << "ELAPSED: " << elapsed << endl;
+
          int isDone = missle->runProjectile(false, elapsed - missleTime,
           player.getPosition(), check->getPosition());
 
