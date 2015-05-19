@@ -14,44 +14,69 @@
 #include "Entity.hpp"
 #include "Terrain.h"
 
+using namespace std;
+
 class Collision {
 private:
     bool cflag;		// True if collision detected.
     Terrain *terrain; // Pointer to the terrain.
+    Entity *player;
+    std::vector<Entity> *opponents;
     
 public:
     Collision();
-    Collision(Terrain *terrain);
+    Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer);
     virtual ~Collision();
     void update();
-    bool detectEntityCollision(Entity player, Entity object);
-    bool detectTerrainCollision(Entity object);
+    bool detectEntityCollision(Entity *player, Entity *object);
+    bool detectTerrainCollision(Entity *object);
 };
 
-using namespace std;
+//using namespace std;
 //using namespace glm;
 
 Collision::Collision() {
     cflag = false;
+    terrain = NULL;
+    player = NULL;
+    opponents = NULL;
 }
 
-Collision::Collision(Terrain *terrainPointer) {
+Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer) {
     cflag = false;
     terrain = terrainPointer;
+    player = playerPointer;
+    opponents = opponentsPointer;
 }
 
 Collision::~Collision() { }
 
 void Collision::update() {
+    if (detectTerrainCollision(player)) {
+        glm::vec3 playerPos = player->getPosition();
+        Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
+        Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
+        glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
+        player->setPosition(playerPos + (convertedNor * 3.f));
+        player->setThrust(0.f);
+        player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
+    }
 
+    for (auto &opponent : *opponents) {
+        //detectEntityCollision(player, opponent);
+    }
+
+    for (auto &opponent : *opponents) {
+        //detectTerrainCollision(opponent);
+    }
 }
 
-bool Collision::detectEntityCollision(Entity player, Entity object) {
+bool Collision::detectEntityCollision(Entity *player, Entity *object) {
 
-    glm::vec3 playerPosition = player.getPosition();
-    glm::vec3 objectPosition = object.getPosition();
-    float playerRadius = player.getRadius();
-    float objectRadius = object.getRadius();
+    glm::vec3 playerPosition = player->getPosition();
+    glm::vec3 objectPosition = object->getPosition();
+    float playerRadius = player->getRadius();
+    float objectRadius = object->getRadius();
 
     // Single operation
     // Spatial data structure for powerups and terrain objects
@@ -71,11 +96,11 @@ bool Collision::detectEntityCollision(Entity player, Entity object) {
     //return anyOverlap;
 }
 
-bool Collision::detectTerrainCollision(Entity object) {
+bool Collision::detectTerrainCollision(Entity *object) {
     //return false;
 
-    Eigen::Vector3f convertedVector = Eigen::Vector3f(object.getPosition().x, object.getPosition().y, object.getPosition().z);
-    return terrain->detectCollision(convertedVector, object.getRadius());
+    Eigen::Vector3f convertedVector = Eigen::Vector3f(object->getPosition().x, object->getPosition().y, object->getPosition().z);
+    return terrain->detectCollision(convertedVector, object->getRadius());
 }
 
 #endif

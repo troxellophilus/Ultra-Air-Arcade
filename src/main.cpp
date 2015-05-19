@@ -337,7 +337,7 @@ void initGround() {
 }
 
 void initCollisions() {
-    collision = Collision(&terrain);
+    collision = Collision(&terrain, &player, &opponents);
 }
 
 void initShaderVars() {
@@ -556,48 +556,6 @@ void drawGround() {
     assert(glGetError() == GL_NO_ERROR);
 }
 
-void checkPlayerCollisions() {
-    if (collision.detectTerrainCollision(player)) {
-        
-        if (!collisionDetectedTerrain) {
-            collisionCount++;
-            collisionDetectedTerrain = !collisionDetectedTerrain;
-            //printf("Detected player collision with terrain: %d\n", collisionCount);
-
-            glm::vec3 playerPos = player.getPosition();
-            Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
-            Eigen::Vector3f normalVec = terrain.getNormal(convertedPos);
-            glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
-            player.setPosition(playerPos + (convertedNor * 3.f));
-            player.setThrust(0.f);
-            player.setVelocity(glm::vec3(0.f, 0.f, 0.f));
-        }
-    }
-    else {
-        collisionDetectedTerrain =  false;
-    }
-}
-
-void checkOpponentCollisions(Entity &opponent) {
-    if (collision.detectEntityCollision(player, opponent)) {
-        if (!collisionDetectedOpponent) {
-            collisionCount++;
-            collisionDetectedOpponent = !collisionDetectedOpponent;
-            printf("Detected collision with enemy: %d\n", collisionCount);
-
-            player.setVelocity(player.getVelocity() * -0.25f);
-        }
-    }
-    else {
-        collisionDetectedOpponent = !collisionDetectedOpponent;
-    }
-
-    if (collision.detectTerrainCollision(opponent)) {
-        //collisionCount++;
-        //printf("Detected opponent collision with terrain: %d\n", collisionCount);
-    }
-}
-
 int main(int argc, char **argv) {
     const GLubyte* renderer;
     const GLubyte* version;
@@ -713,14 +671,14 @@ int main(int argc, char **argv) {
     // Initialize opponents
     int odx = 1;
     while (odx < 6) {
-        Entity opp = Entity();
-		opp.setObject(&obj[3]);
-		glm::vec3 epos = player.getPosition();
-		opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
-		opp.setScale(glm::vec3(0.2,0.2,0.2));
-		    opp.calculateBoundingSphereRadius();
-		opponents.push_back(opp);
-		odx++;
+       Entity opp = Entity();
+       opp.setObject(&obj[3]);
+       glm::vec3 epos = player.getPosition();
+       opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+       opp.setScale(glm::vec3(0.2,0.2,0.2));
+       opp.calculateBoundingSphereRadius();
+       opponents.push_back(opp);
+       odx++;
     }
 
     // Initialize game rules
@@ -771,66 +729,70 @@ int main(int argc, char **argv) {
 	// Update the rules and game state
 	rules.update();
 
+    // Update the collisions
+    collision.update();
+
 	// Update & draw player
 	player.update();
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 	drawVBO(&player, pIndices, PLANE);
-    checkPlayerCollisions();
+    //checkPlayerCollisions();
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Update & draw opponents
     for (auto &opponent : opponents) {
         opponent.update();
         drawVBO(&opponent, pIndices, PLANE);
-        checkOpponentCollisions(opponent);
+        //checkOpponentCollisions(opponent);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     }
         
-	// Draw environment
-	drawGround();
-	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-	drawSky();
-	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+	   // Draw environment
+ 	    drawGround();
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+	    drawSky();
+        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+        
+	   // Update camera
+	   camera.update();
+       assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-	// Update camera
-	camera.update();
-	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+        pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
+      Entity *check = pathPlane.getEntity();
 
-	pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
-	Entity *check = pathPlane.getEntity();
+      drawVBO(check, pIndices, PLANE);
 
-	drawVBO(check, pIndices, PLANE);
+      if(beginProjectile == true){
+         //cout << "MISSLE TIME: " << missleTime << endl;
+         //cout << "ELAPSED: " << elapsed << endl;
 
-	if(beginProjectile == true){
-		//cout << "MISSLE TIME: " << missleTime << endl;
-		//cout << "ELAPSED: " << elapsed << endl;
+         int isDone = missle->runProjectile(false, elapsed - missleTime,
+          player.getPosition(), check->getPosition());
 
-		int isDone = missle->runProjectile(false, elapsed - missleTime,
-		player.getPosition(), check->getPosition());
+         Entity* ent = missle->getEntity();
 
-		Entity* ent = missle->getEntity();
+         drawVBO(ent, mIndices, MISSLE);
 
-		drawVBO(ent, mIndices, MISSLE);
+         if(collision.detectEntityCollision(check, ent)){
+            //Material m = check->getMaterial();
+            if(color == false){
+               //cout << "IN\n" << endl;
+               check->setMaterial(Materials::wood);
+               color = true;
+               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
+            }
+            else if(color == true){
+               //cout << "OUT\n" << endl;
+               check->setMaterial(Materials::jade);
+               color = false;
+               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
+            }
 
-		if(collision.detectEntityCollision(*check, *ent)) {
-			//Material m = check->getMaterial();
-			if(color == false){
-				//cout << "IN\n" << endl;
-				check->setMaterial(Materials::wood);
-				color = true;
-				bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
-			} else if(color == true){
-			   //cout << "OUT\n" << endl;
-			   check->setMaterial(Materials::jade);
-			   color = false;
-			   bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
-			}
-
-			missleTime = 0;
-			beginProjectile = false;
-			delete missle;
-		}
-	}
+            missleTime = 0;
+            beginProjectile = false;
+            delete missle;
+         }
+      }
 
      assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
