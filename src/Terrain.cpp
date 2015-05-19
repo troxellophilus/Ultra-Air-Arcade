@@ -13,6 +13,8 @@ void Terrain::setHeight(int w, int l, float h){
 
 }
 
+Terrain::Terrain() { }
+
 Terrain::Terrain(const char * fileName, float baseHeight, vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf) {
    Image *image = loadBMP(fileName);
    

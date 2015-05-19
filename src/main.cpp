@@ -101,7 +101,7 @@ Object obj[NUMSHAPES];
 Object skydome;
 
 Collision collision = Collision();
-Terrain *terrain;
+Terrain terrain = Terrain();
 
 Camera camera = Camera();
 Entity player = Entity();
@@ -318,8 +318,7 @@ void initSky() {
 
 void initGround() {
 
-    terrain = (Terrain *)malloc(sizeof(Terrain));
-    *terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
+    terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
     glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -335,6 +334,10 @@ void initGround() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void initCollisions() {
+    collision = Collision(&terrain);
 }
 
 void initShaderVars() {
@@ -554,7 +557,7 @@ void drawGround() {
 }
 
 void checkPlayerCollisions() {
-    if (collision.detectTerrainCollision(player, terrain)) {
+    if (collision.detectTerrainCollision(player)) {
         
         if (!collisionDetectedTerrain) {
             collisionCount++;
@@ -563,7 +566,7 @@ void checkPlayerCollisions() {
 
             glm::vec3 playerPos = player.getPosition();
             Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
-            Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
+            Eigen::Vector3f normalVec = terrain.getNormal(convertedPos);
             glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
             player.setPosition(playerPos + (convertedNor * 3.f));
             player.setThrust(0.f);
@@ -589,7 +592,7 @@ void checkOpponentCollisions(Entity &opponent) {
         collisionDetectedOpponent = !collisionDetectedOpponent;
     }
 
-    if (collision.detectTerrainCollision(opponent, terrain)) {
+    if (collision.detectTerrainCollision(opponent)) {
         //collisionCount++;
         //printf("Detected opponent collision with terrain: %d\n", collisionCount);
     }
@@ -682,6 +685,7 @@ int main(int argc, char **argv) {
 
     initSky();
     initGround();
+    initCollisions();
     
     // Initialize player
     player.setObject(&obj[3]);

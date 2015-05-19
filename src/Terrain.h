@@ -37,6 +37,7 @@ class Terrain
       //Determine how large terrain will be. 
       float *heights;
       Eigen::Vector3f *normals;
+      Terrain();
       Terrain(const char* fileName, float baseHeight, vector<float>& posBuf, vector<unsigned int>& indBuf, vector<float>& norBuf);
       //Get the width of terrain.
       int getWidth(){return width;}

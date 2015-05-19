@@ -17,12 +17,15 @@
 class Collision {
 private:
     bool cflag;		// True if collision detected.
+    Terrain *terrain; // Pointer to the terrain.
     
 public:
     Collision();
+    Collision(Terrain *terrain);
     virtual ~Collision();
+    void update();
     bool detectEntityCollision(Entity player, Entity object);
-    bool detectTerrainCollision(Entity object, Terrain *terrain);
+    bool detectTerrainCollision(Entity object);
 };
 
 using namespace std;
@@ -32,14 +35,18 @@ Collision::Collision() {
     cflag = false;
 }
 
+Collision::Collision(Terrain *terrainPointer) {
+    cflag = false;
+    terrain = terrainPointer;
+}
+
 Collision::~Collision() { }
 
+void Collision::update() {
+
+}
+
 bool Collision::detectEntityCollision(Entity player, Entity object) {
-    
-    bool xOverlap = true;
-    bool yOverlap = true;
-    bool zOverlap = true;
-    bool anyOverlap = false;
 
     glm::vec3 playerPosition = player.getPosition();
     glm::vec3 objectPosition = object.getPosition();
@@ -48,21 +55,23 @@ bool Collision::detectEntityCollision(Entity player, Entity object) {
 
     // Single operation
     // Spatial data structure for powerups and terrain objects
-    if (fabs(objectPosition.x - playerPosition.x) > (objectRadius + playerRadius))
-        xOverlap = false;
-    if (fabs(objectPosition.y - playerPosition.y) > (objectRadius + playerRadius))
-        yOverlap = false;
-    if (fabs(objectPosition.z - playerPosition.z) > (objectRadius + playerRadius))
-        zOverlap = false;
-    
+    // if (fabs(objectPosition.x - playerPosition.x) > (objectRadius + playerRadius))
+    //     xOverlap = false;
+    // if (fabs(objectPosition.y - playerPosition.y) > (objectRadius + playerRadius))
+    //     yOverlap = false;
+    // if (fabs(objectPosition.z - playerPosition.z) > (objectRadius + playerRadius))
+    //     zOverlap = false;
+
+    return glm::distance(objectPosition, playerPosition) > (objectRadius + playerRadius);
+
     //cout << xOverlap << " " << yOverlap << " " << zOverlap << endl;
     
-    anyOverlap = xOverlap && yOverlap && zOverlap;
+    //anyOverlap = xOverlap && yOverlap && zOverlap;
     
-    return anyOverlap;
+    //return anyOverlap;
 }
 
-bool Collision::detectTerrainCollision(Entity object, Terrain *terrain) {
+bool Collision::detectTerrainCollision(Entity object) {
     //return false;
 
     Eigen::Vector3f convertedVector = Eigen::Vector3f(object.getPosition().x, object.getPosition().y, object.getPosition().z);
