@@ -78,7 +78,7 @@ public:
     
     void setPosition(glm::vec3);
     void setScale(glm::vec3);
-    void setTargetRotation(glm::mat4);
+    void setTargetRotation(glm::quat);
     
     void setVelocity(glm::vec3);
     void setThrust(float a);
@@ -89,6 +89,7 @@ public:
     void update();
     
     void pitch(float dy);
+    void yaw(float dx);
     void turn(float dx);
     void rollRight();
     void rollLeft();
@@ -117,7 +118,7 @@ Entity::Entity() {
     drag = 0.47f; // sphere for now
     carea = 20.f;
     
-    thrust = 0.f;
+    thrust = 0.5f;
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
@@ -148,12 +149,12 @@ void Entity::update() {
 
 void Entity::throttleUp() {
     // limit the maximum thrust
-    thrust -= thrust >= -1.f ? 0.05f : 0.f;
+    thrust -= thrust >= -1.5f ? 0.1f : 0.f;
 }
 
 void Entity::throttleDown() {
     // limit the minimum thrust
-    thrust += thrust <= 0 ? 0.05f : 0.f;
+    thrust += thrust <= 0 ? 0.1f : 0.f;
 }
 
 void Entity::pitch(float dy) {
@@ -168,9 +169,21 @@ void Entity::pitch(float dy) {
     target_rotation *= rot;
 }
 
+void Entity::yaw(float dx) {
+    // Limit the yaw angle
+    dx = dx > 50.f ? 50.f : dx;
+    dx = dx < -50.f ? -50.f : dx;
+
+    // Build dx yaw rotation glm::quat around y axis
+    glm::quat rot = glm::angleAxis(dx / 360.f, glm::vec3(0, 1, 0));
+
+    // Apply yaw change to the current rotation
+    target_rotation *= rot;
+}
+
 void Entity::rollRight() {
     // build roll quat
-    glm::quat rol = glm::angleAxis(-0.2f, glm::vec3(0, 0, 1));
+    glm::quat rol = glm::angleAxis(-0.1f, glm::vec3(0, 0, 1));
     
     // Apply roll change
     target_rotation *= rol;
@@ -178,8 +191,8 @@ void Entity::rollRight() {
 
 void Entity::rollLeft() {
     // build roll quat
-    glm::quat rol = glm::angleAxis(0.2f, glm::vec3(0, 0, 1));
-    
+    glm::quat rol = glm::angleAxis(0.1f, glm::vec3(0, 0, 1));
+
     // Apply roll change
     target_rotation *= rol;
 }
@@ -194,7 +207,7 @@ void Entity::turn(float dx) {
     
     // Build dx roll rotation glm::quat around z axis
     glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
-    
+
     // Apply yaw change to the current rotation.
     target_rotation *= glm::mix(rot, rol, 0.8f);
 }
@@ -251,8 +264,8 @@ void Entity::setScale(glm::vec3 sc) {
     scale = glm::vec3(sc);
 }
 
-void Entity::setTargetRotation(glm::mat4 r) {
-    target_rotation = glm::quat_cast(r);
+void Entity::setTargetRotation(glm::quat r) {
+    target_rotation = r;
 }
 
 void Entity::setVelocity(glm::vec3 vel) {

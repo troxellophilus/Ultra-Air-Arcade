@@ -623,6 +623,7 @@ int main(int argc, char **argv) {
     // Initialize game rules
     Rules rules = Rules();
     rules.setAgents(&opponents);
+    rules.setPlayer(&player);
 
     Entity bigOpp = Entity();
     bigOpp.setObject(&obj[3]);
