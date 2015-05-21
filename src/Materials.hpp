@@ -68,6 +68,7 @@ public:
 	static Material stone;
 	static Material obsidian;
 	static Material greenPlastic;
+	static Material red;
 };
 
 Material Materials::emerald(glm::vec3(0.0315, 0.3745, 0.0315),
@@ -97,6 +98,11 @@ Material Materials::obsidian = Material(glm::vec3(0.05375, 0.05, 0.06626),
 			38.4);
 
 Material Materials::greenPlastic = Material(glm::vec3(0.15, 0.4, 0.15),
+			glm::vec3(0.1, 0.35, 0.1),
+			glm::vec3(0.45, 0.55, 0.45),
+			100.0);
+
+Material Materials::red = Material(glm::vec3(0.6, 0.0, 0.0),
 			glm::vec3(0.1, 0.35, 0.1),
 			glm::vec3(0.45, 0.55, 0.45),
 			100.0);
