@@ -26,7 +26,7 @@ public:
 };
 
 using namespace std;
-using namespace glm;
+//using namespace glm;
 
 Collision::Collision() {
     cflag = false;
@@ -41,11 +41,13 @@ bool Collision::detectEntityCollision(Entity player, Entity object) {
     bool zOverlap = true;
     bool anyOverlap = false;
 
-    vec3 playerPosition = player.getPosition();
-    vec3 objectPosition = object.getPosition();
+    glm::vec3 playerPosition = player.getPosition();
+    glm::vec3 objectPosition = object.getPosition();
     float playerRadius = player.getRadius();
     float objectRadius = object.getRadius();
-    
+
+    // Single operation
+    // Spatial data structure for powerups and terrain objects
     if (fabs(objectPosition.x - playerPosition.x) > (objectRadius + playerRadius))
         xOverlap = false;
     if (fabs(objectPosition.y - playerPosition.y) > (objectRadius + playerRadius))

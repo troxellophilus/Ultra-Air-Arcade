@@ -116,6 +116,9 @@ void Terrain::createTerrain(vector<float>& posBuf, vector<unsigned int>& indBuf,
 }
 
 bool Terrain::detectCollision(Eigen::Vector3f objVector, float radius){
+   // Try, catch
+
+   // Checks to make sure inside height map
    if ((((int)objVector(2) * width + (int)objVector(0)) > ((width * length) - 1)) || (((int)objVector(2) * width + (int)objVector(0)) < 0)) {
       return false;
    }

@@ -37,7 +37,11 @@ using namespace std;
 
 enum { TERRAIN, SKY, PLANE, MISSLE, NUM_VBO };
 
+// Program IDs
 GLuint passThroughShaders;
+GLuint depthCalcShaders;
+GLuint renderSceneShaders;
+
 GLuint vao;
 GLuint pbo[NUM_VBO];
 GLuint nbo[NUM_VBO];
@@ -52,12 +56,42 @@ GLint uProjMatrix = 0;
 GLint renderObj = 0;
 GLint h_uMatAmb, h_uMatDif, h_uMatSpec, h_uMatShine;
 
-// Billboard vars
+// Billboard variables
 GLuint CameraRight_worldspace_ID;
 GLuint CameraUp_worldspace_ID;
 GLuint BillboardPosID;
 GLuint BillboardSizeID;
 GLuint billboard_vertex_buffer;
+
+// Shadow variables
+GLuint fbo;
+GLuint depthMatrixID;
+GLuint depthTexture;
+GLuint DepthBiasID;
+GLuint ShadowMapID;
+
+glm::vec3 lightPosition = glm::vec3(256.0f, 100.0f, 256.0f);
+glm::mat4 biasMatrix = glm::mat4(
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 0.5, 0.0,
+	0.5, 0.5, 0.5, 1.0
+);
+glm::mat4 depthBiasMVP;
+glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10, 10, -10, 10, -10, 20);
+glm::mat4 depthViewMatrix;
+glm::mat4 depthModelMatrix;
+glm::mat4 depthMVP;
+
+// For renderscene and shadowmap shaders
+GLuint shadowPos;
+GLuint shadowMapPos;
+GLuint shadowNor;
+GLuint shadowLPos;
+GLuint shadowViewMatrix;
+GLuint shadowModelMatrix;
+GLuint shadowProjMatrix;
+// End
 
 vector<float> terPosBuf;
 vector<float> terNorBuf;
@@ -79,6 +113,7 @@ unsigned int frames = 0;
 unsigned int numObj = 0;
 unsigned int collisions = 0;
 unsigned int pIndices = 0;
+unsigned int whichShader = 0;
 
 float xtrans[100];
 float ztrans[100];
@@ -86,6 +121,7 @@ float missleTime;
 
 bool collisionDetectedTerrain = false;
 bool collisionDetectedOpponent = false;
+bool renderShadows;
 int collisionCount = 0;
 
 bool beginProjectile = false;
@@ -322,6 +358,16 @@ void initShaderVars() {
     CameraUp_worldspace_ID  = glGetUniformLocation(passThroughShaders, "CameraUp_worldspace");
     BillboardPosID = glGetUniformLocation(passThroughShaders, "BillboardPos");
     BillboardSizeID = glGetUniformLocation(passThroughShaders, "BillboardSize");
+    
+    DepthBiasID = 	glGetUniformLocation(renderSceneShaders, "depthBiasMVP");
+	ShadowMapID = 	glGetUniformLocation(renderSceneShaders, "shadowMap");
+	shadowViewMatrix = glGetUniformLocation(renderSceneShaders, "V");
+    shadowModelMatrix = glGetUniformLocation(renderSceneShaders, "M");
+    shadowProjMatrix = glGetUniformLocation(renderSceneShaders, "P");
+	shadowLPos = glGetUniformLocation(renderSceneShaders, "lPos");
+	
+	depthMatrixID = glGetUniformLocation(depthCalcShaders, "depthMVP");
+	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 }
 
 GLuint installShaders(const string &vShaderName, const string &fShaderName) {
@@ -370,7 +416,10 @@ GLuint installShaders(const string &vShaderName, const string &fShaderName) {
     glAttachShader(prog, VS);
     glAttachShader(prog, FS);
 
-    glBindFragDataLocation(prog, 0, "outColor");
+    if (whichShader == 0)
+    	glBindFragDataLocation(prog, 0, "fragmentDepth");
+   	else
+   		glBindFragDataLocation(prog, 0, "outColor");
 
     glLinkProgram(prog);
     GLSL::printError(__FILE__,__LINE__);
@@ -552,6 +601,12 @@ int main(int argc, char **argv) {
     
     srand(time(NULL));
     
+    if (argc > 1) {
+    	argv++;
+    	if (**argv == '1') renderShadows = true;
+    	else renderShadows = false;
+    } else renderShadows = false;
+    
     GLFWwindow* window;
 
     glfwSetErrorCallback(error_callback);
@@ -572,22 +627,14 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if(argc == 3)
-    {
-        g_width = atoi(argv[1]);
-        g_height = atoi(argv[2]);
-    }
-    else
-    {
-        g_width = 640;
-        g_height = 480;
-    }
+    g_width = 640;
+    g_height = 480;
 
     // Open a window and create its OpenGL context
     window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
     if( window == NULL ){
         glfwTerminate();
-	exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
@@ -622,11 +669,14 @@ int main(int argc, char **argv) {
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported: %s\n", version);
    
-   assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+   	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     /* tell GL to only draw onto a pixel if the shape is closer to the viewer */
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
     
+    depthCalcShaders = installShaders("shd/depthmap_vert.glsl", "shd/depthmap_frag.glsl");
+    whichShader = 1;
+    renderSceneShaders = installShaders("shd/renderscene_vert.glsl", "shd/renderscene_frag.glsl");
     passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
 	initShaderVars();    
 
@@ -660,13 +710,13 @@ int main(int argc, char **argv) {
     int odx = 1;
     while (odx < 6) {
         Entity opp = Entity();
-	opp.setObject(&obj[3]);
-	glm::vec3 epos = player.getPosition();
-	opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
-	opp.setScale(glm::vec3(0.2,0.2,0.2));
-        opp.calculateBoundingSphereRadius();
-	opponents.push_back(opp);
-	odx++;
+		opp.setObject(&obj[3]);
+		glm::vec3 epos = player.getPosition();
+		opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+		opp.setScale(glm::vec3(0.2,0.2,0.2));
+		    opp.calculateBoundingSphereRadius();
+		opponents.push_back(opp);
+		odx++;
     }
 
     // Initialize game rules
@@ -698,7 +748,7 @@ int main(int argc, char **argv) {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(passThroughShaders);
+		glUseProgram(passThroughShaders);
 
         // Set projection matrix
         glm::mat4 projection = camera.getProjectionMatrix();
@@ -732,59 +782,58 @@ int main(int argc, char **argv) {
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     }
         
-	   // Draw environment
- 	    drawGround();
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-	    drawSky();
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-        
-	   // Update camera
-	   camera.update();
-       assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+	// Draw environment
+	drawGround();
+	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+	drawSky();
+	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-        pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
-      Entity *check = pathPlane.getEntity();
+	// Update camera
+	camera.update();
+	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-      drawVBO(check, pIndices, PLANE);
+	pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
+	Entity *check = pathPlane.getEntity();
 
-      if(beginProjectile == true){
-         //cout << "MISSLE TIME: " << missleTime << endl;
-         //cout << "ELAPSED: " << elapsed << endl;
+	drawVBO(check, pIndices, PLANE);
 
-         int isDone = missle->runProjectile(false, elapsed - missleTime,
-          player.getPosition(), check->getPosition());
+	if(beginProjectile == true){
+		//cout << "MISSLE TIME: " << missleTime << endl;
+		//cout << "ELAPSED: " << elapsed << endl;
 
-         Entity* ent = missle->getEntity();
+		int isDone = missle->runProjectile(false, elapsed - missleTime,
+		player.getPosition(), check->getPosition());
 
-         drawVBO(ent, mIndices, MISSLE);
+		Entity* ent = missle->getEntity();
 
-         if(collision.detectEntityCollision(*check, *ent)){
-            //Material m = check->getMaterial();
-            if(color == false){
-               //cout << "IN\n" << endl;
-               check->setMaterial(Materials::wood);
-               color = true;
-               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
-            }
-            else if(color == true){
-               //cout << "OUT\n" << endl;
-               check->setMaterial(Materials::jade);
-               color = false;
-               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
-            }
+		drawVBO(ent, mIndices, MISSLE);
 
-            missleTime = 0;
-            beginProjectile = false;
-            delete missle;
-         }
-      }
+		if(collision.detectEntityCollision(*check, *ent)) {
+			//Material m = check->getMaterial();
+			if(color == false){
+				//cout << "IN\n" << endl;
+				check->setMaterial(Materials::wood);
+				color = true;
+				bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
+			} else if(color == true){
+			   //cout << "OUT\n" << endl;
+			   check->setMaterial(Materials::jade);
+			   color = false;
+			   bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
+			}
+
+			missleTime = 0;
+			beginProjectile = false;
+			delete missle;
+		}
+	}
 
      assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Print DEBUG messages
-	if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
+	/*if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
 		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
-	}
+	}*/
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

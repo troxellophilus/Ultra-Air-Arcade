@@ -28,15 +28,58 @@ vec4 calcColor(vec3 fadeTo, vec3 fadeFrom, float dist, float bottom) {
 	return vec4(red, green, blue, 1.0);
 }
 
+vec3 waterAmbient = vec3(0.0, 0.05, 0.07);
+vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
+vec3 waterSpecular = vec3(0.04, 0.7, 0.7);
+
+vec3 forestAmbient = vec3(0.0, 0.0, 0.0);
+vec3 forestDiffuse = vec3(0.1, 0.35, 0.1);
+
+vec3 sandAmbient = vec3(0.0, 0.0, 0.0);
+vec3 sandDiffuse = vec3(0.5, 0.5, 0.0);
+
+vec3 rocksAmbient = vec3(0.192, 0.192, 0.192);
+vec3 rocksDiffuse = vec3(0.507, 0.507, 0.507);
+
+vec3 snowAmbient = vec3(0.05, 0.05, 0.05);
+vec3 snowDiffuse = vec3(0.5, 0.5, 0.5);
+ 
 vec3 toonShade()
 {
     vec3 n = normalize(silh_vNor);
     vec3 e = normalize( vec3(-silh_vPos));
 
+	vec3 ambient, diffuse;
+    if (dot(n, e) < 0.15)
+        return vec3(0.0, 0.0, 0.0);
+
     vec3 lightVector = normalize(lPos - vPos);
-    vec3 ambient = UaColor;
-    float cosine = dot(lightVector, vNor);
-    vec3 diffuse = UdColor * floor( cosine * levels ) * scaleFactor;
+    if (vPos.y >= 90) {
+    	ambient = snowAmbient;
+		float cosine = dot(lightVector, vNor);
+		diffuse = snowDiffuse * floor( cosine * levels ) * scaleFactor;
+    }
+    else if (vPos.y >= 20) {
+		ambient = UaColor;
+		float cosine = dot(lightVector, vNor);
+		diffuse = UdColor * floor( cosine * levels ) * scaleFactor;
+	} else if (vPos.y >= 2.5) {
+		ambient = forestAmbient;
+		float cosine = dot(lightVector, vNor);
+		diffuse = forestDiffuse * floor( cosine * levels ) * scaleFactor;
+	} else if (vPos.y >= 1.5) {
+		ambient = rocksAmbient;
+		float cosine = dot(lightVector, vNor);
+		diffuse = rocksDiffuse * floor( cosine * levels ) * scaleFactor;
+	} else if (vPos.y >= 1.0) {
+		ambient = sandAmbient;
+		float cosine = dot(lightVector, vNor);
+		diffuse = sandDiffuse * floor( cosine * levels ) * scaleFactor;
+	} else {
+		vec3 ambient = waterAmbient;
+		float cosine = dot(lightVector, vNor);
+		diffuse = waterDiffuse * floor( cosine * levels ) * scaleFactor;
+	}
 
     if (dot(n, e) < 0.15)
     {
