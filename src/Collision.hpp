@@ -19,9 +19,12 @@ using namespace std;
 class Collision {
 private:
     bool cflag;		// True if collision detected.
+    bool ptFlag; // True if player is being reset.
     Terrain *terrain; // Pointer to the terrain.
     Entity *player;
     std::vector<Entity> *opponents;
+    int resetStep;
+    glm::vec3 convertedNor;
     
 public:
     Collision();
@@ -37,29 +40,52 @@ public:
 
 Collision::Collision() {
     cflag = false;
+    ptFlag = false;
     terrain = NULL;
     player = NULL;
     opponents = NULL;
+    resetStep = 0;
 }
 
 Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer) {
     cflag = false;
+    ptFlag = false;
     terrain = terrainPointer;
     player = playerPointer;
     opponents = opponentsPointer;
+    resetStep = 0;
 }
 
 Collision::~Collision() { }
 
 void Collision::update() {
     if (detectTerrainCollision(player)) {
+        ptFlag = true;
+        player->setMaterial(Materials::red);
         glm::vec3 playerPos = player->getPosition();
         Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
         Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
-        glm::vec3 convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
-        player->setPosition(playerPos + (convertedNor * 3.f));
+        convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
+
+        // Entity opp = Entity();
+        // opp.setObject(&obj[3]);
+        // glm::vec3 epos = player.getPosition();
+        // opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+        // opp.setScale(glm::vec3(0.2,0.2,0.2));
+        // opp.calculateBoundingSphereRadius();
+    }
+
+    if (ptFlag) {
+        glm::vec3 playerPos = player->getPosition();
+        player->setPosition(playerPos + (convertedNor * 0.025f));
         player->setThrust(0.f);
         player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
+
+        if (resetStep++ > 120) {
+            ptFlag = false;
+            resetStep = 0;
+            player->setMaterial(Materials::emerald);
+        }
     }
 
     for (auto &opponent : *opponents) {
