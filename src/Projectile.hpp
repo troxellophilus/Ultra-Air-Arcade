@@ -74,7 +74,9 @@ Projectile::Projectile(Entity e, bool smart, glm::vec3 initPos, glm::vec3 target
 
 int Projectile::runProjectile(bool path, float elapsed, glm::vec3 myPos, glm::vec3 curPos){
    isPath = path;
-   
+   if(!isPath){
+      //cout << elapsed << endl; 
+   }
    if(isSmart){
       return launchSplineBased(elapsed, myPos, curPos);
    }
@@ -102,12 +104,12 @@ void Projectile::updateCps(glm::vec3 pos, glm::vec3 targetPos){
       setCps(pos[0], pos[1], pos[2], 1.0);
       setCps(pos[0], pos[1], pos[2], 1.0);
       setCps(pos[0], pos[1] - 1.0, pos[2], 1.0);
-      //setCps((pos[0] + targetPos[0])/2, (pos[1] + targetPos[1])/2, (pos[2] + targetPos[2])/2, 1.0);
-      //setCps((pos[0] + targetPos[0])/2, (pos[1] + targetPos[1])/2, (pos[2] + targetPos[2])/2, 1.0);
+      setCps((pos[0] + targetPos[0])/2, (pos[1] + targetPos[1])/2, (pos[2] + targetPos[2])/2, 1.0);
+      setCps((pos[0] + targetPos[0])/2, (pos[1] + targetPos[1])/2, (pos[2] + targetPos[2])/2, 1.0);
       setCps(targetPos[0], targetPos[1], targetPos[2], 1.0);
       setCps(targetPos[0], targetPos[1], targetPos[2], 1.0);   
    
-      //cout << "POS: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
+      ////cout << "POS: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
       //cout << "MID: " << (pos[0] + targetPos[0])/2 << ", " << (pos[1] + targetPos[1])/2 << ", " << (pos[2] + targetPos[2])/2 << endl;     
       //cout << "END: " << (targetPos[0]) << ", " << (targetPos[1]) << ", " << (targetPos[2]) << endl;
    }
@@ -115,7 +117,7 @@ void Projectile::updateCps(glm::vec3 pos, glm::vec3 targetPos){
       cps.clear();
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0);
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0);
-      setCps(pos[0]+100.0, pos[1]+20.0, pos[2]+100.0, 1.0);
+      setCps(pos[0]+200.0, pos[1]+200.0, pos[2]+200.0, 1.0);
       setCps(startPos[0]+50.0, startPos[1]+10.0, startPos[2], 1.0);
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0);
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0); 
@@ -233,9 +235,9 @@ void Projectile::updateProjectile(Eigen::Vector3f cp, Eigen::Matrix4f R){
    pos[1] = cp[1];
    pos[2] = cp[2];
    //position = pos + cp;
-  
-   //cout << "Position1: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
- 
+   if(!isPath){ 
+      //cout << "Position1: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
+   }
    object.setPosition(glm::vec3(pos[0], pos[1], pos[2])); 
 }
 
