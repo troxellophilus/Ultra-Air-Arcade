@@ -20,6 +20,12 @@ class CubeMapTexture {
 	private:
 		string fileNames[6];
 		GLuint textureObj;
+		static const GLenum types[6] = {  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+                                  GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+                                  GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+                                  GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+                                  GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+                                  GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
 };
 
 CubeMapTexture::CubeMapTexture(const string& posXFileName,
@@ -77,8 +83,8 @@ bool CubeMapTexture::load() {
 
 }
 
-void CubeMapTexture::bind(GLenum TextureUnit) {
-	glActiveTexture(TextureUnit);
+void CubeMapTexture::bind() {
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
 }
 
@@ -86,8 +92,23 @@ class Skybox {
 	public:
 		Skybox();
 		~Skybox();
+		prepareForRender();
 
 	private:
-		CubeMapTexture cubeMap;
+		CubeMapTexture *cubeMap;
 };
+
+Skybox::Skybox() {
+	cubeMap = new CubeMapTexture("../Assets/models/desertsky_right.jpg",
+								"../Assets/models/desertsky_left.jpg",
+								".../Assets/models/desertsky_top.jpg",
+								"../Assets/models/desertsky_top.jpg",
+								"../Assets/models/desertsky_front.jpg",
+								"../Assets/models/desertsky_back.jpg");
+	cubeMap->load();
+}
+
+Skybod::prepareForRender() {
+	cubeMap->bind();
+}
 #endif
