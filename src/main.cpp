@@ -36,7 +36,7 @@
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, SKY, PLANE, MISSLE, SKYBOX, NUM_VBO };
+enum { TERRAIN, SKY, PLANE, MISSLE, NUM_VBO };
 
 // Program IDs
 GLuint passThroughShaders;
@@ -96,13 +96,6 @@ GLuint shadowModelMatrix;
 GLuint shadowProjMatrix;
 // End
 
-//For Skybox
-GLuint skyTexture;
-GLuint skySampler;
-GLuint skyProj;
-GLuint skyView;
-GLuint skyModel;
-
 vector<float> terPosBuf;
 vector<float> terNorBuf;
 vector<unsigned int> terIndBuf;
@@ -112,6 +105,7 @@ Object skydome;
 
 Collision collision = Collision();
 Terrain *terrain;
+Skybox *skybox;
 
 Camera camera = Camera();
 Entity player = Entity();
@@ -306,60 +300,6 @@ void drawBillboard(Camera *camera) {
 	glDisableVertexAttribArray(0);
 }
 
-void initSkyBox() {
-	static const GLfloat s_vertex_buffer_data[] = {
-		-10.0f,  10.0f, -10.0f,
-		-10.0f, -10.0f, -10.0f,
-		10.0f, -10.0f, -10.0f,
-		10.0f, -10.0f, -10.0f,
-		10.0f,  10.0f, -10.0f,
-		-10.0f,  10.0f, -10.0f,
-
-		-10.0f, -10.0f,  10.0f,
-		-10.0f, -10.0f, -10.0f,
-		-10.0f,  10.0f, -10.0f,
-		-10.0f,  10.0f, -10.0f,
-		-10.0f,  10.0f,  10.0f,
-		-10.0f, -10.0f,  10.0f,
-
-		10.0f, -10.0f, -10.0f,
-		10.0f, -10.0f,  10.0f,
-		10.0f,  10.0f,  10.0f,
-		10.0f,  10.0f,  10.0f,
-		10.0f,  10.0f, -10.0f,
-		10.0f, -10.0f, -10.0f,
-
-		-10.0f, -10.0f,  10.0f,
-		-10.0f,  10.0f,  10.0f,
-		10.0f,  10.0f,  10.0f,
-		10.0f,  10.0f,  10.0f,
-		10.0f, -10.0f,  10.0f,
-		-10.0f, -10.0f,  10.0f,
-
-		-10.0f,  10.0f, -10.0f,
-		10.0f,  10.0f, -10.0f,
-		10.0f,  10.0f,  10.0f,
-		10.0f,  10.0f,  10.0f,
-		-10.0f,  10.0f,  10.0f,
-		-10.0f,  10.0f, -10.0f,
-
-		-10.0f, -10.0f, -10.0f,
-		-10.0f, -10.0f,  10.0f,
-		10.0f, -10.0f, -10.0f,
-		10.0f, -10.0f, -10.0f,
-		-10.0f, -10.0f,  10.0f,
-		10.0f, -10.0f,  10.0f
-	};
-
-	glGenBuffers(1, &pbo[SKYBOX]);
-	glBindBuffer(GL_ARRAY_BUFFER, pbo[SKYBOX]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(s_vertex_buffer_data), s_vertex_buffer_data, GL_STATIC_DRAW);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-    GLSL::checkVersion();
-    assert(glGetError() == GL_NO_ERROR);
-}
-
 void initSky() {
     const vector<float> &posBuf = skydome.shapes[0].mesh.positions;
     glGenBuffers(1, &pbo[SKY]);
@@ -415,12 +355,6 @@ void initShaderVars() {
     shadowPos = glGetAttribLocation(renderSceneShaders, "aPos");
     shadowNor = glGetAttribLocation(renderSceneShaders, "aNor");
     shadowMapPos = glGetAttribLocation(depthCalcShaders, "aPos");
-    skyBoxPos = glGetAttribLocation(skyBoxShaders, "aPos");
-    
-    skyProj = glGetUniformLocation(skyBoxShaders, "P");
-    skyModel = glGetUniformLocation(skyBoxShaders, "M");
-    skyView = glGetUniformLocation(skyBoxShaders, "V");
-    skySampler = glGetUniformLocation(skyBoxShaders, "cubeMapTexture");
     
     uViewMatrix = glGetUniformLocation(passThroughShaders, "V");
     uModelMatrix = glGetUniformLocation(passThroughShaders, "M");
@@ -583,19 +517,6 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Last lines
     glUseProgram(0);
     assert(glGetError() == GL_NO_ERROR);
-}
-
-void drawSkyBox() {
-	glUseProgram(skyBoxShaders);
-	glEnableVertexAttribArray(skyBoxPos);
-	glBindBuffer(GL_ARRAY_BUFFER, pbo[SKYBOX]);
-	
-	GLSL::disableVertexAttribArray(skyBoxPos);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Last lines
-	glUseProgram(0);
-	assert(glGetError() == GL_NO_ERROR);
 }
 
 void drawSky() {
@@ -844,9 +765,11 @@ int main(int argc, char **argv) {
     skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
 	initShaderVars();    
 
-    initSky();
-    initGround();
+    //initSky();
+    //initGround();
     initBillboard();
+	skybox = new Skybox(skyBoxShaders);
+	skybox->initShaderVars();
     
     // Initialize player
     player.setObject(&obj[3]);
@@ -930,19 +853,20 @@ int main(int argc, char **argv) {
 		rules.update();
 
 		// Draw environment
-		drawGround(projection, view);
+		//drawGround(projection, view);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 		glUseProgram(passThroughShaders);
-		drawSky();
+		//drawSky();
+		//skybox->render(view, projection);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-		
+		fprintf(stderr, "11\n");
 		// Update & draw player
 		player.update();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 		drawVBO(&player, pIndices, PLANE);
 		checkPlayerCollisions();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-
+		fprintf(stderr, "10\n");
 		// Update & draw opponents
 		for (auto &opponent : opponents) {
 		    opponent.update();
