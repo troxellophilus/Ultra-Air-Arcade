@@ -51,6 +51,10 @@ void main() {
 	// Output position of the vertex
 	//gl_Position = V*P * vec4(vertexPosition_worldspace, 1.0f);
 		gl_Position = P * V * vec4(vertexPosition_worldspace, 1.0f);
+	} else if (renderObj == 3) {
+		silh_vPos = vec3(V * M * aPos);
+		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
+		gl_Position = P * V * M * aPos;
 	} else {								// Catch-all
 		gl_Position = P * V * M * aPos;
 		vCol = vec3(0.1, 0.5, 0.3);

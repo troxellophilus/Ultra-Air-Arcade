@@ -26,6 +26,7 @@
 #include "Rules.hpp"
 #include "Projectile.hpp"
 #include "Skybox.hpp"
+#include "RacerAI.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -36,7 +37,7 @@
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, PLANE, MISSLE, NUM_VBO };
+enum { TERRAIN, SKY, PLANE, MISSILE, CHECKPOINT, NUM_VBO };
 
 // Program IDs
 GLuint passThroughShaders;
@@ -105,8 +106,9 @@ Collision collision = Collision();
 Terrain terrain = Terrain();
 Skybox *skybox;
 
+RacerAI playerAI = RacerAI();
 Camera camera = Camera();
-Entity player = Entity();
+Entity player = Entity(&playerAI);
 vector<Entity> opponents;
 
 static float g_width, g_height;
@@ -174,14 +176,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	    else
 	        camera.setMode(TPC);
 	}
-	if (key == GLFW_KEY_P) {
-            if (player.getObject() == &obj[3])
-                player.setObject(&obj[2]);
-	    else
-		player.setObject(&obj[3]);
-	    
-	    pIndices = initVBO(&player, PLANE);
-	}
     if(key == GLFW_KEY_X){
            if(!beginProjectile){
               beginProjectile = true;
@@ -191,6 +185,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
               //cout << "New Projectile" << endl;
            }
       }
+
+	if (key == GLFW_KEY_P) {
+	    camera.setPlayer(&player);
+	}
+	if (key == GLFW_KEY_O) {
+	    camera.setPlayer(&(opponents[0]));
+	}
+
+	if (key == GLFW_KEY_N) {
+	    printf("glm::vec3(%f, %f, %f),\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+	}
     }
 }
 
@@ -446,6 +451,9 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
 
     glUniform1i(renderObj, 0);
 
+    if (whichbo == CHECKPOINT)
+	glUniform1i(renderObj, 3);
+
     SetMaterial(entity->getMaterial());
     glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
     glm::mat4 Orient = entity->getRotationM();
@@ -585,9 +593,10 @@ int main(int argc, char **argv) {
     initCollisions();
     
     // Initialize player
+    player.setType(PLAYER_ENTITY);
     player.setObject(&obj[3]);
-    player.setPosition(glm::vec3(200.0f,35.f,200.0f));
-    player.setScale(glm::vec3(0.2,0.2,0.2));
+    player.setPosition(glm::vec3(175.815781, 19.949869, 214.720856));
+    player.setScale(glm::vec3(0.25,0.25,0.25));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
     pIndices = initVBO(&player, PLANE);
@@ -609,15 +618,17 @@ int main(int argc, char **argv) {
 
     // Initialize opponents
     int odx = 1;
-    while (odx < 6) {
-       Entity opp = Entity();
-       opp.setObject(&obj[3]);
-       glm::vec3 epos = player.getPosition();
-       opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
-       opp.setScale(glm::vec3(0.2,0.2,0.2));
-       opp.calculateBoundingSphereRadius();
-       opponents.push_back(opp);
-       odx++;
+    while (odx < 10) {
+	RacerAI *ai = new RacerAI();
+        Entity opp = Entity(ai);
+	opp.setType(AI_ENTITY);
+	opp.setObject(&obj[3]);
+	glm::vec3 epos = player.getPosition();
+	opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+	opp.setScale(glm::vec3(0.25,0.25,0.25));
+        opp.calculateBoundingSphereRadius();
+	opponents.push_back(opp);
+	odx++;
     }
 
     // Initialize game rules
@@ -631,6 +642,21 @@ int main(int argc, char **argv) {
     bigOpp.setMaterial(Materials::jade);
     bigOpp.setScale(glm::vec3(20.0,20.0,20.0));
     bigOpp.calculateBoundingSphereRadius();
+
+    // Initialize Props
+    vector<Entity> checkpoints;
+    int c = 0;
+    while (c < TRACK_LOCS) {
+	RacerAI *propAI = new RacerAI();
+        Entity prop = Entity(propAI);
+	prop.setType(PROP_ENTITY);
+	prop.setObject(&obj[0]);
+	prop.setScale(glm::vec3(5.,5.,5.));
+	prop.setPosition(track[c]);
+	checkpoints.push_back(prop);
+	c++;
+    }
+    int cIndices = initVBO(&checkpoints[0], CHECKPOINT);
 
     float start = glfwGetTime();
     elapsed = 0;
@@ -692,6 +718,10 @@ int main(int argc, char **argv) {
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 		skybox->render(view, projection, camera.getPosition());
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+	for (auto &checkpoint : checkpoints) {
+		drawVBO(&checkpoint, cIndices, CHECKPOINT);
+	}
         
 	   // Update camera
 	   camera.update();

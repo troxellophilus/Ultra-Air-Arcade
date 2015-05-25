@@ -64,17 +64,6 @@ void Rules::update() {
     static unsigned int frames = 0;
     static int i = 0;
 
-    glm::quat pq = player->getRotationQ();
-
-    // check the racers' locations and update laps
-    for (auto &agent : *agents) {
-        glm::quat aq = agent.getRotationQ();
-
-	agent.setTargetRotation(pq);
-
-	agent.throttleUp();
-    }
-
     frames++;
 }
 
