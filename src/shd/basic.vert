@@ -35,10 +35,6 @@ void main() {
 		vNor = vec3(M * vec4(aNor, 0.0));
 		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
 		gl_Position = P * V * M * aPos;
-	} else if (renderObj == 1) {	// For rendering skydome
-		vPos = vec3(M * aPos);
-		vNor = vec3(M * vec4(aNor, 0.0));
-		gl_Position = P * V * M * aPos;
 	} else if (renderObj == 2) { // For rendering billboard
 		vec3 particleCenter_wordspace = BillboardPos;
 	

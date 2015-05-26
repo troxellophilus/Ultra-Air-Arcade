@@ -3,7 +3,7 @@
 
 #include "GLSLProgram.h"
 #include "GLSL.h"
-//#include <Magick++/Include.h>
+
 #include <stb_image.h>
 #include <SOIL/SOIL.h>
 
@@ -49,7 +49,6 @@ CubeMapTexture::CubeMapTexture(const char* posXFileName,
 	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	fprintf(stderr, "1\n");
 }
 
 bool CubeMapTexture::loadCubeMapSide(GLuint texture, GLenum side, const char* fileName) {
@@ -59,8 +58,6 @@ bool CubeMapTexture::loadCubeMapSide(GLuint texture, GLenum side, const char* fi
 	int force_channels = 4;
 	unsigned char*  image_data = stbi_load (
 	fileName, &x, &y, &n, force_channels);
-	/*unsigned char* image_data = SOIL_load_image(fileName, &x, &y, &n, SOIL_LOAD_AUTO);*/
-	fprintf(stderr, "%d\n", image_data);
 	
 	if (!image_data) {
 		fprintf (stderr, "ERROR: could not load %s\n", fileName);
@@ -104,30 +101,31 @@ class Skybox {
 		~Skybox();
 		void prepareForRender();
 		void initShaderVars();
-		void render(glm::mat4, glm::mat4);
+		void render(glm::mat4, glm::mat4, glm::vec3);
 
 	private:
 		CubeMapTexture *cubeMap;
 		GLuint posBuf;
 		GLuint textureObj;
 
-		GLuint progID;
+		GLuint program;
 		GLuint posID;
 		GLuint viewMatID;
 		GLuint projMatID;
+		GLuint modelMatID;
 		GLuint texSamplerID;
 };
 
 Skybox::Skybox(GLuint prog) {
-	cubeMap = new CubeMapTexture("../Assets/models/desertsky_right.jpg",
-								"../Assets/models/desertsky_left.jpg",
-								"../Assets/models/desertsky_top.jpg",
-								"../Assets/models/desertsky_top.jpg",
-								"../Assets/models/desertsky_front.jpg",
-								"../Assets/models/desertsky_back.jpg",
+	cubeMap = new CubeMapTexture("../Assets/models/hourglass_right.jpg",
+								"../Assets/models/hourglass_left.jpg",
+								"../Assets/models/hourglass_top.jpg",
+								"../Assets/models/hourglass_top.jpg",
+								"../Assets/models/hourglass_front.jpg",
+								"../Assets/models/hourglass_back.jpg",
 								&textureObj);
 
-	progID = prog;
+	program = prog;
 
 	static const GLfloat s_vertex_buffer_data[] = {
 		-10.0f,  10.0f, -10.0f,
@@ -187,16 +185,23 @@ void Skybox::prepareForRender() {
 }
 
 void Skybox::initShaderVars() {
-	glUseProgram(progID);
-	posID = glGetAttribLocation(progID, "aPos");
-	texSamplerID = glGetUniformLocation(progID, "cubeMapTexture");
-	projMatID = glGetUniformLocation(progID, "P");
-	viewMatID = glGetUniformLocation(progID, "V");
+	glUseProgram(program);
+	posID = glGetAttribLocation(program, "aPos");
+	texSamplerID = glGetUniformLocation(program, "cubeMapTexture");
+	projMatID = glGetUniformLocation(program, "P");
+	viewMatID = glGetUniformLocation(program, "V");
+	modelMatID = glGetUniformLocation(program, "M");
 }
 
-void Skybox::render(glm::mat4 view, glm::mat4 proj) {
-	glUseProgram(progID);
+void Skybox::render(glm::mat4 view, glm::mat4 proj, glm::vec3 position) {
+	glEnable(GL_DEPTH_TEST);
+	glUseProgram(program);
 	prepareForRender();
+
+	glm::mat4 tempMat = glm::mat4(1.0);
+	vec3 pos = vec3(position.x, 0, position.y);
+	tempMat = glm::translate(tempMat, pos);
+	tempMat = glm::scale(tempMat, vec3(100, 100, 100));
 
 	glEnableVertexAttribArray(posID);
 	glBindBuffer(GL_ARRAY_BUFFER, posBuf);
@@ -204,9 +209,11 @@ void Skybox::render(glm::mat4 view, glm::mat4 proj) {
 
 	glUniformMatrix4fv(viewMatID, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(projMatID, 1, GL_FALSE, glm::value_ptr(proj));
+	glUniformMatrix4fv(modelMatID, 1, GL_FALSE, glm::value_ptr(tempMat)); 
 	glUniform1i(texSamplerID, 0);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glDisableVertexAttribArray(0);
+	assert(glGetError() == GL_NO_ERROR);
 }
 #endif

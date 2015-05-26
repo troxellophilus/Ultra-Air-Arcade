@@ -54,29 +54,34 @@ vec3 toonShade()
         return vec3(0.0, 0.0, 0.0);
 
     vec3 lightVector = normalize(lPos - vPos);
-    if (vPos.y >= 90) {
-    	ambient = snowAmbient;
+	float dotProduct = dot(vNor, vec3(0, 1, 0));
+
+	if (dotProduct > 2 && vPos.y > 50) { //&& vPos.y > 30) { //&& vPos.y >= 90) {
+		ambient = snowAmbient;
 		float cosine = dot(lightVector, vNor);
 		diffuse = snowDiffuse * floor( cosine * levels ) * scaleFactor;
-    }
-    else if (vPos.y >= 20) {
+    } else if (dotProduct > 1.5 && vPos.y > 10) {
 		ambient = UaColor;
 		float cosine = dot(lightVector, vNor);
 		diffuse = UdColor * floor( cosine * levels ) * scaleFactor;
-	} else if (vPos.y >= 2.5) {
+	} else if (dotProduct > 1.0 && vPos.y < 50) {
 		ambient = forestAmbient;
 		float cosine = dot(lightVector, vNor);
 		diffuse = forestDiffuse * floor( cosine * levels ) * scaleFactor;
-	} else if (vPos.y >= 1.5) {
+	} else if (dotProduct > 0.75) {
 		ambient = rocksAmbient;
 		float cosine = dot(lightVector, vNor);
 		diffuse = rocksDiffuse * floor( cosine * levels ) * scaleFactor;
-	} else if (vPos.y >= 1.0) {
+	} else if (dotProduct > 0.25) {
 		ambient = sandAmbient;
 		float cosine = dot(lightVector, vNor);
 		diffuse = sandDiffuse * floor( cosine * levels ) * scaleFactor;
-	} else {
-		vec3 ambient = waterAmbient;
+	} else if (dotProduct > 0.05){
+		ambient = forestAmbient;
+		float cosine = dot(lightVector, vNor);
+		diffuse = forestDiffuse * floor( cosine * levels ) * scaleFactor;
+	} else if (vPos.y < 0.2) {
+		ambient = waterAmbient;
 		float cosine = dot(lightVector, vNor);
 		diffuse = waterDiffuse * floor( cosine * levels ) * scaleFactor;
 	}
@@ -98,19 +103,9 @@ void main() {
 		float intensity = (500 * dist) / (dist * dist + dist + 1);
 
 		outColor = vec4(intensity * toonShade(), 1.0);
-	} 
-	else if (renderObj == 1) { 	// For rendering skydome
-		if (vPos.y < 50.0)
-			outColor = calcColor(vec3(0.03, 0.874, 1.0), vec3(0.0745, 0.815, 1.0), 50.0, 0.0);
-		else if (vPos.y >= 50.0 && vPos.y <= 250.0)
-			outColor = calcColor(vec3(0.0745, 0.815, 1.0), vec3(0.058, 0.725, 1.0), 200.0, 50.0);
-		else
-			outColor = calcColor(vec3(0.058, 0.725, 1.0), vec3(0.007, 0.407, 1.0), 250.0, 250.0);
-	} 
-	else if (renderObj == 2) {	// For rendering billboards
+	} else if (renderObj == 2) {	// For rendering billboards
 			outColor = vec4(1.0, 1.0, 1.0, 0.5);
-	} 
-	else {								// Catch-all
+	} else {								// Catch-all
 			outColor = vec4(vCol, 1.0);
 	}
 }

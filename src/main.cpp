@@ -24,7 +24,8 @@
 #include "Materials.hpp"
 #include "Terrain.h"
 #include "Rules.hpp"
- #include "Projectile.hpp"
+#include "Projectile.hpp"
+#include "Skybox.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -35,12 +36,13 @@
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, SKY, PLANE, MISSLE, NUM_VBO };
+enum { TERRAIN, PLANE, MISSLE, NUM_VBO };
 
 // Program IDs
 GLuint passThroughShaders;
 GLuint depthCalcShaders;
 GLuint renderSceneShaders;
+GLuint skyBoxShaders;
 
 GLuint vao;
 GLuint pbo[NUM_VBO];
@@ -102,6 +104,7 @@ Object skydome;
 
 Collision collision = Collision();
 Terrain terrain = Terrain();
+Skybox *skybox;
 
 Camera camera = Camera();
 Entity player = Entity();
@@ -288,34 +291,6 @@ void drawBillboard(Camera *camera) {
 	glDisableVertexAttribArray(0);
 }
 
-void initSky() {
-	// glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
-    //glEnable(GL_DEPTH_TEST);
-
-    const vector<float> &posBuf = skydome.shapes[0].mesh.positions;
-    glGenBuffers(1, &pbo[SKY]);
-    glBindBuffer(GL_ARRAY_BUFFER, pbo[SKY]);
-    glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
-    
-    // Send the normal array to the GPU
-    const vector<float> &norBuf = skydome.shapes[0].mesh.normals;
-    glGenBuffers(1, &nbo[SKY]);
-    glBindBuffer(GL_ARRAY_BUFFER, nbo[SKY]);
-    glBufferData(GL_ARRAY_BUFFER, norBuf.size()*sizeof(float), &norBuf[0], GL_STATIC_DRAW);
-    
-    // Send the index array to the GPU
-    const vector<unsigned int> &indBuf = skydome.shapes[0].mesh.indices;
-    glGenBuffers(1, &ibo[SKY]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[SKY]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indBuf.size()*sizeof(unsigned int), &indBuf[0], GL_STATIC_DRAW);
-    
-    // Unbind the arrays
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    GLSL::checkVersion();
-    assert(glGetError() == GL_NO_ERROR);
-}
-
 void initGround() {
 
     terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
@@ -361,13 +336,14 @@ void initShaderVars() {
     CameraUp_worldspace_ID  = glGetUniformLocation(passThroughShaders, "CameraUp_worldspace");
     BillboardPosID = glGetUniformLocation(passThroughShaders, "BillboardPos");
     BillboardSizeID = glGetUniformLocation(passThroughShaders, "BillboardSize");
-    
+
+    /*assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     DepthBiasID = 	glGetUniformLocation(renderSceneShaders, "depthBiasMVP");
 	ShadowMapID = 	glGetUniformLocation(renderSceneShaders, "shadowMap");
 	shadowViewMatrix = glGetUniformLocation(renderSceneShaders, "V");
     shadowModelMatrix = glGetUniformLocation(renderSceneShaders, "M");
     shadowProjMatrix = glGetUniformLocation(renderSceneShaders, "P");
-	shadowLPos = glGetUniformLocation(renderSceneShaders, "lPos");
+	shadowLPos = glGetUniformLocation(renderSceneShaders, "lPos");*/
 	
 	depthMatrixID = glGetUniformLocation(depthCalcShaders, "depthMVP");
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
@@ -491,43 +467,6 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     glUseProgram(0);
     assert(glGetError() == GL_NO_ERROR);
 }
-
-void drawSky() {
-	glUseProgram(passThroughShaders);
-	int nIndices = (int)skydome.shapes[0].mesh.indices.size();
-
-	glEnableVertexAttribArray(aPos);
-	glBindBuffer(GL_ARRAY_BUFFER, pbo[SKY]);
-	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(aNor);
-	glBindBuffer(GL_ARRAY_BUFFER, nbo[SKY]);
-	glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[SKY]);
-
-	// Bind index array for drawing
-	// Compute and send the projection matrix - leave this as is
-
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(750.0f, 750.0f, 750.0f)); 
-	glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(512.0f, 0.0f, 512.0f));
-
-	glm::mat4 com = trans * scale;
-	glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
-	glUniform1i(renderObj, 1);
-	glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-
-	// Disable and unbind
-	GLSL::disableVertexAttribArray(aPos);
-	GLSL::disableVertexAttribArray(aNor);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	// Last lines
-	glUseProgram(0);
-	assert(glGetError() == GL_NO_ERROR);
-}
-
 void drawGround() {
     glEnable(GL_CULL_FACE);
     glUseProgram(passThroughShaders);
@@ -632,6 +571,7 @@ int main(int argc, char **argv) {
    
    	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     /* tell GL to only draw onto a pixel if the shape is closer to the viewer */
+	glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
     
@@ -639,9 +579,14 @@ int main(int argc, char **argv) {
     whichShader = 1;
     renderSceneShaders = installShaders("shd/renderscene_vert.glsl", "shd/renderscene_frag.glsl");
     passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
+	skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
+	fprintf(stderr, "Shader ID at render(): %hd\n", skyBoxShaders);
+	skybox = new Skybox(skyBoxShaders);
+	
+	skybox->initShaderVars();
 	initShaderVars();    
 
-    initSky();
+    //initSky();
     initGround();
     initCollisions();
     
@@ -750,7 +695,7 @@ int main(int argc, char **argv) {
 	   // Draw environment
  	    drawGround();
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-	    drawSky();
+	    //drawSky();
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         
 	   // Update camera
@@ -800,7 +745,7 @@ int main(int argc, char **argv) {
 	/*if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
 		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
 	}*/
-
+		skybox->render(view, projection, camera.getPosition());
         last = elapsed;
         elapsed = glfwGetTime() - start;
         
