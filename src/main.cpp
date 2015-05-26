@@ -33,6 +33,7 @@
 #include "GLSLProgram.h"
 
 //#define DEBUG
+#define NUM_OPPONENTS 15
 
 using namespace std;
 //using namespace glm;
@@ -106,6 +107,7 @@ Collision collision = Collision();
 Terrain terrain = Terrain();
 Skybox *skybox;
 
+Rules rules = Rules();
 RacerAI playerAI = RacerAI();
 Camera camera = Camera();
 Entity player = Entity(&playerAI);
@@ -148,34 +150,51 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
     // Check movement keys
     if (action == GLFW_REPEAT || action == GLFW_PRESS) {
-        if (key == GLFW_KEY_W) {
-            camera.move(FORWARD);
-	    player.throttleUp();
-        }
-        if (key == GLFW_KEY_S) {
-            camera.move(BACK);
-	    player.throttleDown();
-        }
-        if (key == GLFW_KEY_A) {
-            camera.move(LEFT);
-	    player.rollLeft();
-        }
-        if (key == GLFW_KEY_D) {
-            camera.move(RIGHT);
-	    player.rollRight();
-        }
-        if (mods == GLFW_MOD_SHIFT) {
-            camera.move(DOWN);
-        }
-        if (key == GLFW_KEY_SPACE) {
-            camera.move(UP);
-    	}
-	if (key == GLFW_KEY_M) {
-            if (camera.getMode() == TPC)
-	        camera.setMode(FREE);
-	    else
-	        camera.setMode(TPC);
+	// Check Game State
+	if (rules.getState() == Rules::SPLASH) {
+            rules.setState(Rules::CSEL);
 	}
+
+	if (rules.getState() == Rules::CSEL) {
+	    rules.setState(Rules::RACE);
+	}
+	if (rules.getState() == Rules::FINISH) {
+	    rules.setState(Rules::LEADERBOARD);
+	}
+	if (rules.getState() == Rules::LEADERBOARD) {
+	    rules.setState(Rules::SPLASH);
+	}
+	if (rules.getState() == Rules::RACE) {
+	    // Check movement keys
+            if (key == GLFW_KEY_W) {
+                camera.move(Camera::FORWARD);
+	        player.throttleUp();
+            }
+            if (key == GLFW_KEY_S) {
+                camera.move(Camera::BACK);
+	        player.throttleDown();
+            }
+            if (key == GLFW_KEY_A) {
+                camera.move(Camera::LEFT);
+	        player.rollLeft();
+            }
+            if (key == GLFW_KEY_D) {
+                camera.move(Camera::RIGHT);
+	        player.rollRight();
+            }
+            if (mods == GLFW_MOD_SHIFT) {
+                camera.move(Camera::DOWN);
+            }
+            if (key == GLFW_KEY_SPACE) {
+                camera.move(Camera::UP);
+    	    }
+	    if (key == GLFW_KEY_M) {
+                if (camera.getMode() == Camera::TPC)
+	            camera.setMode(Camera::FREE);
+	        else
+	            camera.setMode(Camera::TPC);
+	    }
+
     if(key == GLFW_KEY_X){
            if(!beginProjectile){
               beginProjectile = true;
@@ -186,16 +205,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
            }
       }
 
-	if (key == GLFW_KEY_P) {
-	    camera.setPlayer(&player);
-	}
-	if (key == GLFW_KEY_O) {
-	    camera.setPlayer(&(opponents[0]));
-	}
+	    if (key == GLFW_KEY_P) {
+	        camera.setPlayer(&player);
+	    }
+	    if (key == GLFW_KEY_O) {
+	        camera.setPlayer(&(opponents[0]));
+	    }
 
-	if (key == GLFW_KEY_N) {
-	    printf("glm::vec3(%f, %f, %f),\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
-	}
+	    if (key == GLFW_KEY_N) {
+	        printf("glm::vec3(%f, %f, %f),\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+	    }
+        }
     }
 }
 
@@ -593,6 +613,7 @@ int main(int argc, char **argv) {
     initCollisions();
     
     // Initialize player
+    playerAI.setType(RacerAI::PLAYER);
     player.setType(PLAYER_ENTITY);
     player.setObject(&obj[3]);
     player.setPosition(glm::vec3(175.815781, 19.949869, 214.720856));
@@ -602,7 +623,7 @@ int main(int argc, char **argv) {
     pIndices = initVBO(&player, PLANE);
 
     // Initialize camera
-    camera.setMode(TPC);
+    camera.setMode(Camera::TPC);
     camera.setPosition(glm::vec3(0,0,-10));
     camera.setClipping(0.1, 1500);
     camera.setFOV(90);
@@ -617,14 +638,17 @@ int main(int argc, char **argv) {
     projectileEntity.calculateBoundingSphereRadius();
 
     // Initialize opponents
+    RacerAI *ai;
+    Entity opp;
     int odx = 1;
-    while (odx < 10) {
-	RacerAI *ai = new RacerAI();
-        Entity opp = Entity(ai);
+    while (odx <= NUM_OPPONENTS) {
+	ai = new RacerAI();
+	printf("ai: %llu\n", (uint64_t)ai);
+        opp = Entity(ai);
 	opp.setType(AI_ENTITY);
 	opp.setObject(&obj[3]);
-	glm::vec3 epos = player.getPosition();
-	opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+	//glm::vec3 epos = player.getPosition();
+	//opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
 	opp.setScale(glm::vec3(0.25,0.25,0.25));
         opp.calculateBoundingSphereRadius();
 	opponents.push_back(opp);
@@ -648,6 +672,7 @@ int main(int argc, char **argv) {
     int c = 0;
     while (c < TRACK_LOCS) {
 	RacerAI *propAI = new RacerAI();
+	propAI->setType(RacerAI::PROP);
         Entity prop = Entity(propAI);
 	prop.setType(PROP_ENTITY);
 	prop.setObject(&obj[0]);
@@ -657,6 +682,10 @@ int main(int argc, char **argv) {
 	c++;
     }
     int cIndices = initVBO(&checkpoints[0], CHECKPOINT);
+
+    // Initialize rules
+    rules.setPlayer(&player);
+    rules.setAgents(&opponents);
 
     float start = glfwGetTime();
     elapsed = 0;
@@ -686,14 +715,13 @@ int main(int argc, char **argv) {
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
-
         initBillboard();
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         drawBillboard(&camera);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Update the rules and game state
-	rules.update();
+	rules.update(&camera);
 
     // Update the collisions
     collision.update();

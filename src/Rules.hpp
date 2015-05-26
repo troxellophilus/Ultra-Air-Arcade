@@ -11,63 +11,68 @@
 
 #include "Entity.hpp"
 #include "Collision.hpp"
+#include "RacerAI.hpp"
 
 class Rules {
-private:
+public:
     enum GameState { SPLASH, CSEL, RACE, FREE_FLY, TIME_TRIAL, FINISH, LEADERBOARD };
 
+    // Constructors
+    Rules();
+    
+    // Methods
+    void update(Camera *);
+
+    // Getters
+    GameState getState();
+    
+    // Setters
+    void setPlayer(Entity *p);
+    void setAgents(vector<Entity> *a);
+    void setState(GameState s);
+
+private:
     // Mode
     GameState state;
     
     // Players
     Entity *player; // Pointer to the player entity
-    vector<Entity> *agents; // Pointer to the vector of opponents in main
+    RacerAI *playerAI;
+    vector<Entity> *agents; // Pointer to the vector of agents in main
+    vector<RacerAI *> agentsAI;
 
     // state methods
-    void splash();
-    void characterSelect();
-    void race();
+    void splash(Camera *);
+    void characterSelect(Camera *);
+    void race(Camera *);
     void freeFly();
     void timeTrial();
-    void finish();
+    void finish(Camera *);
     void leaderboard();
-    
-public:
-    // Constructors
-    Rules();
-    
-    // Methods
-    void update();
-
-    // Getters
-    
-    // Setters
-    void setPlayer(Entity *p);
-    void setAgents(vector<Entity> *a);
 };
 
 // Constructors
 Rules::Rules() {
     state = SPLASH; // init game state
-    
-    player = NULL; // set by main
-    agents = NULL; // set by main
 }
 
 // Methods
-void Rules::update() {
+void Rules::update(Camera *cam) {
     static unsigned int frames = 0;
     static int i = 0;
 
+    if (frames % 50 == 0)
+        printf("Game State: %d\n", state);
+
     switch (state) {
         case SPLASH:
-            splash();
+            splash(cam);
 	    break;
 	case CSEL:
-	    characterSelect();
+	    characterSelect(cam);
 	    break;
 	case RACE:
-	    race();
+	    race(cam);
 	    break;
 	case FREE_FLY:
 	    freeFly();
@@ -76,7 +81,7 @@ void Rules::update() {
 	    timeTrial();
 	    break;
 	case FINISH:
-	    finish();
+	    finish(cam);
 	    break;
 	case LEADERBOARD:
 	    leaderboard();
@@ -88,28 +93,80 @@ void Rules::update() {
     frames++;
 }
 
-void Rules::splash() {
+void Rules::splash(Camera *cam) {
     // Draw camera above overlooking track
+    cam->setMode(Camera::SPLASH_CAM);
+
     // Have AI players running track endlessly
+    for (RacerAI *opp : agentsAI) {
+        opp->setState(RacerAI::SPLASH);
+    }
+
     // Have on-screen text w/ logo and 'press any key to start'
+    playerAI->setState(RacerAI::SPLASH);
+
     // Once game started, switch state to character select
+    // This occurs as a result of input handler
 }
 
-void Rules::characterSelect() {
+void Rules::characterSelect(Camera *cam) {
     // same camera as splash state
+    cam->setMode(Camera::SPLASH_CAM);
+
     // draw large character plane in front of screen
+    player->setPosition(cam->getPosition() + glm::vec3(0, 0, -0.3));
+
     // accept left and right arrows to change character
+    // handled by input handler
+    
     // accept spacebar to select character
+    // handled by input handler
+
     // Upon accept, switch state to race, free fly, or time trial
+    // handled by input handler
 }
 
-void Rules::race() {
+void Rules::race(Camera *cam) {
+    static int start_count = 0;
+
     // Setup all racers in starting positions
-    // Change camera to player camera
+    if (start_count == 0) {
+        playerAI->setState(RacerAI::SETUP);
+
+        for (RacerAI *opp : agentsAI) {
+	    opp->setState(RacerAI::SETUP);
+        }
+
+        // Change camera to player camera
+        cam->setMode(Camera::TPC);
+    }
+
+    if (start_count < 300)
+	start_count++;
+
     // Run a countdown before allowing the racers to control
-    //  (so before giving player control and before starting AI update)
+    if (start_count == 300) {
+        playerAI->setState(RacerAI::RACE);
+	for (RacerAI *opp : agentsAI) {
+            opp->setState(RacerAI::RACE);
+	}
+	start_count++;
+    }
+
     // Keep track of racer positions
+
     // When all racers have finish 3 laps, set state to finish
+    if (playerAI->getLap() == 3) {
+        int unfinished = 0;
+        for (RacerAI *opp : agentsAI) {
+            if (opp->getLap() < 3)
+	        unfinished++;
+	}
+	if (unfinished == 0) {
+	    state = FINISH;
+	    start_count = 0;
+	}
+    }
 }
 
 void Rules::freeFly() {
@@ -129,33 +186,52 @@ void Rules::timeTrial() {
     // When 3 laps are finished set state to finish
 }
 
-void Rules::finish() {
+void Rules::finish(Camera *cam) {
     // Change camera to splash cam
-    // Run AI players running track endlessly
+    cam->setMode(Camera::SPLASH_CAM);
+
     // Draw the top racer on the screen
+
     // Draw their names as text, draw their best lap and overall race time as text
+
     // Prompt for any key to move forward
+    
     // On key press, change state to leaderboard
+    // Handled by input handler
 }
 
 void Rules::leaderboard() {
     // Clear screen in front of splash cam
-    // AI players running track in background
+
     // 2 sections: best lap times and best avg race finish
+
     // List top 3 racers in each as well as the value
+
     // Prompt for any button to move forward
+
     // On key press, change state to splash
+    // Handled by input handler
 }
 
 // Getters
+Rules::GameState Rules::getState() {
+    return state;
+}
 
 // Setters
+void Rules::setState(GameState s) {
+    state = s;
+}
+
 void Rules::setPlayer(Entity *p) {
     player = p;
+    playerAI = (RacerAI *)(p->getAI());
 }
 
 void Rules::setAgents(vector<Entity> *a) {
     agents = a;
+    for (Entity e : *a)
+	agentsAI.push_back((RacerAI *)(e.getAI()));
 }
 
 #endif

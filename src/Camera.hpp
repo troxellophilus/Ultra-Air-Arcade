@@ -18,11 +18,33 @@
 
 #define PI 3.14159265
 
-enum CameraMode { TPC, FREE, SPLASH };
-
-enum CameraDirection { FORWARD, BACK, LEFT, RIGHT, UP, DOWN };
-
 class Camera {
+public:
+    enum CameraMode { TPC, FREE, SPLASH_CAM };
+    enum CameraDirection { FORWARD, BACK, LEFT, RIGHT, UP, DOWN };
+
+    // Constructors
+    Camera();
+    
+    // Getters
+    glm::mat4 getProjectionMatrix();
+    glm::mat4 getViewMatrix();
+    glm::vec3 getPosition();
+    CameraMode getMode();
+    
+    // Setters
+    void setFOV(float fov);
+    void setClipping(float zNear, float zFar);
+    void setPosition(glm::vec3 position);
+    void setPlayer(Entity *player);
+    void setMode(CameraMode m);
+    
+    // Methods
+    void update();
+    void move(CameraDirection dir);
+    void pitch(float dy);
+    void yaw(float dx);
+
 private:
     // Mode
     CameraMode mode; // mode of the camera
@@ -46,29 +68,6 @@ private:
     
     // Player
     Entity *player;
-    
-public:
-    // Constructors
-    Camera();
-    
-    // Getters
-    glm::mat4 getProjectionMatrix();
-    glm::mat4 getViewMatrix();
-    glm::vec3 getPosition();
-    CameraMode getMode();
-    
-    // Setters
-    void setFOV(float fov);
-    void setClipping(float zNear, float zFar);
-    void setPosition(glm::vec3 position);
-    void setPlayer(Entity *player);
-    void setMode(CameraMode m);
-    
-    // Methods
-    void update();
-    void move(CameraDirection dir);
-    void pitch(float dy);
-    void yaw(float dx);
 };
 
 // Constructors
@@ -109,7 +108,7 @@ void Camera::update() {
         
         last = player->getRotationQ();
     }
-    else if (mode == SPLASH) {
+    else if (mode == SPLASH_CAM) {
         //position = glm::vec3(0, 0, 0);
     }
 }
@@ -187,7 +186,7 @@ glm::vec3 Camera::getPosition() {
     return glm::vec3(position);
 }
 
-CameraMode Camera::getMode() {
+Camera::CameraMode Camera::getMode() {
     return mode;
 }
 

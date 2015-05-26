@@ -67,6 +67,7 @@ private:
 public:
     // Constructor
     Entity(AIComponent *ai);
+    Entity();
     
     // Getters
     Object * getObject();
@@ -84,6 +85,8 @@ public:
     EntityFlag getFlag();
 
     float getRadius();
+
+    AIComponent *getAI();
     
     // Setters
     void setObject(Object *);
@@ -115,6 +118,34 @@ public:
 
     void calculateBoundingSphereRadius();
 };
+
+Entity::Entity() {
+    object = NULL;
+	// Zach - removed Material:: from the call to the Material constructor - 
+	// Would not allow my version to compile
+    material = Material();
+    
+    position = glm::vec3(0, 0, 0);
+    rotation = glm::quat(1, 0, 0, 0);
+    target_rotation = glm::quat(1, 0, 0, 0);
+    
+    
+    scale = glm::vec3(1, 1, 1);
+    mass = 5000.0f;
+    force = glm::vec3(0, 0, 0);
+    drag = 1.5f; // sphere for now
+    carea = 25.f;
+    
+    thrust = -0.5f;
+    velocity = glm::vec3(0, 0, 0);
+    
+    flag = C_FLAG;
+    type = AI_ENTITY;
+
+    radius = 0.f;
+
+    ai_ = NULL;
+}
 
 Entity::Entity(AIComponent *ai) {
     object = NULL;
@@ -279,6 +310,10 @@ glm::vec3 Entity::getDirection() {
 
 float Entity::getThrust() {
     return thrust;
+}
+
+AIComponent * Entity::getAI() {
+    return ai_;
 }
 
 void Entity::setObject(Object *obj) {
