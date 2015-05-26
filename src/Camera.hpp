@@ -18,7 +18,7 @@
 
 #define PI 3.14159265
 
-enum CameraMode { TPC, FREE };
+enum CameraMode { TPC, FREE, SPLASH };
 
 enum CameraDirection { FORWARD, BACK, LEFT, RIGHT, UP, DOWN };
 
@@ -85,8 +85,8 @@ Camera::Camera() {
     // Initialize perspective
     field_of_view = 75;
     aspect = window_width / window_height;
-    z_near = 0.1;
-    z_far = 10000;
+    z_near = 0.01;
+    z_far = 2000;
     
     // Initialize camera transforms
     position = glm::vec3(0, 0, 0);
@@ -108,6 +108,9 @@ void Camera::update() {
         rotation = glm::mix(rotation, player->getRotationQ(), mixFact);
         
         last = player->getRotationQ();
+    }
+    else if (mode == SPLASH) {
+        //position = glm::vec3(0, 0, 0);
     }
 }
 
