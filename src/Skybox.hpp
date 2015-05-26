@@ -4,7 +4,7 @@
 #include "GLSLProgram.h"
 #include "GLSL.h"
 
-#include <stb_image.h>
+#include <SOIL/stb_image_aug.h>
 #include <SOIL/SOIL.h>
 
 using namespace std;

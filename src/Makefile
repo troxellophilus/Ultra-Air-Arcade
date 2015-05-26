@@ -11,7 +11,7 @@ all:
 
 
 osx:
-	clang++ -std=c++11 -stdlib=libc++ *.cpp ext/*.cpp ext/*.cc -lglfw3 -framework OpenGL -lGLEW -framework Cocoa -DGL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+	clang++ -std=c++11 -stdlib=libc++ *.cpp ext/*.cpp ext/*.cc -lglfw3 -framework OpenGL -lGLEW -lSOIL -framework Cocoa -DGL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
 
 fedora:
 	g++ *.cpp ext/*.cpp ext/*.cc -lGL -lGLEW -lglfw -lSOIL -std=c++11
