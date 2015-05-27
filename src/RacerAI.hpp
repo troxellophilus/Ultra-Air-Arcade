@@ -63,7 +63,6 @@ public:
     // Setters
     void setState(AIState s);
     void setType(AIType t);
-    void setAvoidTarget(Entity *);
 
     // Getters
     int getLap();
@@ -77,7 +76,6 @@ private:
     int state;
     int type;
     glm::vec3 start_loc;
-    Entity *avoid_target;
 
     void splash(Entity *);
     void setup(Entity *);
@@ -95,8 +93,6 @@ RacerAI::RacerAI() {
     next_idx = 1;
     type = OPPONENT;
     state = SETUP;
-
-    avoid_target = NULL;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -153,9 +149,6 @@ void RacerAI::setup(Entity *agent) {
     track_idx = 0;
     next_idx = 1;
     agent->setPosition(start_loc);
-
-    if (agent->getThrust() > -0.5f)
-	agent->throttleUp();
 }
 
 void RacerAI::race(int frames, Entity *agent) {
@@ -163,9 +156,8 @@ void RacerAI::race(int frames, Entity *agent) {
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::normal_distribution<> noise(0,2.0);
+        std::normal_distribution<> noise(0,1.5);
         target = track[track_idx] + glm::vec3(float(noise(gen)), float(noise(gen)), float(noise(gen)));
-
     // Update track targets
     if (glm::distance(agent->getPosition(), target) < 5.f) {
         track_idx = next_idx;
@@ -180,21 +172,16 @@ void RacerAI::race(int frames, Entity *agent) {
     if (type == OPPONENT) {
         agent->throttleUp();
 
-        glm::vec3 todir = glm::normalize(target - agent->getPosition());
-        glm::quat q = glm::rotation(glm::vec3(0, 0, -1), todir);
-        agent->setTargetRotationQ(q);
+        //if (frames % 15 == 0) {
+            glm::vec3 todir = glm::normalize(target - agent->getPosition());
+            glm::quat q = glm::rotation(glm::vec3(0, 0, -1), todir);
+            agent->setTargetRotationQ(q);
+        //}
     }
 }
 
 void RacerAI::avoid(Entity *agent) {
     agent->throttleDown();
-
-    glm::vec3 vec_away_opp = glm::normalize(agent->getPosition() - avoid_target->getPosition());
-
-    agent->setTargetRotationQ(glm::shortMix(agent->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.3f));
-
-    if (glm::distance(agent->getPosition(), avoid_target->getPosition()) > 3.0f)
-	state = RACE;
 }
 
 void RacerAI::recover(Entity *agent) {
@@ -218,10 +205,6 @@ void RacerAI::setState(AIState s) {
 
 void RacerAI::setType(AIType t) {
     type = t;
-}
-
-void RacerAI::setAvoidTarget(Entity *e) {
-    avoid_target = e;
 }
 
 #endif

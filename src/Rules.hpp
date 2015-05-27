@@ -61,8 +61,8 @@ void Rules::update(Camera *cam) {
     static unsigned int frames = 0;
     static int i = 0;
 
-    //if (frames % 50 == 0)
-    //    printf("Game State: %d\n", state);
+    if (frames % 50 == 0)
+        printf("Game State: %d\n", state);
 
     switch (state) {
         case SPLASH:
@@ -141,11 +141,11 @@ void Rules::race(Camera *cam) {
         cam->setMode(Camera::TPC);
     }
 
-    if (start_count < 200)
+    if (start_count < 300)
 	start_count++;
 
     // Run a countdown before allowing the racers to control
-    if (start_count == 200) {
+    if (start_count == 300) {
         playerAI->setState(RacerAI::RACE);
 	for (RacerAI *opp : agentsAI) {
             opp->setState(RacerAI::RACE);
@@ -154,25 +154,6 @@ void Rules::race(Camera *cam) {
     }
 
     // Keep track of racer positions
-
-    // Trigger avoidance states
-    if (start_count > 200) {
-	for (Entity opp1 : *agents) {
-            for (Entity opp2 : *agents) {
-		float d = glm::distance(opp1.getPosition(), opp2.getPosition());
-                if (d < 2.f && d > 0.00001f) {
-		    ((RacerAI *)opp1.getAI())->setAvoidTarget(&opp2);
-		    ((RacerAI *)opp1.getAI())->setState(RacerAI::AVOID);
-		    ((RacerAI *)opp2.getAI())->setAvoidTarget(&opp1);
-		    ((RacerAI *)opp2.getAI())->setState(RacerAI::AVOID);
-		}
-		else {
-		    ((RacerAI *)opp1.getAI())->setState(RacerAI::RACE);
-		    ((RacerAI *)opp2.getAI())->setState(RacerAI::RACE);
-		}
-            }
-	}
-    }
 
     // When all racers have finish 3 laps, set state to finish
     if (playerAI->getLap() == 3) {
