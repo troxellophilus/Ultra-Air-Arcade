@@ -19,6 +19,8 @@
 #include FT_FREETYPE_H
 
 #include "Text.hpp"
+#include "GLSLProgram.h"
+#include "GLSL.h"
 
 #include <string>
 #include <vector>
@@ -69,14 +71,19 @@ private:
     std::vector<std::string> fontnames;
     std::vector<MyFont> fonts;
 
-public:
     int width, height;
+    GLuint program;
+    GLint aCoord;
+    GLint uText;
+    GLint uColor;
+
+public:
     //Constructor/destructor
-    DrawText();
+    DrawText(GLuint prog);
     virtual ~DrawText();
 
     //Functions
-    int initResources(int w, int h, GLint coord, GLint text, GLint color);
+    int initResources(int w, int h);
     void initFonts();
     void destructFonts();
     const char *setFont(int f);

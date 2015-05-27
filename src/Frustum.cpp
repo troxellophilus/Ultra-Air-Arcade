@@ -1,5 +1,4 @@
 #include "Frustum.h"
-#include "Camera.hpp"
 
 Frustum::Frustum() {
 
@@ -54,14 +53,14 @@ void Frustum::setFrustum(glm::mat4 viewMatrix, glm::mat4 projMatrix) {
 //NEAR PLANE
 	viewFrustum[NEARP].setA(clip[0][3] + clip[0][2]);
 	viewFrustum[NEARP].setB(clip[1][3] + clip[1][2]);
-	viewFrustum[NEARP].setC(clip[2][3] + clip[2][1]);
+	viewFrustum[NEARP].setC(clip[2][3] + clip[2][2]);
 	viewFrustum[NEARP].setD(clip[3][3] + clip[3][2]);
 	normalize(NEARP);
 
 //FAR PLANE
 	viewFrustum[FARP].setA(clip[0][3] - clip[0][2]);
 	viewFrustum[FARP].setB(clip[1][3] - clip[1][2]);
-	viewFrustum[FARP].setC(clip[2][3] - clip[2][1]);
+	viewFrustum[FARP].setC(clip[2][3] - clip[2][2]);
 	viewFrustum[FARP].setD(clip[3][3] - clip[3][2]);
 	normalize(FARP);
 }
@@ -69,6 +68,7 @@ void Frustum::setFrustum(glm::mat4 viewMatrix, glm::mat4 projMatrix) {
 bool Frustum::sphereInFrustum(glm::vec3 pos, float r) {
 	for (int i = 0; i < 6; i++) {
 		float value = viewFrustum[i].getA() * pos.x + viewFrustum[i].getB() * pos.y + viewFrustum[i].getC() * pos.z + viewFrustum[i].getD();
+		std::cout << i << ": " << value << std::endl;
 		if (value <= -r) {
 			return false;
 		}
