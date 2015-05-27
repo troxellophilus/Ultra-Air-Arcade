@@ -38,7 +38,7 @@
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, SKY, PLANE, MISSILE, CHECKPOINT, NUM_VBO };
+enum { TERRAIN, PLANE, MISSILE, CHECKPOINT, NUM_VBO };
 
 // Program IDs
 GLuint passThroughShaders;
@@ -154,7 +154,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (rules.getState() == Rules::SPLASH) {
             rules.setState(Rules::CSEL);
 	}
-
 	if (rules.getState() == Rules::CSEL) {
 	    rules.setState(Rules::RACE);
 	}
@@ -200,7 +199,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
               beginProjectile = true;
               missle = new Projectile(projectileEntity, true, player.getPosition(), opponents[1].getPosition());
               missleTime = elapsed;
-              //cout << "MISSLE TIME: " << missleTime << endl;
+              //cout << "MISSILE TIME: " << missleTime << endl;
               //cout << "New Projectile" << endl;
            }
       }
@@ -634,7 +633,7 @@ int main(int argc, char **argv) {
     projectileEntity.setPosition(glm::vec3(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]));
     projectileEntity.setScale(glm::vec3(2.0, 2.0, 2.0));
     projectileEntity.setMaterial(Materials::emerald);
-    int mIndices = initVBO(&projectileEntity, MISSLE);
+    int mIndices = initVBO(&projectileEntity, MISSILE);
     projectileEntity.calculateBoundingSphereRadius();
 
     // Initialize opponents
@@ -643,7 +642,7 @@ int main(int argc, char **argv) {
     int odx = 1;
     while (odx <= NUM_OPPONENTS) {
 	ai = new RacerAI();
-	printf("ai: %llu\n", (uint64_t)ai);
+	//printf("ai: %llu\n", (uint64_t)ai);
         opp = Entity(ai);
 	opp.setType(AI_ENTITY);
 	opp.setObject(&obj[3]);
@@ -656,11 +655,12 @@ int main(int argc, char **argv) {
     }
 
     // Initialize game rules
-    Rules rules = Rules();
     rules.setAgents(&opponents);
     rules.setPlayer(&player);
 
-    Entity bigOpp = Entity();
+    RacerAI *propAI = new RacerAI();
+    Entity bigOpp = Entity(propAI);
+    bigOpp.setType(PROP_ENTITY);
     bigOpp.setObject(&obj[3]);
     bigOpp.setPosition(player.getPosition() + odx * 5.f);
     bigOpp.setMaterial(Materials::jade);
@@ -671,7 +671,6 @@ int main(int argc, char **argv) {
     vector<Entity> checkpoints;
     int c = 0;
     while (c < TRACK_LOCS) {
-	RacerAI *propAI = new RacerAI();
 	propAI->setType(RacerAI::PROP);
         Entity prop = Entity(propAI);
 	prop.setType(PROP_ENTITY);
@@ -755,13 +754,14 @@ int main(int argc, char **argv) {
 	   camera.update();
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-        pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
-      Entity *check = pathPlane.getEntity();
+        //pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
+      //Entity *check = pathPlane.getEntity();
 
-      drawVBO(check, pIndices, PLANE);
+      //drawVBO(check, pIndices, PLANE);
 
+       /*
       if(beginProjectile == true){
-         //cout << "MISSLE TIME: " << missleTime << endl;
+         //cout << "MISSILE TIME: " << missleTime << endl;
          //cout << "ELAPSED: " << elapsed << endl;
 
          int isDone = missle->runProjectile(false, elapsed - missleTime,
@@ -769,7 +769,7 @@ int main(int argc, char **argv) {
 
          Entity* ent = missle->getEntity();
 
-         drawVBO(ent, mIndices, MISSLE);
+         drawVBO(ent, mIndices, MISSILE);
 
          if(collision.detectEntityCollision(check, ent)){
             //Material m = check->getMaterial();
@@ -791,6 +791,7 @@ int main(int argc, char **argv) {
             delete missle;
          }
       }
+      */
 
      assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 

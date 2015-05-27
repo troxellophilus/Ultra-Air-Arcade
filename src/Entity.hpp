@@ -195,7 +195,7 @@ void Entity::update() {
     position += (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0.0001f, 0);
     vn = glm::vec3(0, 0, 1);
     fd = -0.5f * glm::vec3(0, 0, -1) * 1.293f * drag * carea * velocity * velocity;
-    force = 10 * thrust * vn * mass;
+    force = thrust * vn * mass;
     velocity += (force + fd) * (1.f / mass) * dt;
 }
 

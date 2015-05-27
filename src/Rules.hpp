@@ -62,7 +62,7 @@ void Rules::update(Camera *cam) {
     static int i = 0;
 
     //if (frames % 50 == 0)
-    //    printf("Game State: %d\n", state);
+        //printf("Game State: %d\n", state);
 
     switch (state) {
         case SPLASH:

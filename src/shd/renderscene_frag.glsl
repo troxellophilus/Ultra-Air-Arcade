@@ -1,12 +1,12 @@
 #version 330 core
 
-in vec3 Position_worldspace;
+in vec3 position_worldspace;
 in vec3 normal_cameraspace;
 in vec3 eye;
 in vec3 lightDirection_cameraspace;
 in vec4 shadowCoord;
 
-out vec3 color;
+out vec3 outColor;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2DShadow shadowMap;
@@ -59,5 +59,5 @@ void main(){
 	vec3 diffuse = lightFactor * MaterialDiffuseColor * lightColor * shininess * Kt;
 	vec3 specular = lightFactor * MaterialSpecularColor * lightColor * shininess * pow(Ka,5);
 
-	color = ambient + specular + diffuse;
+	outColor = ambient + specular + diffuse;
 }
