@@ -28,6 +28,7 @@
 #include "Skybox.hpp"
 #include "RacerAI.hpp"
 #include "DrawText.h"
+#include "Frustum.h"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -129,12 +130,14 @@ Object obj[NUMSHAPES];
 Collision collision = Collision();
 Terrain terrain = Terrain();
 Skybox *skybox;
-DrawText drawText = DrawText();
+DrawText *drawText;
 
 Rules rules = Rules();
 RacerAI playerAI = RacerAI();
 Camera camera = Camera();
 Entity player = Entity(&playerAI);
+Frustum viewFrustum = Frustum();
+
 vector<Entity> opponents;
 
 static float g_width, g_height;
@@ -554,19 +557,19 @@ void drawGround() {
 void drawHUD(int fps) {
    char buffer[256], *text;
 
-   drawText.addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText.getFontSize(45), 2));
-   drawText.addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2, 0, 1, drawText.getFontSize(45), 2));
+   drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
+   drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2, 0, 1, drawText->getFontSize(45), 2));
 
-   drawText.addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText.getFontSize(90), 2));
-   drawText.addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText.getFontSize(90), 2));
+   drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
 
    snprintf(buffer, sizeof(buffer), "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10);
    int len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText.addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText.getFontSize(90), 1));
+   drawText->addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
-   drawText.addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText.getFontSize(30), 1));
+   drawText->addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
    // drawText.addText(Text("Thrust: 25%", 0.025 * g_width, 0.98 * g_height, 0, 0, drawText.getFontSize(90), 1));
    // drawText.addText(Text("Weapon: Gun", 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
 
@@ -574,22 +577,23 @@ void drawHUD(int fps) {
    len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText.addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(45), 1));
+   drawText->addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText->getFontSize(45), 1));
 
-   drawText.addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText.getFontSize(90), 2));
-   drawText.addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText.getFontSize(90), 2));
+   drawText->addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   drawText->addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
 
    snprintf(buffer, sizeof(buffer), "%.0fm", player.getPosition().y * 10);
    len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText.addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText.getFontSize(90), 1));
+   drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
    snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
-   drawText.addText(Text(buffer, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText.getFontSize(90), 1));
+   drawText->addText(Text(buffer, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
+   // glUniform1i(renderObj, 2);
    glUseProgram(textShaders);
-   drawText.drawText();
+   drawText->drawText();
 }
 
 int main(int argc, char **argv) {
@@ -603,6 +607,7 @@ int main(int argc, char **argv) {
       if (**argv == '1') renderShadows = true;
       else renderShadows = false;
    } else renderShadows = false;
+
 
 
    glfwSetErrorCallback(error_callback);
@@ -680,7 +685,8 @@ int main(int argc, char **argv) {
    skybox = new Skybox(skyBoxShaders);
    skybox->initShaderVars();
 
-
+   drawText = new DrawText(textShaders);
+   drawText->initResources(g_width, g_height);
 
    initGround();
    initCollisions();
@@ -760,9 +766,6 @@ int main(int argc, char **argv) {
    rules.setPlayer(&player);
    rules.setAgents(&opponents);
 
-
-   drawText.initResources(g_width, g_height, h_aCoord, h_uText, h_uColor);
-
    unsigned int frames = 0;
    double lastTime = glfwGetTime();
    int fps = 0;
@@ -788,12 +791,15 @@ int main(int argc, char **argv) {
          lastTime += 1.0;
       }
 
+
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       //glfwGetFramebufferSize(window, &width, &height);
       //glViewport(0, 0, width, height);
 
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       glUseProgram(passThroughShaders);
 
@@ -804,6 +810,9 @@ int main(int argc, char **argv) {
       // Set view matrix
       glm::mat4 view = camera.getViewMatrix();
       glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
+
+      // Set View Frustum
+      viewFrustum.setFrustum(view, projection);
 
       initBillboard();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
@@ -823,11 +832,23 @@ int main(int argc, char **argv) {
       //checkPlayerCollisions();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
+      int i = 0;
       // Update & draw opponents
       for (auto &opponent : opponents) {
-         opponent.update();
+         // opponent.update();
+
+         i++;
+
+         opponent.setMaterial(Materials::wood);
+
+         // Check if opponent in view viewFrustum
+
+         // cout << opponent.getRadius() << endl;
+         if(viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
+            cout << "Plane " << i << " drawn" << endl;
+         }
          drawVBO(&opponent, pIndices, PLANE);
-         //checkOpponentCollisions(opponent);
+
          assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       }
 
@@ -885,6 +906,9 @@ int main(int argc, char **argv) {
       // drawHUD(fps);
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+
+      //Draw HUD
+      drawHUD(fps);
 
       // Print DEBUG messages
       /*if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
