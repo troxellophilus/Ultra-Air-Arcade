@@ -90,6 +90,7 @@ int Projectile::runProjectile(float elapsed, glm::vec3 myPos, glm::vec3 curPos){
    else{
       launchPhysicsBased();
    }
+   return 0;
 }
 
 void Projectile::updateCps(glm::vec3 pos, glm::vec3 targetPos){
