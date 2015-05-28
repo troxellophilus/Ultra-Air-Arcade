@@ -746,7 +746,7 @@ int main(int argc, char **argv) {
 	prop.setType(PROP_ENTITY);
 	prop.setObject(&obj[0]);
 	prop.setScale(glm::vec3(5.,5.,5.));
-	prop.setPosition(track[c]);
+	prop.setPosition(global_track[c]);
 	checkpoints.push_back(prop);
 	c++;
     }
