@@ -12,7 +12,8 @@
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
- 
+#define CELL 32
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -27,6 +28,7 @@
 #include "Projectile.hpp"
 #include "Skybox.hpp"
 #include "RacerAI.hpp"
+#include "Scenery.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -38,9 +40,9 @@
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, PLANE, MISSILE, CHECKPOINT, NUM_VBO };
+enum { PLANE, MISSILE, CHECKPOINT, TERRAIN, ROCK, STONE1, STONE2, STONE3, STONE4, STONE5, TREE, NUM_VBO };
 
-// Program IDs
+// Program IDsterrain
 GLuint passThroughShaders;
 GLuint depthCalcShaders;
 GLuint renderSceneShaders;
@@ -231,7 +233,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
       if(key == GLFW_KEY_C)
       {
         lightX = clamp(lightX - 0.01, 0.0f, 1.0f);
-        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+        std::cout << "(" << lightX << ",terrain" << lightY << "," << lightZ << ")" << std::endl;
 
       }
 
@@ -566,7 +568,8 @@ void drawGround() {
 int main(int argc, char **argv) {
     const GLubyte* renderer;
     const GLubyte* version;
-    
+    int indices[7];
+
     srand(time(NULL));
     
     if (argc > 1) {
@@ -595,8 +598,8 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    g_width = 640;
-    g_height = 480;
+    g_width = 640 * 2;
+    g_height = 480 * 2;
 
     // Open a window and create its OpenGL context
     window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
@@ -620,6 +623,13 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
     loadShapes("../Assets/models/Plane1.obj", obj[3]);
     loadShapes("../Assets/models/missile.obj", obj[4]);
+    loadShapes("../Assets/models/Rock.obj", obj[5]);
+    loadShapes("../Assets/models/stone1.obj", obj[6]);
+    loadShapes("../Assets/models/stone2.obj", obj[7]);
+    loadShapes("../Assets/models/stone3.obj", obj[8]);
+    loadShapes("../Assets/models/stone4.obj", obj[9]);
+    loadShapes("../Assets/models/stone5.obj", obj[10]);
+    loadShapes("../Assets/models/tree.obj", obj[11]);
     std::cout << " loaded the objects " << endl;
 
     // Initialize GLEW
@@ -652,7 +662,16 @@ int main(int argc, char **argv) {
 
     initGround();
     initCollisions();
-    
+   
+    for(int i = 0; i < 7; i++){
+        Entity dumb;
+        dumb.setObject(&obj[i+5]);
+        indices[i] = initVBO(&dumb, ROCK + i);
+    }
+
+    std::vector<int> typeProp;
+    std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
+
     // Initialize player
     playerAI.setType(RacerAI::PLAYER);
     player.setType(PLAYER_ENTITY);
@@ -782,6 +801,12 @@ int main(int argc, char **argv) {
 	drawVBO(&player, pIndices, PLANE);
     //checkPlayerCollisions();
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+    //cout << props.size() << endl;
+    for(int i = 0; i < props.size(); i++){
+       //cout << indices[typeProp[i]] << endl;
+       drawVBO(&props[i], indices[typeProp[i]], ROCK + typeProp[i]);
+    }
 
 	// Update & draw opponents
     for (auto &opponent : opponents) {
