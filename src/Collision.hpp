@@ -62,42 +62,36 @@ Collision::~Collision() { }
 void Collision::update() {
     if (detectTerrainCollision(player)) {
         ptFlag = true;
-        player->setMaterial(Materials::red);
+        //player->setMaterial(Materials::red);
         glm::vec3 playerPos = player->getPosition();
         Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
         Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
         convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
-
-        // Entity opp = Entity();
-        // opp.setObject(&obj[3]);
-        // glm::vec3 epos = player.getPosition();
-        // opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
-        // opp.setScale(glm::vec3(0.2,0.2,0.2));
-        // opp.calculateBoundingSphereRadius();
+        // camera->setMode(Camera::CameraMode::FREE);
+        // for (int i = 0; i < 100; i++)
+        //     camera->move(Camera::CameraDirection::BACK);
     }
 
     if (ptFlag) {
         glm::vec3 playerPos = player->getPosition();
-        player->setPosition(playerPos + (convertedNor * 0.025f));
-        //player->setThrust(-0.5f);
-        //player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
-	
-	if (resetStep < 4)
-	    player->throttleDown();
-	
-        if (resetStep++ > 50) {
+        player->setPosition(playerPos + (convertedNor * 0.0167f));
+        player->setThrust(0.f);
+        player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
+
+        // if (resetStep % 20 == 0) {
+        //     player->setMaterial(Materials::red);
+        // }
+
+        // else if (resetStep % 10 == 0) {
+        //     player->setMaterial(Materials::stone);
+        // }
+
+        if (resetStep++ > 180) {
             ptFlag = false;
             resetStep = 0;
             player->setMaterial(Materials::emerald);
+            // camera->setMode(Camera::CameraMode::TPC);
         }
-    }
-
-    for (auto &opponent : *opponents) {
-        //detectEntityCollision(player, opponent);
-    }
-
-    for (auto &opponent : *opponents) {
-        //detectTerrainCollision(opponent);
     }
 }
 
