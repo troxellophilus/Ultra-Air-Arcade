@@ -201,7 +201,7 @@ void Skybox::render(glm::mat4 view, glm::mat4 proj, glm::vec3 position) {
 	glm::mat4 tempMat = glm::mat4(1.0);
 	vec3 pos = vec3(position.x, 0, position.y);
 	tempMat = glm::translate(tempMat, pos);
-	tempMat = glm::scale(tempMat, vec3(90, 90, 90));
+	tempMat = glm::scale(tempMat, vec3(80, 80, 80));
 
 	glEnableVertexAttribArray(posID);
 	glBindBuffer(GL_ARRAY_BUFFER, posBuf);
