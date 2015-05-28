@@ -803,9 +803,12 @@ int main(int argc, char **argv) {
      assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Print DEBUG messages
-	/*if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
+	/*
+	if (frames % 5 == 0) {
 		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
-	}*/
+	    printf("Player Pitch Angle: %f\n", player.getPitch());
+	}
+	*/
 
         last = elapsed;
         elapsed = glfwGetTime() - start;

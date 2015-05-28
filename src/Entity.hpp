@@ -46,6 +46,8 @@ private:
     glm::vec3 direction;       // Direction vector of the entity
     glm::quat rotation;        // Quaternion rotation of entity
     glm::quat target_rotation; // Quaternion target rotation of entity
+
+    float pitch_angle; // relative angle from current of most recent cursor input
     
     // Physical properties
     float     mass;  // mass of the plane
@@ -78,6 +80,7 @@ public:
     glm::mat4 getRotationM();
     glm::quat getRotationQ();
     glm::vec3 getDirection();
+    float getPitch();
     
     glm::vec3 getVelocity();
     float getThrust();
@@ -224,8 +227,10 @@ void Entity::pitch(float dy) {
     dy = dy > 50.f ? 50.f : dy;
     dy = dy < -50.f ? -50.f : dy;
     
+    pitch_angle = dy / 360.f;
+
     // Build dy pitch rotation glm::quat around x axis
-    glm::quat rot = glm::angleAxis(dy / 360.f, glm::vec3(1, 0, 0));
+    glm::quat rot = glm::angleAxis(pitch_angle, glm::vec3(1, 0, 0));
     
     // Apply pitch change to the current rotation.
     target_rotation *= rot;
@@ -296,6 +301,10 @@ Material Entity::getMaterial() {
 
 glm::vec3 Entity::getPosition() {
     return position;
+}
+
+float Entity::getPitch() {
+    return pitch_angle;
 }
 
 glm::vec3 Entity::getScale() {
