@@ -136,7 +136,7 @@ Entity::Entity() {
     drag = 1.5f; // sphere for now
     carea = 25.f;
     
-    thrust = -0.5f;
+    thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
@@ -163,7 +163,7 @@ Entity::Entity(AIComponent *ai) {
     drag = 1.5f; // sphere for now
     carea = 25.f;
     
-    thrust = -0.5f;
+    thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
@@ -200,13 +200,23 @@ void Entity::update() {
 }
 
 void Entity::throttleUp() {
+    float top_speed = -1.f;
+    float mod = 0.f;
+    if (type == AI_ENTITY) {
+	top_speed = -1.f;
+	mod = 0.01f;
+    }
+    if (type == PLAYER_ENTITY) {
+	top_speed = -1.1f;
+	mod = 0.1f;
+    }
     // limit the maximum thrust
-    thrust -= thrust >= -1.f ? 0.1f : 0.f;
+    thrust -= thrust > -1.f ? mod : 0.f;
 }
 
 void Entity::throttleDown() {
     // limit the minimum thrust
-    thrust += thrust <= 0 ? 0.1f : 0.f;
+    thrust += thrust < 0 ? 0.1f : 0.f;
 }
 
 void Entity::pitch(float dy) {
@@ -235,7 +245,7 @@ void Entity::yaw(float dx) {
 
 void Entity::rollRight() {
     // build roll quat
-    glm::quat rol = glm::angleAxis(-0.1f, glm::vec3(0, 0, 1));
+    glm::quat rol = glm::angleAxis(-0.15f, glm::vec3(0, 0, 1));
     
     // Apply roll change
     target_rotation *= rol;
@@ -243,7 +253,7 @@ void Entity::rollRight() {
 
 void Entity::rollLeft() {
     // build roll quat
-    glm::quat rol = glm::angleAxis(0.1f, glm::vec3(0, 0, 1));
+    glm::quat rol = glm::angleAxis(0.15f, glm::vec3(0, 0, 1));
 
     // Apply roll change
     target_rotation *= rol;
@@ -261,7 +271,7 @@ void Entity::turn(float dx) {
     glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
 
     // Apply yaw change to the current rotation.
-    target_rotation *= glm::mix(rot, rol, 0.8f);
+    target_rotation *= glm::mix(rot, rol, 0.3f);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {
