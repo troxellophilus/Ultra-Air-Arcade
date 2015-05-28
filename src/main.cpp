@@ -92,9 +92,9 @@ glm::mat4 depthMVP;
 float lightX = lightPosition.x, lightY = lightPosition.y, lightZ = lightPosition.z;
 
 // For renderscene and shadowmap shaders
-GLuint shadowPos;
+GLuint bPos;
 GLuint shadowMapPos;
-GLuint shadowNor;
+GLuint bNor;
 GLuint shadowLPos;
 GLuint shadowViewMatrix;
 GLuint shadowModelMatrix;
@@ -393,8 +393,9 @@ void initShaderVars() {
 	// Set up the shader variables
     aPos = glGetAttribLocation(passThroughShaders, "aPos");
     aNor = glGetAttribLocation(passThroughShaders, "aNor");
-    shadowPos = glGetAttribLocation(renderSceneShaders, "aPos");
-    shadowNor = glGetAttribLocation(renderSceneShaders, "aNor");
+    bPos = glGetAttribLocation(renderSceneShaders, "aPos");
+    bNor = glGetAttribLocation(renderSceneShaders, "aNor");
+    fprintf(stderr, "shadowNor: %d", shadowMapPos);
     shadowMapPos = glGetAttribLocation(depthCalcShaders, "aPos");
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     
@@ -566,9 +567,9 @@ assert(glGetError() == GL_NO_ERROR);
 }
 
 void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
-	glEnable(GL_CULL_FACE);
     if (!renderShadows) {
 		glUseProgram(passThroughShaders);
+		glEnable(GL_CULL_FACE);
 		
 		glEnableVertexAttribArray(aPos);
 		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
@@ -594,6 +595,8 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 		assert(glGetError() == GL_NO_ERROR);
     } else {
 		glUseProgram(depthCalcShaders);
+		glEnable(GL_CULL_FACE);
+		
 		depthModelMatrix = SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1), 1);
 		depthViewMatrix = glm::lookAt(lightPosition, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
@@ -603,7 +606,7 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 
 		glEnableVertexAttribArray(shadowMapPos);
 		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-		glVertexAttribPointer(shadowPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(bPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
@@ -612,10 +615,10 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 		// Done drawing shadow map
 
+		glUseProgram(renderSceneShaders);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, g_width, g_height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(renderSceneShaders);
 		glUniform3f(shadowLPos, lightPosition.x, lightPosition.y, lightPosition.z);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
@@ -637,20 +640,21 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 		glUniform1i(shadowMapID, 0);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-		glEnableVertexAttribArray(shadowPos);
-		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-		glVertexAttribPointer(shadowPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-
-		GLSL::enableVertexAttribArray(shadowNor);
+		fprintf(stderr, "shadowNor: %d", bNor);
+		glEnableVertexAttribArray(bNor);
 		glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-		glVertexAttribPointer(shadowNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(bNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+		glEnableVertexAttribArray(bPos);
+		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+		glVertexAttribPointer(bPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
 		glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
-	
-		GLSL::disableVertexAttribArray(shadowPos);
-		GLSL::disableVertexAttribArray(shadowNor);
+		
+		GLSL::disableVertexAttribArray(bPos);
+		GLSL::disableVertexAttribArray(bNor);
 	}
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 }
