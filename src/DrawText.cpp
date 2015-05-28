@@ -61,7 +61,6 @@ int DrawText::initResources(int w, int h) {
       return 0;
    }
 
-   glUseProgram(program);
    aCoord = glGetAttribLocation(program, "coord");
    uText = glGetUniformLocation(program, "tex");
    uColor = glGetUniformLocation(program, "color");
@@ -118,10 +117,9 @@ void DrawText::addText(Text text) {
  * Rendering starts at coordinates (x, y), z is always 0.
  * The pixel coordinates that the FreeType2 library uses are scaled by (sx, sy).
  */
-void DrawText::renderText(const char *text, int font, float x, float y, float sx, float sy) {
-   glUseProgram(program);
-
+void DrawText::renderText(const char *text, int font, float angle, float x, float y, float sx, float sy) {
    const char *p;
+
    FT_GlyphSlot slot = face->glyph;
 
    /* Create a texture that will be used to hold one "glyph" */
@@ -150,7 +148,7 @@ void DrawText::renderText(const char *text, int font, float x, float y, float sx
 
    FT_Matrix matrix;
    FT_Vector     pen;                    /* untransformed origin  */
-   double ang = ( 25.0 / 360 ) * 3.14159 * 2;      /* use 25 degrees     */
+   double t = 2;
 
    /* Transform matrix */
    matrix.xx = (FT_Fixed)( cos( 0 ) * 0x10000L );
@@ -164,6 +162,12 @@ void DrawText::renderText(const char *text, int font, float x, float y, float sx
    /* Loop through all characters */
    for (p = text; *p; p++) {
       // FT_Set_Transform( face, &matrix, &pen );
+      FT_Matrix mx = {0x10000L,t*0x10000L,0,0x10000L};
+      FT_Matrix matrix = {(FT_Fixed)(cos( 3.14/180*angle)*0x10000L),(FT_Fixed)(sin(3.14/180*angle)*0x10000L),
+                     (FT_Fixed)(-sin(3.14/180*angle)*0x10000L),(FT_Fixed)(cos(3.14/180*angle)*0x10000L)};
+      FT_Matrix_Multiply(&matrix,&mx);
+      FT_Set_Transform(face,&mx,0);
+
 
       /* Try to load and render the character */
       if (FT_Load_Char(face, *p, FT_LOAD_RENDER))
@@ -235,7 +239,7 @@ void DrawText::drawText() {
       float new_x1 = new_x * 2;
       float new_y = (float)texts[i].getY() / height - sy - 0.5;
       float new_y1 = new_y * 2;
-      renderText(texts[i].getText(), texts[i].getFont(), new_x1, new_y1, sx, sy);
+      renderText(texts[i].getText(), texts[i].getFont(), texts[i].getAngle(), new_x1, new_y1, sx, sy);
       // printf("%s at x: %f, y: %f with font %d and color %d\n", texts[i].getText(), new_x1, new_y1, texts[i].getFont(), texts[i].getColor());
       FT_Done_Face( face );
    }

@@ -17,6 +17,7 @@
 
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
+#include FT_GLYPH_H
 
 #include "Text.hpp"
 #include "GLSLProgram.h"
@@ -90,7 +91,7 @@ public:
     GLfloat4 setFontColor(int c);
     int getFontSize(int divisor);
     void addText(Text text);
-    void renderText(const char *text, int font, float x, float y, float sx, float sy);
+    void renderText(const char *text, int font, float angle, float x, float y, float sx, float sy);
     void drawText();
     // void countdown(int seconds);
 };

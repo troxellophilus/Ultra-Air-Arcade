@@ -564,38 +564,38 @@ void drawHUD(int fps) {
    char buffer[256], *text;
 
    drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
-   drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2, 0, 1, drawText->getFontSize(45), 2));
+   drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2, 15, 1, drawText->getFontSize(45), 2));
 
-   drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-   drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   // drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   // drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
 
-   snprintf(buffer, sizeof(buffer), "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10);
-   int len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
+   // snprintf(buffer, sizeof(buffer), "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10);
+   // int len = strlen(buffer) + 1;
+   // text = new char[len];
+   // strncpy(text, buffer, len);
+   // drawText->addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
-   drawText->addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
+   // drawText->addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
    // drawText.addText(Text("Thrust: 25%", 0.025 * g_width, 0.98 * g_height, 0, 0, drawText.getFontSize(90), 1));
    // drawText.addText(Text("Weapon: Gun", 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
 
-   snprintf(buffer, sizeof(buffer), "Collision Count: %d", collisionCount);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText->getFontSize(45), 1));
+   // snprintf(buffer, sizeof(buffer), "Collision Count: %d", collisionCount);
+   // len = strlen(buffer) + 1;
+   // text = new char[len];
+   // strncpy(text, buffer, len);
+   // drawText->addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText->getFontSize(45), 1));
 
-   drawText->addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-   drawText->addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   // drawText->addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   // drawText->addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
 
-   snprintf(buffer, sizeof(buffer), "%.0fm", player.getPosition().y * 10);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
+   // snprintf(buffer, sizeof(buffer), "%.0fm", player.getPosition().y * 10);
+   // len = strlen(buffer) + 1;
+   // text = new char[len];
+   // strncpy(text, buffer, len);
+   // drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
-   snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
-   drawText->addText(Text(buffer, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText->getFontSize(90), 1));
+   // snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
+   // drawText->addText(Text(buffer, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
    // glUniform1i(renderObj, 2);
    glUseProgram(textShaders);
@@ -831,6 +831,16 @@ int main(int argc, char **argv) {
 
       // Update & draw player
       player.update();
+
+      glm::quat q = player.getRotationQ();
+      glm::vec3 euler = glm::eulerAngles(q);
+
+      std::cout << "x: " << euler.x << std::endl;
+      std::cout << "y: " << euler.y << std::endl;
+      std::cout << "z: " << euler.z << std::endl;
+
+
+
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
       //checkPlayerCollisions();
@@ -849,9 +859,9 @@ int main(int argc, char **argv) {
 
          // cout << opponent.getRadius() << endl;
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
-            cout << "Plane " << i << " drawn" << endl;
+            // cout << "Plane " << i << " drawn" << endl;
+            drawVBO(&opponent, pIndices, PLANE);
          }
-         drawVBO(&opponent, pIndices, PLANE);
 
          assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       }
@@ -867,7 +877,7 @@ int main(int argc, char **argv) {
          i++;
 
          if (viewFrustum.sphereInFrustum(checkpoint.getPosition(), checkpoint.getRadius())) {
-            cout << "Checkpoint " << i << " drawn" << endl;
+            // cout << "Checkpoint " << i << " drawn" << endl;
             drawVBO(&checkpoint, cIndices, CHECKPOINT);
          }
       }
