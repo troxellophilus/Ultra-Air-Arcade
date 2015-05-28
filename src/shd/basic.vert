@@ -6,7 +6,7 @@ in vec3 aNor;
 uniform mat4 P;
 uniform mat4 M;
 uniform mat4 V;
-uniform vec3 lPos;
+uniform vec4 lPos;
 uniform int renderObj;
 uniform vec3 UaColor;
 uniform vec3 UsColor;

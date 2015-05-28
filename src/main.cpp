@@ -83,6 +83,8 @@ glm::mat4 depthViewMatrix;
 glm::mat4 depthModelMatrix;
 glm::mat4 depthMVP;
 
+float lightX = 200.0f, lightY = 1000.0f, lightZ = 200.0f;
+
 // For renderscene and shadowmap shaders
 GLuint shadowPos;
 GLuint shadowMapPos;
@@ -132,6 +134,11 @@ float elapsed;
 
 float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
+}
+
+inline float clamp(float value, float minNum, float maxNum)
+{
+    return min(max(minNum,value),maxNum);
 }
 
 int initVBO(Entity *e, int i);
@@ -189,6 +196,43 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
               //cout << "New Projectile" << endl;
            }
       }
+      if(key == GLFW_KEY_J)
+      {
+        lightX = clamp(lightX + 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+
+      }
+
+      if(key == GLFW_KEY_K)
+      {
+        lightY = clamp(lightY + 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;        
+      }
+
+      if(key == GLFW_KEY_L)
+      {
+        lightZ = clamp(lightZ + 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+      }
+      if(key == GLFW_KEY_C)
+      {
+        lightX = clamp(lightX - 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+
+      }
+
+      if(key == GLFW_KEY_V)
+      {
+        lightY = clamp(lightY - 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;        
+      }
+
+      if(key == GLFW_KEY_B)
+      {
+        lightZ = clamp(lightZ - 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+      }
+
     }
 }
 
@@ -465,10 +509,10 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
     glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
-    // Bind index array for drawing
+    // Bind index array for drawing 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform3f(lPos, 200, 1000, 200);
+    glUniform4f(lPos, lightX, lightY,lightZ, 1.0f);
 
     glUniform1i(renderObj, 0);
 
