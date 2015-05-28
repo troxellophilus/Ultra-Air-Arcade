@@ -87,6 +87,8 @@ glm::mat4 depthViewMatrix;
 glm::mat4 depthModelMatrix;
 glm::mat4 depthMVP;
 
+float lightX = 200.0f, lightY = 1000.0f, lightZ = 200.0f;
+
 // For renderscene and shadowmap shaders
 GLuint shadowPos;
 GLuint shadowMapPos;
@@ -138,6 +140,11 @@ float elapsed;
 
 float randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
+}
+
+inline float clamp(float value, float minNum, float maxNum)
+{
+    return min(max(minNum,value),maxNum);
 }
 
 int initVBO(Entity *e, int i);
@@ -197,13 +204,48 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if(key == GLFW_KEY_X){
            if(!beginProjectile){
               beginProjectile = true;
-              missle = new Projectile(projectileEntity, true, player.getPosition(), opponents[1].getPosition());
+              missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[1].getPosition());
               missleTime = elapsed;
               //cout << "MISSILE TIME: " << missleTime << endl;
               //cout << "New Projectile" << endl;
            }
       }
+      if(key == GLFW_KEY_J)
+      {
+        lightX = clamp(lightX + 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
 
+      }
+
+      if(key == GLFW_KEY_K)
+      {
+        lightY = clamp(lightY + 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;        
+      }
+
+      if(key == GLFW_KEY_L)
+      {
+        lightZ = clamp(lightZ + 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+      }
+      if(key == GLFW_KEY_C)
+      {
+        lightX = clamp(lightX - 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+
+      }
+
+      if(key == GLFW_KEY_V)
+      {
+        lightY = clamp(lightY - 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;        
+      }
+
+      if(key == GLFW_KEY_B)
+      {
+        lightZ = clamp(lightZ - 0.01, 0.0f, 1.0f);
+        std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+      }
 	    if (key == GLFW_KEY_P) {
 	        camera.setPlayer(&player);
 	    }
@@ -463,10 +505,10 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
     glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
-    // Bind index array for drawing
+    // Bind index array for drawing 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform3f(lPos, 200, 1000, 200);
+    glUniform4f(lPos, lightX, lightY,lightZ, 1.0f);
 
     glUniform1i(renderObj, 0);
 
@@ -668,13 +710,13 @@ int main(int argc, char **argv) {
     rules.setPlayer(&player);
 
     RacerAI *propAI = new RacerAI();
-    Entity bigOpp = Entity(propAI);
-    bigOpp.setType(PROP_ENTITY);
-    bigOpp.setObject(&obj[3]);
+    //Entity bigOpp = Entity(propAI);
+    //bigOpp.setType(PROP_ENTITY);
+    /*bigOpp.setObject(&obj[3]);
     bigOpp.setPosition(player.getPosition() + odx * 5.f);
     bigOpp.setMaterial(Materials::jade);
     bigOpp.setScale(glm::vec3(20.0,20.0,20.0));
-    bigOpp.calculateBoundingSphereRadius();
+    bigOpp.calculateBoundingSphereRadius();*/
 
     // Initialize Props
     vector<Entity> checkpoints;
@@ -699,7 +741,7 @@ int main(int argc, char **argv) {
     elapsed = 0;
     float last = -1;
 
-    Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
+    //Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
     bool color = false;
     // Frame loop
     while (!glfwWindowShouldClose(window)) {
@@ -763,36 +805,36 @@ int main(int argc, char **argv) {
 	   camera.update();
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-        pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
-      Entity *check = pathPlane.getEntity();
+        //pathPlane.runProjectile(elapsed, bigOpp.getPosition(), bigOpp.getPosition());
+      //Entity *check = pathPlane.getEntity();
 
-      drawVBO(check, pIndices, PLANE);
+      //drawVBO(check, pIndices, PLANE);
 
       if(beginProjectile == true){
          //cout << "MISSILE TIME: " << missleTime << endl;
          //cout << "ELAPSED: " << elapsed << endl;
 
-         int isDone = missle->runProjectile(false, elapsed - missleTime,
-          player.getPosition(), check->getPosition());
+         int isDone = missle->runProjectile(elapsed - missleTime,
+          player.getPosition(), opponents[0].getPosition());
 
          Entity* ent = missle->getEntity();
 
          drawVBO(ent, mIndices, MISSILE);
 
-         if(collision.detectEntityCollision(check, ent)){
+         if(collision.detectEntityCollision(&opponents[0], ent)){
             //Material m = check->getMaterial();
-            if(color == false){
+            //if(color == false){
                //cout << "IN\n" << endl;
-               check->setMaterial(Materials::wood);
-               color = true;
-               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
-            }
-            else if(color == true){
+               //check->setMaterial(Materials::wood);
+               //color = true;
+               //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
+            //}
+            //else if(color == true){
                //cout << "OUT\n" << endl;
-               check->setMaterial(Materials::jade);
-               color = false;
-               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
-            }
+               //check->setMaterial(Materials::jade);
+               //color = false;
+               //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
+            //}
 
             missleTime = 0;
             beginProjectile = false;

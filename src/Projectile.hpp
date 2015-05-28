@@ -38,25 +38,28 @@ private:
    glm::vec3 targetPos;
    Eigen::Vector3f position;
    Entity object;
+   float distance;
    float tPrev;
    float t;
-   
+   float time;   
+
    void translateProjectile(Eigen::Vector3f trans);
    float s2u(float s);
    void buildTable();
    void updateProjectile(Eigen::Vector3f cp, Eigen::Matrix4f R);
    void updateCps(glm::vec3 pos, glm::vec3 targetPos);
    void setCps(float x1, float x2, float x3, float x4);
-
-public:
-   Projectile(Entity e, bool smart, glm::vec3 initPos, glm::vec3 target);
-   int runProjectile(bool path, float elapsed, glm::vec3 myPos, glm::vec3 curPos);
    void launchPhysicsBased();
    int launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 curPos);
+
+public:
+   Projectile(Entity &e, bool path, bool smart, glm::vec3 initPos, glm::vec3 target);
+   float getDistance(){return distance;}
+   int runProjectile(float elapsed, glm::vec3 myPos, glm::vec3 curPos);
    Entity* getEntity(){return &object;}
 };
 
-Projectile::Projectile(Entity e, bool smart, glm::vec3 initPos, glm::vec3 target):
+Projectile::Projectile(Entity &e, bool path, bool smart, glm::vec3 initPos, glm::vec3 target) :
    t(0.0),
    tPrev(0.0)
 {
@@ -64,26 +67,29 @@ Projectile::Projectile(Entity e, bool smart, glm::vec3 initPos, glm::vec3 target
       position[i] = initPos[i];
    }
    
+   isPath = path;
    isSmart = smart;
    pos = initPos;
    startPos = initPos;
    targetPos = target;   
 
    object = e;
+
+   distance = glm::sqrt((pos[0] - targetPos[0]) * (pos[0] - targetPos[0]) +
+       (pos[1] - targetPos[1]) * (pos[1] - targetPos[1]) +
+       (pos[2] - targetPos[2]) * (pos[2] - targetPos[2]));
+
+   time = (distance/100) + 1.0;
+   //cout << time << endl;
 }
 
-int Projectile::runProjectile(bool path, float elapsed, glm::vec3 myPos, glm::vec3 curPos){
-   isPath = path;
-   if(!isPath){
-      //cout << elapsed << endl; 
-   }
+int Projectile::runProjectile(float elapsed, glm::vec3 myPos, glm::vec3 curPos){
    if(isSmart){
       return launchSplineBased(elapsed, myPos, curPos);
    }
    else{
       launchPhysicsBased();
    }
-   return 0;
 }
 
 void Projectile::updateCps(glm::vec3 pos, glm::vec3 targetPos){
@@ -96,21 +102,15 @@ void Projectile::updateCps(glm::vec3 pos, glm::vec3 targetPos){
          pos[2]+=.01;
       }
  
-      float distance = glm::sqrt((pos[0] - targetPos[0]) * (pos[0] - targetPos[0]) +      
-       (pos[1] - targetPos[1]) * (pos[1] - targetPos[1]) +
-       (pos[2] - targetPos[2]) * (pos[2] - targetPos[2]));
+      setCps(pos[0], pos[1], pos[2], 1.0);
+      setCps(pos[0], pos[1], pos[2], 1.0);
+      setCps(pos[0], pos[1], pos[2] + 10.0, 1.0);   
 
-      //int numCps = 4 * (distance/1000) + 2;   
- 
-      setCps(pos[0], pos[1], pos[2], 1.0);
-      setCps(pos[0], pos[1], pos[2], 1.0);
-      setCps(pos[0], pos[1] - 1.0, pos[2], 1.0);
-      setCps((pos[0] + targetPos[0])/2, (pos[1] + targetPos[1])/2, (pos[2] + targetPos[2])/2, 1.0);
-      setCps((pos[0] + targetPos[0])/2, (pos[1] + targetPos[1])/2, (pos[2] + targetPos[2])/2, 1.0);
-      setCps(targetPos[0], targetPos[1], targetPos[2], 1.0);
-      setCps(targetPos[0], targetPos[1], targetPos[2], 1.0);   
-   
-      ////cout << "POS: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
+      for(int i = 0; i < 5; i++){
+         setCps(targetPos[0], targetPos[1], targetPos[2], 1.0);
+      } 
+
+      //cout << "POS: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
       //cout << "MID: " << (pos[0] + targetPos[0])/2 << ", " << (pos[1] + targetPos[1])/2 << ", " << (pos[2] + targetPos[2])/2 << endl;     
       //cout << "END: " << (targetPos[0]) << ", " << (targetPos[1]) << ", " << (targetPos[2]) << endl;
    }
@@ -118,7 +118,7 @@ void Projectile::updateCps(glm::vec3 pos, glm::vec3 targetPos){
       cps.clear();
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0);
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0);
-      setCps(pos[0]+200.0, pos[1]+200.0, pos[2]+200.0, 1.0);
+      setCps(pos[0]+100.0, pos[1]+20.0, pos[2]+100.0, 1.0);
       setCps(startPos[0]+50.0, startPos[1]+10.0, startPos[2], 1.0);
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0);
       setCps(startPos[0], startPos[1]+20.0, startPos[2]+100.0, 1.0); 
@@ -236,9 +236,9 @@ void Projectile::updateProjectile(Eigen::Vector3f cp, Eigen::Matrix4f R){
    pos[1] = cp[1];
    pos[2] = cp[2];
    //position = pos + cp;
-   if(!isPath){ 
-      //cout << "Position1: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
-   }
+  
+   //cout << "Position1: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
+ 
    object.setPosition(glm::vec3(pos[0], pos[1], pos[2])); 
 }
 
@@ -262,11 +262,14 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
    updateCps(myPos, targetPos);
 
    //alpha is the linear interpolation paramter between 0 and 2
-   float alpha = std::fmod(t/100, 1.0f);
+
+   float alpha = std::fmod(t/100, time);
 
    //PRODUCE REAL TIME CONTROL POINTS
+   glm::quat tempQuaternion = object.getRotationQ();   
 
    Eigen::Quaternionf q0, q1;
+
    q0 = Eigen::AngleAxisf(90.0f/180.0f*M_PI, Eigen::Vector3f(0.0, 0.0, 0.0));
 
    Eigen::Matrix4f R = Eigen::Matrix4f::Identity();
@@ -300,7 +303,7 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
            cps[itr](1), cps[itr+1](1), cps[itr+2](1), cps[itr+3](1),
            cps[itr](2), cps[itr+1](2), cps[itr+2](2), cps[itr+3](2);
 
-      for(float u = 0.0; u < 1 && ncps > 3; u+=.0007){
+      for(float u = 0.0; u < 1 && ncps > 3; u++){
          uVec << 1.0, u, u * u, u * u * u;
          Eigen::Vector3f p = G * B * uVec;	
       }
@@ -312,7 +315,7 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
 	float sMax, s;
 	pair<float,float> row = usTable[(int)usTable.size()-1];
 	sMax = row.second;	
-	float tNorm = std::fmod((double)t, 5.0) / 5.0;
+	float tNorm = std::fmod((double)t, (double)time) / time;
 	float sNorm = tNorm;
 
 	s = sMax * sNorm;	
@@ -349,7 +352,7 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
 
 	Eigen::Matrix4f RLoc2 = Eigen::Matrix4f::Identity();
    RLoc2.block<3,3>(0,0) = quaternion.toRotationMatrix();
-   
+ 
    //IMPLEMENT DRAW. IN OLD CODE I CALLED DRAW HELICOPTER HERE
    //cout << "INCLASS: " << p << endl;
    if(!isPath){
@@ -357,16 +360,19 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
       //cout << "P: " << p[0] << ", " << p[1] << ", " << p[2] << endl;
       //cout << "K: " << k << endl;
       //cout << "U: " << u << endl;
+      //cout << time << endl;
    }
    //cout << "targetPos: " << targetPos[0] << ", " << targetPos[1] << ", " << targetPos[2] << endl;   
      
- 
-   
+    
+   distance = glm::sqrt((pos[0] - targetPos[0]) * (pos[0] - targetPos[0]) +
+       (pos[1] - targetPos[1]) * (pos[1] - targetPos[1]) +
+       (pos[2] - targetPos[2]) * (pos[2] - targetPos[2]));
+
    if(p[0] == targetPos[0] && p[1] == targetPos[1] && p[2] == targetPos[2]){
       return 1;
    }
-      
-   
+       
    updateProjectile(p, RLoc2);
 
    return 0;
