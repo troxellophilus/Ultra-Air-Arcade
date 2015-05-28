@@ -62,7 +62,7 @@ Collision::~Collision() { }
 void Collision::update() {
     if (detectTerrainCollision(player)) {
         ptFlag = true;
-        //player->setMaterial(Materials::red);
+        player->setMaterial(Materials::red);
         glm::vec3 playerPos = player->getPosition();
         Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
         Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
@@ -78,13 +78,13 @@ void Collision::update() {
         player->setThrust(0.f);
         player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
 
-        // if (resetStep % 20 == 0) {
-        //     player->setMaterial(Materials::red);
-        // }
+        if (resetStep % 20 == 0) {
+            player->setMaterial(Materials::red);
+        }
 
-        // else if (resetStep % 10 == 0) {
-        //     player->setMaterial(Materials::stone);
-        // }
+        else if (resetStep % 10 == 0) {
+            player->setMaterial(Materials::stone);
+        }
 
         if (resetStep++ > 180) {
             ptFlag = false;
