@@ -78,10 +78,10 @@ void Collision::update() {
     if (ptFlag) {
         glm::vec3 playerPos = player->getPosition();
         player->setPosition(playerPos + (convertedNor * 0.025f));
-        player->setThrust(0.f);
-        player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
+        //player->setThrust(-0.5f);
+        //player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
 
-        if (resetStep++ > 120) {
+        if (resetStep++ > 50) {
             ptFlag = false;
             resetStep = 0;
             player->setMaterial(Materials::emerald);

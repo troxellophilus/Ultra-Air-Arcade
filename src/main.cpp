@@ -155,7 +155,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             rules.setState(Rules::CSEL);
 	}
 	if (rules.getState() == Rules::CSEL) {
-	    rules.setState(Rules::RACE);
+	    rules.setState(Rules::SETUP);
 	}
 	if (rules.getState() == Rules::FINISH) {
 	    rules.setState(Rules::LEADERBOARD);
@@ -615,7 +615,7 @@ int main(int argc, char **argv) {
     playerAI.setType(RacerAI::PLAYER);
     player.setType(PLAYER_ENTITY);
     player.setObject(&obj[3]);
-    player.setPosition(glm::vec3(175.815781, 19.949869, 214.720856));
+    player.setPosition(glm::vec3(170.056442, 13.324112, 222.544495));
     player.setScale(glm::vec3(0.25,0.25,0.25));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
@@ -650,6 +650,15 @@ int main(int argc, char **argv) {
 	//opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
 	opp.setScale(glm::vec3(0.25,0.25,0.25));
         opp.calculateBoundingSphereRadius();
+	if (odx % 5 == 0)
+	    opp.setMaterial(Materials::emerald);
+	else if (odx % 5 == 1)
+	    opp.setMaterial(Materials::jade);
+	else if (odx % 5 == 2)
+	    opp.setMaterial(Materials::stone);
+	else if (odx % 5 == 3)
+	    opp.setMaterial(Materials::greenPlastic);
+	
 	opponents.push_back(opp);
 	odx++;
     }
@@ -754,6 +763,7 @@ int main(int argc, char **argv) {
 	   camera.update();
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
+       /*
         pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
       Entity *check = pathPlane.getEntity();
 
@@ -790,6 +800,7 @@ int main(int argc, char **argv) {
             delete missle;
          }
       }
+      */
 
      assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
