@@ -12,6 +12,8 @@
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
+#define SHADOWS_OFF '1'
+#define SHADOW_ON '2'
  
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -71,10 +73,10 @@ GLuint billboard_vertex_buffer;
 GLuint fbo;
 GLuint depthMatrixID;
 GLuint depthTexture;
-GLuint DepthBiasID;
-GLuint ShadowMapID;
+GLuint depthBiasID;
+GLuint shadowMapID;
 
-glm::vec3 lightPosition = glm::vec3(256.0f, 100.0f, 256.0f);
+glm::vec3 lightPosition = glm::vec3(256.0f, 1000.0f, 256.0f);
 glm::mat4 biasMatrix = glm::mat4(
 	0.5, 0.0, 0.0, 0.0,
 	0.0, 0.5, 0.0, 0.0,
@@ -87,7 +89,7 @@ glm::mat4 depthViewMatrix;
 glm::mat4 depthModelMatrix;
 glm::mat4 depthMVP;
 
-float lightX = 200.0f, lightY = 1000.0f, lightZ = 200.0f;
+float lightX = lightPosition.x, lightY = lightPosition.y, lightZ = lightPosition.z;
 
 // For renderscene and shadowmap shaders
 GLuint shadowPos;
@@ -287,6 +289,14 @@ void SetModel(vec3 trans, glm::vec3 rot, vec3 sc) {
     glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
 }
 
+glm::mat4 SetModel(vec3 trans, glm::vec3 rot, vec3 sc, int num) {
+    glm::mat4 Trans = glm::translate( glm::mat4(1.0f), trans);
+    glm::mat4 Orient = glm::orientation(rot, glm::vec3(0, 1, 0));
+    glm::mat4 Sc = glm::scale(glm::mat4(1.0f), sc);
+    glm::mat4 com = Trans*Orient*Sc;
+    return com;
+}
+
 int initVBO(Entity *e, int whichbo) {
     vector<float> posBuf, norBuf;
     vector<unsigned int> indBuf;
@@ -332,6 +342,7 @@ void initBillboard() {
 }
 
 void drawBillboard(Camera *camera) {
+	glUseProgram(passThroughShaders);
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUniform1i(renderObj, 2);
@@ -342,15 +353,13 @@ void drawBillboard(Camera *camera) {
 	int i;
 
 	for (i = 0; i < 100; i++) {
-		glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]); // The billboard will be just above the cube
-		glUniform2f(BillboardSizeID, 20.0f, 20.0f);     // and 1m*12cm, because it matches its 256*32 resolution =)
+		glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]);
+		glUniform2f(BillboardSizeID, 20.0f, 20.0f);
 
 		// Enable and bind position array for drawing
 		glEnableVertexAttribArray(aPos);
 		glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
 		glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		// Draw the billboard !
-		// This draws a triangle_strip which looks like a quad.
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 	glDisableVertexAttribArray(0);
@@ -384,6 +393,10 @@ void initShaderVars() {
 	// Set up the shader variables
     aPos = glGetAttribLocation(passThroughShaders, "aPos");
     aNor = glGetAttribLocation(passThroughShaders, "aNor");
+    shadowPos = glGetAttribLocation(renderSceneShaders, "aPos");
+    shadowNor = glGetAttribLocation(renderSceneShaders, "aNor");
+    shadowMapPos = glGetAttribLocation(depthCalcShaders, "aPos");
+    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     
     uViewMatrix = glGetUniformLocation(passThroughShaders, "V");
     uModelMatrix = glGetUniformLocation(passThroughShaders, "M");
@@ -402,14 +415,31 @@ void initShaderVars() {
     BillboardPosID = glGetUniformLocation(passThroughShaders, "BillboardPos");
     BillboardSizeID = glGetUniformLocation(passThroughShaders, "BillboardSize");
     
-    DepthBiasID = 	glGetUniformLocation(renderSceneShaders, "depthBiasMVP");
-	ShadowMapID = 	glGetUniformLocation(renderSceneShaders, "shadowMap");
+    depthBiasID = 	glGetUniformLocation(renderSceneShaders, "depthBiasMVP");
+	shadowMapID = 	glGetUniformLocation(renderSceneShaders, "shadowMap");
 	shadowViewMatrix = glGetUniformLocation(renderSceneShaders, "V");
     shadowModelMatrix = glGetUniformLocation(renderSceneShaders, "M");
     shadowProjMatrix = glGetUniformLocation(renderSceneShaders, "P");
 	shadowLPos = glGetUniformLocation(renderSceneShaders, "lPos");
-	
 	depthMatrixID = glGetUniformLocation(depthCalcShaders, "depthMVP");
+	
+	if (renderShadows) {
+		glGenFramebuffers(1, &fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glGenTextures(1, &depthTexture);
+		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+		glDrawBuffer(GL_NONE);
+	}
+	
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 }
 
@@ -508,8 +538,8 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Bind index array for drawing 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
     
-    glUniform4f(lPos, lightX, lightY,lightZ, 1.0f);
-
+    glUniform3f(lPos, lightPosition.x, lightPosition.y, lightPosition.z);
+    
     glUniform1i(renderObj, 0);
 
     if (whichbo == CHECKPOINT)
@@ -521,9 +551,9 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
     glm::mat4 com = Trans*Orient*Sc;
     glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
-
+assert(glGetError() == GL_NO_ERROR);
     glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-    
+    assert(glGetError() == GL_NO_ERROR);
     // Disable and unbind
     GLSL::disableVertexAttribArray(aPos);
     GLSL::disableVertexAttribArray(aNor);
@@ -535,32 +565,94 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     assert(glGetError() == GL_NO_ERROR);
 }
 
-void drawGround() {
-    glEnable(GL_CULL_FACE);
-    glUseProgram(passThroughShaders);
-    
-    glEnableVertexAttribArray(aPos);
-    glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-    glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
+	glEnable(GL_CULL_FACE);
+    if (!renderShadows) {
+		glUseProgram(passThroughShaders);
+		
+		glEnableVertexAttribArray(aPos);
+		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+		glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    GLSL::enableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-    glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		GLSL::enableVertexAttribArray(aNor);
+		glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
+		glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
-    
-    glUniform1i(renderObj, 0);
-    SetMaterial(Materials::wood);
-    SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
-    glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
-    
-    GLSL::disableVertexAttribArray(aPos);
-    GLSL::disableVertexAttribArray(aNor);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    glUseProgram(0);
-    assert(glGetError() == GL_NO_ERROR);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
+		
+		glUniform1i(renderObj, 0);
+		SetMaterial(Materials::wood);
+		SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1));
+		glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
+		
+		GLSL::disableVertexAttribArray(aPos);
+		GLSL::disableVertexAttribArray(aNor);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		
+		glUseProgram(0);
+		assert(glGetError() == GL_NO_ERROR);
+    } else {
+		glUseProgram(depthCalcShaders);
+		depthModelMatrix = SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1), 1);
+		depthViewMatrix = glm::lookAt(lightPosition, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+
+		depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+		glUniformMatrix4fv(depthMatrixID, 1, GL_FALSE, glm::value_ptr(depthMVP));
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		glEnableVertexAttribArray(shadowMapPos);
+		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+		glVertexAttribPointer(shadowPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
+		glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
+		GLSL::disableVertexAttribArray(shadowMapPos);
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+		// Done drawing shadow map
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, g_width, g_height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(renderSceneShaders);
+		glUniform3f(shadowLPos, lightPosition.x, lightPosition.y, lightPosition.z);
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		glm::mat4 projection = projMatrix;
+		glUniformMatrix4fv(shadowProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		// Set view matrix
+		glm::mat4 view = viewMatrix;
+		glUniformMatrix4fv(shadowViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		glm::mat4 model = SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1), 1);
+		glUniformMatrix4fv(shadowModelMatrix, 1, GL_FALSE, glm::value_ptr(model));
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glUniform1i(shadowMapID, 0);
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		glEnableVertexAttribArray(shadowPos);
+		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
+		glVertexAttribPointer(shadowPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		GLSL::enableVertexAttribArray(shadowNor);
+		glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
+		glVertexAttribPointer(shadowNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
+		glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
+	
+		GLSL::disableVertexAttribArray(shadowPos);
+		GLSL::disableVertexAttribArray(shadowNor);
+	}
+	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 }
 
 int main(int argc, char **argv) {
@@ -571,8 +663,8 @@ int main(int argc, char **argv) {
     
     if (argc > 1) {
     	argv++;
-    	if (**argv == '1') renderShadows = true;
-    	else renderShadows = false;
+    	if (**argv == SHADOWS_OFF) renderShadows = false;
+    	else renderShadows = true;
     } else renderShadows = false;
     
     GLFWwindow* window;
@@ -646,12 +738,15 @@ int main(int argc, char **argv) {
     renderSceneShaders = installShaders("shd/renderscene_vert.glsl", "shd/renderscene_frag.glsl");
     passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
 	skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
+	
 	initShaderVars();
 	skybox = new Skybox(skyBoxShaders);
 	skybox->initShaderVars();    
 
     initGround();
     initCollisions();
+    initBillboard();
+    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     
     // Initialize player
     playerAI.setType(RacerAI::PLAYER);
@@ -749,14 +844,10 @@ int main(int argc, char **argv) {
         int width, height;
 
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-        
-        //glfwGetFramebufferSize(window, &width, &height);
-        //glViewport(0, 0, width, height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		glUseProgram(passThroughShaders);
-
+		
         // Set projection matrix
         glm::mat4 projection = camera.getProjectionMatrix();
         glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
@@ -765,89 +856,80 @@ int main(int argc, char **argv) {
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
-        initBillboard();
+		drawGround(projection, view);
+       	drawBillboard(&camera);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-        drawBillboard(&camera);
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-	// Update the rules and game state
-	rules.update(&camera);
+		// Update the rules and game state
+		rules.update(&camera);
 
-    // Update the collisions
-    collision.update();
+		// Update the collisions
+		collision.update();
 
-	// Update & draw player
-	player.update();
-    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-	drawVBO(&player, pIndices, PLANE);
-    //checkPlayerCollisions();
-    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+		// Update & draw player
+		player.update();
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+		drawVBO(&player, pIndices, PLANE);
+		//checkPlayerCollisions();
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-	// Update & draw opponents
-    for (auto &opponent : opponents) {
-        opponent.update();
-        drawVBO(&opponent, pIndices, PLANE);
-        //checkOpponentCollisions(opponent);
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-    }
+		// Update & draw opponents
+		for (auto &opponent : opponents) {
+		    opponent.update();
+		    drawVBO(&opponent, pIndices, PLANE);
+		    //checkOpponentCollisions(opponent);
+		    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+		}
+		    
+			skybox->render(view, projection, camera.getPosition());
+		    assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+		for (auto &checkpoint : checkpoints) {
+			drawVBO(&checkpoint, cIndices, CHECKPOINT);
+		}
         
-	   // Draw environment
- 	    drawGround();
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-		skybox->render(view, projection, camera.getPosition());
-        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-
-	for (auto &checkpoint : checkpoints) {
-		drawVBO(&checkpoint, cIndices, CHECKPOINT);
-	}
-        
-	   // Update camera
-	   camera.update();
-       assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+		// Update camera
+		camera.update();
+		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
         //pathPlane.runProjectile(elapsed, bigOpp.getPosition(), bigOpp.getPosition());
       //Entity *check = pathPlane.getEntity();
 
       //drawVBO(check, pIndices, PLANE);
 
-      if(beginProjectile == true){
-         //cout << "MISSILE TIME: " << missleTime << endl;
-         //cout << "ELAPSED: " << elapsed << endl;
+		if(beginProjectile == true){
+			//cout << "MISSILE TIME: " << missleTime << endl;
+			//cout << "ELAPSED: " << elapsed << endl;
 
-         int isDone = missle->runProjectile(elapsed - missleTime,
-          player.getPosition(), opponents[0].getPosition());
+			int isDone = missle->runProjectile(elapsed - missleTime,
+			player.getPosition(), opponents[0].getPosition());
 
-         Entity* ent = missle->getEntity();
+			Entity* ent = missle->getEntity();
 
-         drawVBO(ent, mIndices, MISSILE);
+			drawVBO(ent, mIndices, MISSILE);
 
-         if(collision.detectEntityCollision(&opponents[0], ent)){
-            //Material m = check->getMaterial();
-            //if(color == false){
-               //cout << "IN\n" << endl;
-               //check->setMaterial(Materials::wood);
-               //color = true;
-               //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
-            //}
-            //else if(color == true){
-               //cout << "OUT\n" << endl;
-               //check->setMaterial(Materials::jade);
-               //color = false;
-               //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
-            //}
+			if(collision.detectEntityCollision(&opponents[0], ent)){
+				//Material m = check->getMaterial();
+				//if(color == false){
+				//cout << "IN\n" << endl;
+				//check->setMaterial(Materials::wood);
+				//color = true;
+				//bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
+				//}
+				//else if(color == true){
+				//cout << "OUT\n" << endl;
+				//check->setMaterial(Materials::jade);
+				//color = false;
+				//bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
+				//}
 
-            missleTime = 0;
-            beginProjectile = false;
-            delete missle;
-         }
-      }
+				missleTime = 0;
+				beginProjectile = false;
+				delete missle;
+			}
+		}
 
      assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-
-	// Print DEBUG messages
-	/*if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {
-		printf("Player Pos: %f, %f, %f\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
-	}*/
 
         last = elapsed;
         elapsed = glfwGetTime() - start;
@@ -857,6 +939,7 @@ int main(int argc, char **argv) {
         frames++;
     }
     
+    glDeleteFramebuffers(1, &fbo);
     glfwTerminate();
     
     return 0;
