@@ -207,10 +207,10 @@ void Entity::throttleUp() {
     float mod = 0.f;
     if (type == AI_ENTITY) {
 	top_speed = -1.f;
-	mod = 0.01f;
+	mod = 0.05f;
     }
     if (type == PLAYER_ENTITY) {
-	top_speed = -1.1f;
+	top_speed = -1.f;
 	mod = 0.1f;
     }
     // limit the maximum thrust
@@ -276,7 +276,7 @@ void Entity::turn(float dx) {
     glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
 
     // Apply yaw change to the current rotation.
-    target_rotation *= glm::mix(rot, rol, 0.3f);
+    target_rotation *= glm::mix(rot, rol, 0.6f);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {

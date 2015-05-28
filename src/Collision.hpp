@@ -13,6 +13,7 @@
 #include "types.h"
 #include "Entity.hpp"
 #include "Terrain.h"
+#include "RacerAI.hpp"
 
 using namespace std;
 
@@ -80,7 +81,10 @@ void Collision::update() {
         player->setPosition(playerPos + (convertedNor * 0.025f));
         //player->setThrust(-0.5f);
         //player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
-
+	
+	if (resetStep < 4)
+	    player->throttleDown();
+	
         if (resetStep++ > 50) {
             ptFlag = false;
             resetStep = 0;
