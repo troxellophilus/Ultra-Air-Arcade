@@ -51,7 +51,7 @@ vec3 toonShade() {
     float cosine = dot(lightVector, vNor);
     float dotProduct = dot(normalize(vNor), vec3(0, 1, 0));
 
-    if (vPos.y < 60) {
+    if (vPos.y < 40) {
     	if (dotProduct > 0.6) {
     		ambient = forestAmbient;
 			diffuse = forestDiffuse;
