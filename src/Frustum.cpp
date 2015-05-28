@@ -68,7 +68,7 @@ void Frustum::setFrustum(glm::mat4 viewMatrix, glm::mat4 projMatrix) {
 bool Frustum::sphereInFrustum(glm::vec3 pos, float r) {
 	for (int i = 0; i < 6; i++) {
 		float value = viewFrustum[i].getA() * pos.x + viewFrustum[i].getB() * pos.y + viewFrustum[i].getC() * pos.z + viewFrustum[i].getD();
-		std::cout << i << ": " << value << std::endl;
+		// std::cout << i << ": " << value << std::endl;
 		if (value <= -r) {
 			return false;
 		}
