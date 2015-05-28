@@ -16,7 +16,7 @@
 #define TRACK_LOCS 52
 
 // Track Target Positions
-glm::vec3 track[TRACK_LOCS] = {
+glm::vec3 global_track[TRACK_LOCS] = {
 glm::vec3(185.700714, 8.031444, 202.729111),
 glm::vec3(197.875748, 11.899343, 187.747467),
 glm::vec3(203.233734, 11.739080, 176.238144),
@@ -91,6 +91,9 @@ public:
     int getLap();
 
 private:
+    int id;
+    glm::vec3 track[TRACK_LOCS];
+
     // Race Status Vars
     int lap;
     int place;
@@ -111,6 +114,8 @@ private:
 
 // Constructors
 RacerAI::RacerAI() {
+    static int new_id = 1;
+    id = new_id++;
     lap = 0;
     place = 0;
     track_idx = 0;
@@ -123,8 +128,15 @@ RacerAI::RacerAI() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::normal_distribution<> noise(0,1.0);
+    float x = noise(gen);
+    float y = noise(gen);
+    float z = noise(gen);
 
-    start_loc = track[TRACK_LOCS - 1] + glm::vec3(float(noise(gen)), float(noise(gen)), float(noise(gen)));
+    start_loc = global_track[TRACK_LOCS - 1] + glm::vec3(x, y, z);
+
+    // Fill individual track locations with noise
+    for (int i = 0; i < TRACK_LOCS; i++)
+	track[i] = global_track[i] + glm::vec3(noise(gen), noise(gen), noise(gen));
 }
 
 // Methods
@@ -180,10 +192,13 @@ void RacerAI::setup(Entity *agent) {
 void RacerAI::race(int frames, Entity *agent) {
     static glm::vec3 target = track[track_idx];
 
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::normal_distribution<> noise(0,2.0);
-        target = track[track_idx] + glm::vec3(float(noise(gen)), float(noise(gen)), float(noise(gen)));
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<> noise(0,1.0);
+    //float x = noise(gen);
+    //float y = noise(gen);
+    //float z = noise(gen);
+    target = track[track_idx];// + glm::vec3(x, y, z);
 
     // Update track targets
     if (glm::distance(agent->getPosition(), target) < 5.f) {
@@ -206,7 +221,10 @@ void RacerAI::race(int frames, Entity *agent) {
 }
 
 void RacerAI::avoid(Entity *agent) {
-    agent->throttleDown();
+    if (agent->getThrust() > -0.7f && rand() % 10 > 5)
+        agent->throttleDown();
+    else
+	agent->throttleUp();
 
     glm::vec3 vec_away_opp = glm::normalize(agent->getPosition() - avoid_target->getPosition());
 
@@ -219,6 +237,7 @@ void RacerAI::avoid(Entity *agent) {
 void RacerAI::recover(Entity *agent) {
     // Set agent to last checkpoint
     agent->setPosition(track[track_idx - 1]);
+    state = RACE;
 }
 
 void RacerAI::finish(Entity *agent) {

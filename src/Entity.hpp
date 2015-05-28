@@ -46,6 +46,8 @@ private:
     glm::vec3 direction;       // Direction vector of the entity
     glm::quat rotation;        // Quaternion rotation of entity
     glm::quat target_rotation; // Quaternion target rotation of entity
+
+    float pitch_angle; // relative angle from current of most recent cursor input
     
     // Physical properties
     float     mass;  // mass of the plane
@@ -78,6 +80,7 @@ public:
     glm::mat4 getRotationM();
     glm::quat getRotationQ();
     glm::vec3 getDirection();
+    float getPitch();
     
     glm::vec3 getVelocity();
     float getThrust();
@@ -204,10 +207,10 @@ void Entity::throttleUp() {
     float mod = 0.f;
     if (type == AI_ENTITY) {
 	top_speed = -1.f;
-	mod = 0.01f;
+	mod = 0.05f;
     }
     if (type == PLAYER_ENTITY) {
-	top_speed = -1.1f;
+	top_speed = -1.f;
 	mod = 0.1f;
     }
     // limit the maximum thrust
@@ -224,8 +227,10 @@ void Entity::pitch(float dy) {
     dy = dy > 50.f ? 50.f : dy;
     dy = dy < -50.f ? -50.f : dy;
     
+    pitch_angle = dy / 360.f;
+
     // Build dy pitch rotation glm::quat around x axis
-    glm::quat rot = glm::angleAxis(dy / 360.f, glm::vec3(1, 0, 0));
+    glm::quat rot = glm::angleAxis(pitch_angle, glm::vec3(1, 0, 0));
     
     // Apply pitch change to the current rotation.
     target_rotation *= rot;
@@ -271,7 +276,7 @@ void Entity::turn(float dx) {
     glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
 
     // Apply yaw change to the current rotation.
-    target_rotation *= glm::mix(rot, rol, 0.3f);
+    target_rotation *= glm::mix(rot, rol, 0.6f);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {
@@ -296,6 +301,10 @@ Material Entity::getMaterial() {
 
 glm::vec3 Entity::getPosition() {
     return position;
+}
+
+float Entity::getPitch() {
+    return pitch_angle;
 }
 
 glm::vec3 Entity::getScale() {

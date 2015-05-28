@@ -109,8 +109,8 @@ void Camera::update() {
         last = player->getRotationQ();
     }
     else if (mode == SPLASH_CAM) {
-        position = glm::vec3(174.789032, 100, 271.474487);
-	glm::vec3 dir = glm::normalize(glm::vec3(198.505310, 30, 187.099915) - position);
+        position = glm::vec3(174.789032, 50, 271.474487);
+	glm::vec3 dir = glm::normalize(glm::vec3(198.505310, 15, 187.099915) - position);
 	rotation = glm::rotation(glm::vec3(0, 0, -1), dir);
     }
 }

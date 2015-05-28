@@ -20,14 +20,6 @@ out vec4 outColor;
 const int levels = 5;
 const float scaleFactor = 1.0 / levels;
 
-vec4 calcColor(vec3 fadeTo, vec3 fadeFrom, float dist, float bottom) {
-	float red = fadeTo.r - (fadeTo.r - fadeFrom.r) * (vPos.y - bottom) / (dist);
-	float green = fadeTo.g - (fadeTo.g - fadeFrom.g) * (vPos.y - bottom) / (dist);
-	float blue = fadeTo.b - (fadeTo.b - fadeFrom.b) * (vPos.y - bottom) / (dist);
-
-	return vec4(red, green, blue, 1.0);
-}
-
 vec3 waterAmbient = vec3(0.0, 0.05, 0.07);
 vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
 vec3 waterSpecular = vec3(0.04, 0.7, 0.7);
@@ -44,8 +36,15 @@ vec3 rocksDiffuse = vec3(0.507, 0.507, 0.507);
 vec3 snowAmbient = vec3(0.05, 0.05, 0.05);
 vec3 snowDiffuse = vec3(0.5, 0.5, 0.5);
  
-vec3 toonShade()
-{
+ vec4 calcColor(vec3 fadeTo, vec3 fadeFrom, float dist, float bottom) {
+	float red = fadeTo.r - (fadeTo.r - fadeFrom.r) * (vPos.y - bottom) / (dist);
+	float green = fadeTo.g - (fadeTo.g - fadeFrom.g) * (vPos.y - bottom) / (dist);
+	float blue = fadeTo.b - (fadeTo.b - fadeFrom.b) * (vPos.y - bottom) / (dist);
+
+	return vec4(red, green, blue, 1.0);
+}
+
+vec3 toonShade() {
     vec3 n = normalize(silh_vNor);
     vec3 e = normalize( vec3(-silh_vPos));
 
@@ -79,6 +78,7 @@ vec3 toonShade()
 		vec3 ambient = waterAmbient;
 		float cosine = dot(lightVector, vNor);
 		diffuse = waterDiffuse * floor( cosine * levels ) * scaleFactor;
+
 	}
 
     if (dot(n, e) < 0.15)
@@ -93,7 +93,6 @@ vec3 toonShade()
 void main() {
 	// FOR PHONG SHADING
 	if (renderObj == 0) {			// For rendering Characters and Terrain
-		
 		float dist = length(lPos.xyz - vPos);
 		float intensity = (500 * dist) / (dist * dist + dist + 1);
 

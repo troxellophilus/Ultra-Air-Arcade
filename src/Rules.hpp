@@ -142,18 +142,35 @@ void Rules::setup(Camera *cam) {
         }
 	
 	cam->setMode(Camera::TPC);
+
+	printf("RACE BEGIN!\n5\n");
     }
 
-    start_count++;
+    if (start_count == 30)
+	printf("4\n");
 
-    if (start_count == 200) {
+    if (start_count == 60)
+        printf("3\n");
+
+    if (start_count == 90)
+	printf("2\n");
+
+    if (start_count == 120)
+	printf("1\n");
+
+    if (start_count == 150) {
+	printf("GO!\n");
+
 	playerAI->setState(RacerAI::RACE);
 	for (RacerAI *opp : agentsAI) {
 	    opp->setState(RacerAI::RACE);
 	}
+
 	state = RACE;
 	start_count = 0;
     }
+
+    start_count++;
 }
 
 void Rules::race(Camera *cam) {
@@ -169,7 +186,7 @@ void Rules::race(Camera *cam) {
     for (Entity opp1 : *agents) {
         for (Entity opp2 : *agents) {
             float d = glm::distance(opp1.getPosition(), opp2.getPosition());
-            if (d < 2.f && d > 0.00001f) {
+            if (d < 1.f && d > 0.00001f) {
 		((RacerAI *)opp1.getAI())->setAvoidTarget(&opp2);
 		((RacerAI *)opp1.getAI())->setState(RacerAI::AVOID);
 		((RacerAI *)opp2.getAI())->setAvoidTarget(&opp1);
