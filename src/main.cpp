@@ -51,6 +51,13 @@
 
 //#define _DEBUG
 
+#include <string>
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+//#define _DEBUG
+
 using namespace std;
 //using namespace glm;
 
@@ -341,7 +348,6 @@ void drawBillboard(Camera *camera) {
 }
 
 void initGround() {
-
    terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
    glGenBuffers(1, &pbo[TERRAIN]);
@@ -609,7 +615,6 @@ int main(int argc, char **argv) {
    } else renderShadows = false;
 
 
-
    glfwSetErrorCallback(error_callback);
 
    int i;
@@ -791,8 +796,6 @@ int main(int argc, char **argv) {
          lastTime += 1.0;
       }
 
-      std::cout << "fps: " << fps << std::endl;
-
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       //glfwGetFramebufferSize(window, &width, &height);
@@ -910,8 +913,6 @@ int main(int argc, char **argv) {
          }
       }
 
-      // drawHUD(fps);
-
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       //Draw HUD
@@ -928,6 +929,7 @@ int main(int argc, char **argv) {
       glfwSwapBuffers(window);
       glfwPollEvents();
       frames++;
+
    }
 
    glfwTerminate();

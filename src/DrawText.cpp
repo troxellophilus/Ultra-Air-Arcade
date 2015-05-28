@@ -61,6 +61,7 @@ int DrawText::initResources(int w, int h) {
       return 0;
    }
 
+   glUseProgram(program);
    aCoord = glGetAttribLocation(program, "coord");
    uText = glGetUniformLocation(program, "tex");
    uColor = glGetUniformLocation(program, "color");
@@ -118,8 +119,9 @@ void DrawText::addText(Text text) {
  * The pixel coordinates that the FreeType2 library uses are scaled by (sx, sy).
  */
 void DrawText::renderText(const char *text, int font, float x, float y, float sx, float sy) {
-   const char *p;
+   glUseProgram(program);
 
+   const char *p;
    FT_GlyphSlot slot = face->glyph;
 
    /* Create a texture that will be used to hold one "glyph" */
