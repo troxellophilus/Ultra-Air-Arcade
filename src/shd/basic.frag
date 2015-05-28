@@ -78,9 +78,9 @@ vec3 toonShade() {
     diffuse *= floor( cosine * levels ) * scaleFactor;
     
 	if (renderObj == 1) { // Rendering for airplanes
-		ambient = vCol;
+		ambient = UaColor;
 		float cosine = dot(lightVector, vNor);
-		diffuse = vCol * floor( cosine * levels ) * scaleFactor; 
+		diffuse = UdColor * floor( cosine * levels ) * scaleFactor; 
 	}
 
     if (dot(n, e) < 0.15)
@@ -94,7 +94,7 @@ vec3 toonShade() {
 
 void main() {
 	// FOR PHONG SHADING
-	if (renderObj == 0) {			// For rendering Characters and Terrain
+	if (renderObj == 0 || renderObj == 1) {			// For rendering Characters and Terrain
 		float dist = length(lPos.xyz - vPos);
 		float intensity = (500 * dist) / (dist * dist + dist + 1);
 
