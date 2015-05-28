@@ -1,13 +1,13 @@
 # Make file to compile on linux (all) or mac (osx)
 CC=g++
-CFLAGS= -ansi -pedantic -Wno-deprecated -O3 -std=c++11 
+CFLAGS= -ansi -pedantic -Wno-deprecated -g -std=c++11 -I/usr/include/freetype2 -I/usr/include/freetype2/config
 INC=-I$(EIGEN3_INCLUDE_DIR)
-LIB=-DGL_GLEXT_PROTOTYPES -lGL -lGLEW -lSOIL -lglfw3 -lrt -lXrandr -lXinerama -lXi -lXcursor -lGL -lm -ldl -lXrender -ldrm -lXdamage -lX11-xcb -lxcb-glx -lxcb-dri2 -lxcb-dri3 -lxcb-present -lxcb-sync -lxshmfence -lXxf86vm -lXfixes -lXext -lX11 -lpthread -lxcb -lXau -lXdmcp
+LIB= -lfreetype -DGL_GLEXT_PROTOTYPES -lGL -lSOIL -lGLEW -lglfw3 -lrt -lXrandr -lXinerama -lXi -lXcursor -lm -ldl -lXrender -ldrm -lXdamage -lX11-xcb -lxcb-glx -lxcb-dri2 -lxcb-dri3 -lxcb-present -lxcb-sync -lxshmfence -lXxf86vm -lXfixes -lXext -lX11 -lpthread -lxcb -lXau -lXdmcp
 LIB_OSX= -framework OpenGL
 
 
 all:
-	$(CC) $(CFLAGS) $(INC) *.cpp ext/*.cpp ext/*.cc $(LIB)
+	$(CC) $(CFLAGS) *.cpp ext/*.cpp ext/*.cc $(LIB)
 
 
 osx:
