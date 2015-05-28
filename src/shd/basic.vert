@@ -63,7 +63,12 @@ void main() {
 		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
 		gl_Position = P * V * M * aPos;
 	} else {								// Catch-all
+		vec3 I_c = vec3(1.0, 1.0, 1.0);
+		vPos = vec3(M * aPos);
+		silh_vPos = vec3(V * M * aPos);
+		vCol = I_c;
+		vNor = vec3(M * vec4(aNor, 0.0));
+		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
 		gl_Position = P * V * M * aPos;
-		vCol = vec3(0.1, 0.5, 0.3);
 	}
 }
