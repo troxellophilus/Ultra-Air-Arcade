@@ -46,6 +46,8 @@ private:
     glm::vec3 direction;       // Direction vector of the entity
     glm::quat rotation;        // Quaternion rotation of entity
     glm::quat target_rotation; // Quaternion target rotation of entity
+
+    float pitch_angle; // relative angle from current of most recent cursor input
     
     // Physical properties
     float     mass;  // mass of the plane
@@ -78,6 +80,7 @@ public:
     glm::mat4 getRotationM();
     glm::quat getRotationQ();
     glm::vec3 getDirection();
+    float getPitch();
     
     glm::vec3 getVelocity();
     float getThrust();
@@ -136,7 +139,7 @@ Entity::Entity() {
     drag = 1.5f; // sphere for now
     carea = 25.f;
     
-    thrust = -0.5f;
+    thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
@@ -163,7 +166,7 @@ Entity::Entity(AIComponent *ai) {
     drag = 1.5f; // sphere for now
     carea = 25.f;
     
-    thrust = -0.5f;
+    thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
@@ -200,13 +203,23 @@ void Entity::update() {
 }
 
 void Entity::throttleUp() {
+    float top_speed = -1.f;
+    float mod = 0.f;
+    if (type == AI_ENTITY) {
+	top_speed = -1.f;
+	mod = 0.01f;
+    }
+    if (type == PLAYER_ENTITY) {
+	top_speed = -1.1f;
+	mod = 0.1f;
+    }
     // limit the maximum thrust
-    thrust -= thrust >= -1.f ? 0.1f : 0.f;
+    thrust -= thrust > -1.f ? mod : 0.f;
 }
 
 void Entity::throttleDown() {
     // limit the minimum thrust
-    thrust += thrust <= 0 ? 0.1f : 0.f;
+    thrust += thrust < 0 ? 0.1f : 0.f;
 }
 
 void Entity::pitch(float dy) {
@@ -214,8 +227,10 @@ void Entity::pitch(float dy) {
     dy = dy > 50.f ? 50.f : dy;
     dy = dy < -50.f ? -50.f : dy;
     
+    pitch_angle = dy / 360.f;
+
     // Build dy pitch rotation glm::quat around x axis
-    glm::quat rot = glm::angleAxis(dy / 360.f, glm::vec3(1, 0, 0));
+    glm::quat rot = glm::angleAxis(pitch_angle, glm::vec3(1, 0, 0));
     
     // Apply pitch change to the current rotation.
     target_rotation *= rot;
@@ -235,7 +250,7 @@ void Entity::yaw(float dx) {
 
 void Entity::rollRight() {
     // build roll quat
-    glm::quat rol = glm::angleAxis(-0.1f, glm::vec3(0, 0, 1));
+    glm::quat rol = glm::angleAxis(-0.15f, glm::vec3(0, 0, 1));
     
     // Apply roll change
     target_rotation *= rol;
@@ -243,7 +258,7 @@ void Entity::rollRight() {
 
 void Entity::rollLeft() {
     // build roll quat
-    glm::quat rol = glm::angleAxis(0.1f, glm::vec3(0, 0, 1));
+    glm::quat rol = glm::angleAxis(0.15f, glm::vec3(0, 0, 1));
 
     // Apply roll change
     target_rotation *= rol;
@@ -261,7 +276,7 @@ void Entity::turn(float dx) {
     glm::quat rol = glm::angleAxis(-dx / 360.f, glm::vec3(0, 0, 1));
 
     // Apply yaw change to the current rotation.
-    target_rotation *= glm::mix(rot, rol, 0.8f);
+    target_rotation *= glm::mix(rot, rol, 0.3f);
 }
 
 void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {
@@ -286,6 +301,10 @@ Material Entity::getMaterial() {
 
 glm::vec3 Entity::getPosition() {
     return position;
+}
+
+float Entity::getPitch() {
+    return pitch_angle;
 }
 
 glm::vec3 Entity::getScale() {

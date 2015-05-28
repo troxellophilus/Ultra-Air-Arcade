@@ -148,7 +148,7 @@ void DrawText::renderText(const char *text, int font, float angle, float x, floa
 
    FT_Matrix matrix;
    FT_Vector     pen;                    /* untransformed origin  */
-   double t = 2;
+   long t = 2;
 
    /* Transform matrix */
    matrix.xx = (FT_Fixed)( cos( 0 ) * 0x10000L );

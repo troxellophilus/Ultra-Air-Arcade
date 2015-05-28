@@ -113,6 +113,8 @@ glm::mat4 depthViewMatrix;
 glm::mat4 depthModelMatrix;
 glm::mat4 depthMVP;
 
+float lightX = 200.0f, lightY = 1000.0f, lightZ = 200.0f;
+
 // For renderscene and shadowmap shaders
 GLuint shadowPos;
 GLuint shadowMapPos;
@@ -173,6 +175,11 @@ float randNum() {
    return ((float) rand() / (RAND_MAX)) * 600.0;
 }
 
+inline float clamp(float value, float minNum, float maxNum)
+{
+   return min(max(minNum, value), maxNum);
+}
+
 int initVBO(Entity *e, int i);
 
 // EVENT CALLBACKS
@@ -188,7 +195,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
          rules.setState(Rules::CSEL);
       }
       if (rules.getState() == Rules::CSEL) {
-         rules.setState(Rules::RACE);
+         rules.setState(Rules::SETUP);
       }
       if (rules.getState() == Rules::FINISH) {
          rules.setState(Rules::LEADERBOARD);
@@ -230,13 +237,48 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
          if (key == GLFW_KEY_X) {
             if (!beginProjectile) {
                beginProjectile = true;
-               missle = new Projectile(projectileEntity, true, player.getPosition(), opponents[1].getPosition());
+               missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[1].getPosition());
                missleTime = elapsed;
                //cout << "MISSILE TIME: " << missleTime << endl;
                //cout << "New Projectile" << endl;
             }
          }
+         if (key == GLFW_KEY_J)
+         {
+            lightX = clamp(lightX + 0.01, 0.0f, 1.0f);
+            std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
 
+         }
+
+         if (key == GLFW_KEY_K)
+         {
+            lightY = clamp(lightY + 0.01, 0.0f, 1.0f);
+            std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+         }
+
+         if (key == GLFW_KEY_L)
+         {
+            lightZ = clamp(lightZ + 0.01, 0.0f, 1.0f);
+            std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+         }
+         if (key == GLFW_KEY_C)
+         {
+            lightX = clamp(lightX - 0.01, 0.0f, 1.0f);
+            std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+
+         }
+
+         if (key == GLFW_KEY_V)
+         {
+            lightY = clamp(lightY - 0.01, 0.0f, 1.0f);
+            std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+         }
+
+         if (key == GLFW_KEY_B)
+         {
+            lightZ = clamp(lightZ - 0.01, 0.0f, 1.0f);
+            std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
+         }
          if (key == GLFW_KEY_P) {
             camera.setPlayer(&player);
          }
@@ -503,7 +545,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
    // Bind index array for drawing
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
 
-   glUniform3f(lPos, 200, 1000, 200);
+   glUniform4f(lPos, lightX, lightY, lightZ, 1.0f);
 
    glUniform1i(renderObj, 0);
 
@@ -560,11 +602,11 @@ void drawGround() {
    assert(glGetError() == GL_NO_ERROR);
 }
 
-void drawHUD(int fps) {
+void drawHUD(int fps, float pitch) {
    char buffer[256], *text;
 
    drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
-   drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2, 15, 1, drawText->getFontSize(45), 2));
+   drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
 
    // drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
    // drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
@@ -614,6 +656,7 @@ int main(int argc, char **argv) {
       else renderShadows = false;
    } else renderShadows = false;
 
+   GLFWwindow* window;
 
    glfwSetErrorCallback(error_callback);
 
@@ -700,7 +743,7 @@ int main(int argc, char **argv) {
    playerAI.setType(RacerAI::PLAYER);
    player.setType(PLAYER_ENTITY);
    player.setObject(&obj[3]);
-   player.setPosition(glm::vec3(175.815781, 19.949869, 214.720856));
+   player.setPosition(glm::vec3(170.056442, 13.324112, 222.544495));
    player.setScale(glm::vec3(0.25, 0.25, 0.25));
    player.setMaterial(Materials::emerald);
    player.calculateBoundingSphereRadius();
@@ -735,6 +778,15 @@ int main(int argc, char **argv) {
       //opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
       opp.setScale(glm::vec3(0.25, 0.25, 0.25));
       opp.calculateBoundingSphereRadius();
+      if (odx % 5 == 0)
+         opp.setMaterial(Materials::emerald);
+      else if (odx % 5 == 1)
+         opp.setMaterial(Materials::jade);
+      else if (odx % 5 == 2)
+         opp.setMaterial(Materials::stone);
+      else if (odx % 5 == 3)
+         opp.setMaterial(Materials::greenPlastic);
+
       opponents.push_back(opp);
       odx++;
    }
@@ -744,13 +796,13 @@ int main(int argc, char **argv) {
    rules.setPlayer(&player);
 
    RacerAI *propAI = new RacerAI();
-   Entity bigOpp = Entity(propAI);
-   bigOpp.setType(PROP_ENTITY);
-   bigOpp.setObject(&obj[3]);
+   //Entity bigOpp = Entity(propAI);
+   //bigOpp.setType(PROP_ENTITY);
+   /*bigOpp.setObject(&obj[3]);
    bigOpp.setPosition(player.getPosition() + odx * 5.f);
    bigOpp.setMaterial(Materials::jade);
-   bigOpp.setScale(glm::vec3(20.0, 20.0, 20.0));
-   bigOpp.calculateBoundingSphereRadius();
+   bigOpp.setScale(glm::vec3(20.0,20.0,20.0));
+   bigOpp.calculateBoundingSphereRadius();*/
 
    // Initialize Props
    vector<Entity> checkpoints;
@@ -778,23 +830,14 @@ int main(int argc, char **argv) {
    float start = glfwGetTime();
    elapsed = 0;
    float last = -1;
+   float pitch = 0;
 
-   Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
+   //Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
    bool color = false;
-
    // Frame loop
    while (!glfwWindowShouldClose(window)) {
       float ratio;
       int width, height;
-
-      double currentTime = glfwGetTime();
-      frames++;
-      if ( currentTime - lastTime >= 1.0 ) {
-
-         fps = frames;
-         frames = 0;
-         lastTime += 1.0;
-      }
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -802,8 +845,6 @@ int main(int argc, char **argv) {
       //glViewport(0, 0, width, height);
 
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       glUseProgram(passThroughShaders);
 
@@ -831,40 +872,50 @@ int main(int argc, char **argv) {
 
       // Update & draw player
       player.update();
-
-      glm::quat q = player.getRotationQ();
-      glm::vec3 euler = glm::eulerAngles(q);
-
-      std::cout << "x: " << euler.x << std::endl;
-      std::cout << "y: " << euler.y << std::endl;
-      std::cout << "z: " << euler.z << std::endl;
-
-
-
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
       //checkPlayerCollisions();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      int i = 0;
+      if (player.getPitch() > 0) {
+         if (pitch > 0) {
+            pitch -= 0.4;
+         }
+         else {
+            pitch -= 0.2;
+         }
+      }
+      else if (player.getPitch() < 0) {
+         if (pitch > 0) {
+            pitch += 0.4;
+         }
+         else {
+            pitch += 0.8;
+         }
+      }
+      else {
+         if (pitch > 0) {
+            pitch -= 0.2;
+         }
+         else if (pitch < 0) {
+            pitch += 0.2;
+         } 
+      }
+
+      int i = 0, t = 0;
       // Update & draw opponents
       for (auto &opponent : opponents) {
-         // opponent.update();
-
-         i++;
-
-         opponent.setMaterial(Materials::wood);
-
-         // Check if opponent in view viewFrustum
-
-         // cout << opponent.getRadius() << endl;
+         t++;
+         opponent.update();
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
-            // cout << "Plane " << i << " drawn" << endl;
             drawVBO(&opponent, pIndices, PLANE);
+            i++;
          }
-
+         //checkOpponentCollisions(opponent);
          assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       }
+      // std::cout << "Planes Drawn: " << i << " Total Planes: " << t << std::endl;
+
 
       // Draw environment
       drawGround();
@@ -872,12 +923,8 @@ int main(int argc, char **argv) {
       skybox->render(view, projection, camera.getPosition());
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      i = 0;
       for (auto &checkpoint : checkpoints) {
-         i++;
-
          if (viewFrustum.sphereInFrustum(checkpoint.getPosition(), checkpoint.getRadius())) {
-            // cout << "Checkpoint " << i << " drawn" << endl;
             drawVBO(&checkpoint, cIndices, CHECKPOINT);
          }
       }
@@ -886,36 +933,37 @@ int main(int argc, char **argv) {
       camera.update();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
-      Entity *check = pathPlane.getEntity();
+      //pathPlane.runProjectile(elapsed, bigOpp.getPosition(), bigOpp.getPosition());
+      //Entity *check = pathPlane.getEntity();
 
-      drawVBO(check, pIndices, PLANE);
+      //drawVBO(check, pIndices, PLANE);
 
       if (beginProjectile == true) {
          //cout << "MISSILE TIME: " << missleTime << endl;
          //cout << "ELAPSED: " << elapsed << endl;
 
-         int isDone = missle->runProjectile(false, elapsed - missleTime,
-                                            player.getPosition(), check->getPosition());
+         int isDone = missle->runProjectile(elapsed - missleTime,
+                                            player.getPosition(), opponents[0].getPosition());
 
          Entity* ent = missle->getEntity();
 
          drawVBO(ent, mIndices, MISSILE);
 
-         if (collision.detectEntityCollision(check, ent)) {
+
+         if (collision.detectEntityCollision(&opponents[0], ent)) {
             //Material m = check->getMaterial();
-            if (color == false) {
-               //cout << "IN\n" << endl;
-               check->setMaterial(Materials::wood);
-               color = true;
-               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
-            }
-            else if (color == true) {
-               //cout << "OUT\n" << endl;
-               check->setMaterial(Materials::jade);
-               color = false;
-               bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
-            }
+            //if(color == false){
+            //cout << "IN\n" << endl;
+            //check->setMaterial(Materials::wood);
+            //color = true;
+            //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
+            //}
+            //else if(color == true){
+            //cout << "OUT\n" << endl;
+            //check->setMaterial(Materials::jade);
+            //color = false;
+            //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
+            //}
 
             missleTime = 0;
             beginProjectile = false;
@@ -926,7 +974,7 @@ int main(int argc, char **argv) {
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       //Draw HUD
-      drawHUD(fps);
+      drawHUD(fps, pitch);
 
       // Print DEBUG messages
       /*if (argc > 1 && argv[1][0] == 'd' && frames % 5 == 0) {

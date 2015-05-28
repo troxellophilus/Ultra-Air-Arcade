@@ -15,7 +15,7 @@
 
 class Rules {
 public:
-    enum GameState { SPLASH, CSEL, RACE, FREE_FLY, TIME_TRIAL, FINISH, LEADERBOARD };
+    enum GameState { SPLASH, CSEL, SETUP, RACE, FREE_FLY, TIME_TRIAL, FINISH, LEADERBOARD };
 
     // Constructors
     Rules();
@@ -44,6 +44,7 @@ private:
     // state methods
     void splash(Camera *);
     void characterSelect(Camera *);
+    void setup(Camera *);
     void race(Camera *);
     void freeFly();
     void timeTrial();
@@ -70,6 +71,9 @@ void Rules::update(Camera *cam) {
 	    break;
 	case CSEL:
 	    characterSelect(cam);
+	    break;
+	case SETUP:
+	    setup(cam);
 	    break;
 	case RACE:
 	    race(cam);
@@ -126,7 +130,7 @@ void Rules::characterSelect(Camera *cam) {
     // handled by input handler
 }
 
-void Rules::race(Camera *cam) {
+void Rules::setup(Camera *cam) {
     static int start_count = 0;
 
     // Setup all racers in starting positions
@@ -136,42 +140,46 @@ void Rules::race(Camera *cam) {
         for (RacerAI *opp : agentsAI) {
 	    opp->setState(RacerAI::SETUP);
         }
-
-        // Change camera to player camera
-        cam->setMode(Camera::TPC);
+	
+	cam->setMode(Camera::TPC);
     }
 
-    if (start_count < 200)
-	start_count++;
+    start_count++;
 
-    // Run a countdown before allowing the racers to control
     if (start_count == 200) {
-        playerAI->setState(RacerAI::RACE);
+	playerAI->setState(RacerAI::RACE);
 	for (RacerAI *opp : agentsAI) {
-            opp->setState(RacerAI::RACE);
+	    opp->setState(RacerAI::RACE);
 	}
-	start_count++;
+	state = RACE;
+	start_count = 0;
+    }
+}
+
+void Rules::race(Camera *cam) {
+    // Run a countdown before allowing the racers to control
+    playerAI->setState(RacerAI::RACE);
+    for (RacerAI *opp : agentsAI) {
+        opp->setState(RacerAI::RACE);
     }
 
     // Keep track of racer positions
 
     // Trigger avoidance states
-    if (start_count > 200) {
-	for (Entity opp1 : *agents) {
-            for (Entity opp2 : *agents) {
-		float d = glm::distance(opp1.getPosition(), opp2.getPosition());
-                if (d < 2.f && d > 0.00001f) {
-		    ((RacerAI *)opp1.getAI())->setAvoidTarget(&opp2);
-		    ((RacerAI *)opp1.getAI())->setState(RacerAI::AVOID);
-		    ((RacerAI *)opp2.getAI())->setAvoidTarget(&opp1);
-		    ((RacerAI *)opp2.getAI())->setState(RacerAI::AVOID);
-		}
-		else {
-		    ((RacerAI *)opp1.getAI())->setState(RacerAI::RACE);
-		    ((RacerAI *)opp2.getAI())->setState(RacerAI::RACE);
-		}
+    for (Entity opp1 : *agents) {
+        for (Entity opp2 : *agents) {
+            float d = glm::distance(opp1.getPosition(), opp2.getPosition());
+            if (d < 2.f && d > 0.00001f) {
+		((RacerAI *)opp1.getAI())->setAvoidTarget(&opp2);
+		((RacerAI *)opp1.getAI())->setState(RacerAI::AVOID);
+		((RacerAI *)opp2.getAI())->setAvoidTarget(&opp1);
+		((RacerAI *)opp2.getAI())->setState(RacerAI::AVOID);
             }
-	}
+            else {
+		((RacerAI *)opp1.getAI())->setState(RacerAI::RACE);
+		((RacerAI *)opp2.getAI())->setState(RacerAI::RACE);
+	    }
+        }
     }
 
     // When all racers have finish 3 laps, set state to finish
@@ -183,7 +191,6 @@ void Rules::race(Camera *cam) {
 	}
 	if (unfinished == 0) {
 	    state = FINISH;
-	    start_count = 0;
 	}
     }
 }
