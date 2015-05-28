@@ -18,11 +18,33 @@
 
 #define PI 3.14159265
 
-enum CameraMode { TPC, FREE };
-
-enum CameraDirection { FORWARD, BACK, LEFT, RIGHT, UP, DOWN };
-
 class Camera {
+public:
+    enum CameraMode { TPC, FREE, SPLASH_CAM };
+    enum CameraDirection { FORWARD, BACK, LEFT, RIGHT, UP, DOWN };
+
+    // Constructors
+    Camera();
+    
+    // Getters
+    glm::mat4 getProjectionMatrix();
+    glm::mat4 getViewMatrix();
+    glm::vec3 getPosition();
+    CameraMode getMode();
+    
+    // Setters
+    void setFOV(float fov);
+    void setClipping(float zNear, float zFar);
+    void setPosition(glm::vec3 position);
+    void setPlayer(Entity *player);
+    void setMode(CameraMode m);
+    
+    // Methods
+    void update();
+    void move(CameraDirection dir);
+    void pitch(float dy);
+    void yaw(float dx);
+
 private:
     // Mode
     CameraMode mode; // mode of the camera
@@ -46,29 +68,6 @@ private:
     
     // Player
     Entity *player;
-    
-public:
-    // Constructors
-    Camera();
-    
-    // Getters
-    glm::mat4 getProjectionMatrix();
-    glm::mat4 getViewMatrix();
-    glm::vec3 getPosition();
-    CameraMode getMode();
-    
-    // Setters
-    void setFOV(float fov);
-    void setClipping(float zNear, float zFar);
-    void setPosition(glm::vec3 position);
-    void setPlayer(Entity *player);
-    void setMode(CameraMode m);
-    
-    // Methods
-    void update();
-    void move(CameraDirection dir);
-    void pitch(float dy);
-    void yaw(float dx);
 };
 
 // Constructors
@@ -85,8 +84,8 @@ Camera::Camera() {
     // Initialize perspective
     field_of_view = 75;
     aspect = window_width / window_height;
-    z_near = 0.1;
-    z_far = 10000;
+    z_near = 0.01;
+    z_far = 2000;
     
     // Initialize camera transforms
     position = glm::vec3(0, 0, 0);
@@ -108,6 +107,11 @@ void Camera::update() {
         rotation = glm::mix(rotation, player->getRotationQ(), mixFact);
         
         last = player->getRotationQ();
+    }
+    else if (mode == SPLASH_CAM) {
+        position = glm::vec3(174.789032, 100, 271.474487);
+	glm::vec3 dir = glm::normalize(glm::vec3(198.505310, 30, 187.099915) - position);
+	rotation = glm::rotation(glm::vec3(0, 0, -1), dir);
     }
 }
 
@@ -184,7 +188,7 @@ glm::vec3 Camera::getPosition() {
     return glm::vec3(position);
 }
 
-CameraMode Camera::getMode() {
+Camera::CameraMode Camera::getMode() {
     return mode;
 }
 

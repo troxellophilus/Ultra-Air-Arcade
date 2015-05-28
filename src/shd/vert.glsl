@@ -46,7 +46,7 @@ void main() {
 	// Output position of the vertex
 	//gl_Position = V*P * vec4(vertexPosition_worldspace, 1.0f);
 		gl_Position = P * V * vec4(vertexPosition_worldspace, 1.0f);
-	} else {								// Catch-all
+        } else {								// Catch-all
 		gl_Position = P * V * M * aPos;
 		vCol = vec3(0.1, 0.5, 0.3);
 	}

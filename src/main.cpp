@@ -24,23 +24,27 @@
 #include "Materials.hpp"
 #include "Terrain.h"
 #include "Rules.hpp"
- #include "Projectile.hpp"
+#include "Projectile.hpp"
+#include "Skybox.hpp"
+#include "RacerAI.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
 #include "GLSLProgram.h"
 
 //#define DEBUG
+#define NUM_OPPONENTS 15
 
 using namespace std;
 //using namespace glm;
 
-enum { TERRAIN, SKY, PLANE, MISSLE, NUM_VBO };
+enum { TERRAIN, PLANE, MISSILE, CHECKPOINT, NUM_VBO };
 
 // Program IDs
 GLuint passThroughShaders;
 GLuint depthCalcShaders;
 GLuint renderSceneShaders;
+GLuint skyBoxShaders;
 
 GLuint vao;
 GLuint pbo[NUM_VBO];
@@ -100,13 +104,15 @@ vector<float> terNorBuf;
 vector<unsigned int> terIndBuf;
 
 Object obj[NUMSHAPES];
-Object skydome;
 
 Collision collision = Collision();
 Terrain terrain = Terrain();
+Skybox *skybox;
 
+Rules rules = Rules();
+RacerAI playerAI = RacerAI();
 Camera camera = Camera();
-Entity player = Entity();
+Entity player = Entity(&playerAI);
 vector<Entity> opponents;
 
 static float g_width, g_height;
@@ -151,48 +157,56 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
     // Check movement keys
     if (action == GLFW_REPEAT || action == GLFW_PRESS) {
-        if (key == GLFW_KEY_W) {
-            camera.move(FORWARD);
-	    player.throttleUp();
-        }
-        if (key == GLFW_KEY_S) {
-            camera.move(BACK);
-	    player.throttleDown();
-        }
-        if (key == GLFW_KEY_A) {
-            camera.move(LEFT);
-	    player.rollLeft();
-        }
-        if (key == GLFW_KEY_D) {
-            camera.move(RIGHT);
-	    player.rollRight();
-        }
-        if (mods == GLFW_MOD_SHIFT) {
-            camera.move(DOWN);
-        }
-        if (key == GLFW_KEY_SPACE) {
-            camera.move(UP);
-    	}
-	if (key == GLFW_KEY_M) {
-            if (camera.getMode() == TPC)
-	        camera.setMode(FREE);
-	    else
-	        camera.setMode(TPC);
+	// Check Game State
+	if (rules.getState() == Rules::SPLASH) {
+            rules.setState(Rules::CSEL);
 	}
-	if (key == GLFW_KEY_P) {
-            if (player.getObject() == &obj[3])
-                player.setObject(&obj[2]);
-	    else
-		player.setObject(&obj[3]);
-	    
-	    pIndices = initVBO(&player, PLANE);
+	if (rules.getState() == Rules::CSEL) {
+	    rules.setState(Rules::RACE);
 	}
+	if (rules.getState() == Rules::FINISH) {
+	    rules.setState(Rules::LEADERBOARD);
+	}
+	if (rules.getState() == Rules::LEADERBOARD) {
+	    rules.setState(Rules::SPLASH);
+	}
+	if (rules.getState() == Rules::RACE) {
+	    // Check movement keys
+            if (key == GLFW_KEY_W) {
+                camera.move(Camera::FORWARD);
+	        player.throttleUp();
+            }
+            if (key == GLFW_KEY_S) {
+                camera.move(Camera::BACK);
+	        player.throttleDown();
+            }
+            if (key == GLFW_KEY_A) {
+                camera.move(Camera::LEFT);
+	        player.rollLeft();
+            }
+            if (key == GLFW_KEY_D) {
+                camera.move(Camera::RIGHT);
+	        player.rollRight();
+            }
+            if (mods == GLFW_MOD_SHIFT) {
+                camera.move(Camera::DOWN);
+            }
+            if (key == GLFW_KEY_SPACE) {
+                camera.move(Camera::UP);
+    	    }
+	    if (key == GLFW_KEY_M) {
+                if (camera.getMode() == Camera::TPC)
+	            camera.setMode(Camera::FREE);
+	        else
+	            camera.setMode(Camera::TPC);
+	    }
+
     if(key == GLFW_KEY_X){
            if(!beginProjectile){
               beginProjectile = true;
               missle = new Projectile(projectileEntity, true, player.getPosition(), opponents[1].getPosition());
               missleTime = elapsed;
-              //cout << "MISSLE TIME: " << missleTime << endl;
+              //cout << "MISSILE TIME: " << missleTime << endl;
               //cout << "New Projectile" << endl;
            }
       }
@@ -232,7 +246,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         lightZ = clamp(lightZ - 0.01, 0.0f, 1.0f);
         std::cout << "(" << lightX << "," << lightY << "," << lightZ << ")" << std::endl;
       }
+	    if (key == GLFW_KEY_P) {
+	        camera.setPlayer(&player);
+	    }
+	    if (key == GLFW_KEY_O) {
+	        camera.setPlayer(&(opponents[0]));
+	    }
 
+	    if (key == GLFW_KEY_N) {
+	        printf("glm::vec3(%f, %f, %f),\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+	    }
+        }
     }
 }
 
@@ -330,34 +354,6 @@ void drawBillboard(Camera *camera) {
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 	glDisableVertexAttribArray(0);
-}
-
-void initSky() {
-	// glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
-    //glEnable(GL_DEPTH_TEST);
-
-    const vector<float> &posBuf = skydome.shapes[0].mesh.positions;
-    glGenBuffers(1, &pbo[SKY]);
-    glBindBuffer(GL_ARRAY_BUFFER, pbo[SKY]);
-    glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
-    
-    // Send the normal array to the GPU
-    const vector<float> &norBuf = skydome.shapes[0].mesh.normals;
-    glGenBuffers(1, &nbo[SKY]);
-    glBindBuffer(GL_ARRAY_BUFFER, nbo[SKY]);
-    glBufferData(GL_ARRAY_BUFFER, norBuf.size()*sizeof(float), &norBuf[0], GL_STATIC_DRAW);
-    
-    // Send the index array to the GPU
-    const vector<unsigned int> &indBuf = skydome.shapes[0].mesh.indices;
-    glGenBuffers(1, &ibo[SKY]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[SKY]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indBuf.size()*sizeof(unsigned int), &indBuf[0], GL_STATIC_DRAW);
-    
-    // Unbind the arrays
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    GLSL::checkVersion();
-    assert(glGetError() == GL_NO_ERROR);
 }
 
 void initGround() {
@@ -516,6 +512,9 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
 
     glUniform1i(renderObj, 0);
 
+    if (whichbo == CHECKPOINT)
+	glUniform1i(renderObj, 3);
+
     SetMaterial(entity->getMaterial());
     glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
     glm::mat4 Orient = entity->getRotationM();
@@ -534,42 +533,6 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     // Last lines
     glUseProgram(0);
     assert(glGetError() == GL_NO_ERROR);
-}
-
-void drawSky() {
-	glUseProgram(passThroughShaders);
-	int nIndices = (int)skydome.shapes[0].mesh.indices.size();
-
-	glEnableVertexAttribArray(aPos);
-	glBindBuffer(GL_ARRAY_BUFFER, pbo[SKY]);
-	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(aNor);
-	glBindBuffer(GL_ARRAY_BUFFER, nbo[SKY]);
-	glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[SKY]);
-
-	// Bind index array for drawing
-	// Compute and send the projection matrix - leave this as is
-
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(750.0f, 750.0f, 750.0f)); 
-	glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(512.0f, 0.0f, 512.0f));
-
-	glm::mat4 com = trans * scale;
-	glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
-	glUniform1i(renderObj, 1);
-	glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-
-	// Disable and unbind
-	GLSL::disableVertexAttribArray(aPos);
-	GLSL::disableVertexAttribArray(aNor);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	// Last lines
-	glUseProgram(0);
-	assert(glGetError() == GL_NO_ERROR);
 }
 
 void drawGround() {
@@ -657,7 +620,6 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
     loadShapes("../Assets/models/Plane1.obj", obj[3]);
     loadShapes("../Assets/models/missile.obj", obj[4]);
-    loadShapes("../Assets/models/skydome.obj", skydome);
     std::cout << " loaded the objects " << endl;
 
     // Initialize GLEW
@@ -683,22 +645,26 @@ int main(int argc, char **argv) {
     whichShader = 1;
     renderSceneShaders = installShaders("shd/renderscene_vert.glsl", "shd/renderscene_frag.glsl");
     passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
-	initShaderVars();    
+	skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
+	initShaderVars();
+	skybox = new Skybox(skyBoxShaders);
+	skybox->initShaderVars();    
 
-    initSky();
     initGround();
     initCollisions();
     
     // Initialize player
+    playerAI.setType(RacerAI::PLAYER);
+    player.setType(PLAYER_ENTITY);
     player.setObject(&obj[3]);
-    player.setPosition(glm::vec3(200.0f,35.f,200.0f));
-    player.setScale(glm::vec3(0.2,0.2,0.2));
+    player.setPosition(glm::vec3(175.815781, 19.949869, 214.720856));
+    player.setScale(glm::vec3(0.25,0.25,0.25));
     player.setMaterial(Materials::emerald);
     player.calculateBoundingSphereRadius();
     pIndices = initVBO(&player, PLANE);
 
     // Initialize camera
-    camera.setMode(TPC);
+    camera.setMode(Camera::TPC);
     camera.setPosition(glm::vec3(0,0,-10));
     camera.setClipping(0.1, 1500);
     camera.setFOV(90);
@@ -709,32 +675,58 @@ int main(int argc, char **argv) {
     projectileEntity.setPosition(glm::vec3(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]));
     projectileEntity.setScale(glm::vec3(2.0, 2.0, 2.0));
     projectileEntity.setMaterial(Materials::emerald);
-    int mIndices = initVBO(&projectileEntity, MISSLE);
+    int mIndices = initVBO(&projectileEntity, MISSILE);
     projectileEntity.calculateBoundingSphereRadius();
 
     // Initialize opponents
+    RacerAI *ai;
+    Entity opp;
     int odx = 1;
-    while (odx < 6) {
-       Entity opp = Entity();
-       opp.setObject(&obj[3]);
-       glm::vec3 epos = player.getPosition();
-       opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
-       opp.setScale(glm::vec3(0.2,0.2,0.2));
-       opp.calculateBoundingSphereRadius();
-       opponents.push_back(opp);
-       odx++;
+    while (odx <= NUM_OPPONENTS) {
+	ai = new RacerAI();
+	//printf("ai: %llu\n", (uint64_t)ai);
+        opp = Entity(ai);
+	opp.setType(AI_ENTITY);
+	opp.setObject(&obj[3]);
+	//glm::vec3 epos = player.getPosition();
+	//opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
+	opp.setScale(glm::vec3(0.25,0.25,0.25));
+        opp.calculateBoundingSphereRadius();
+	opponents.push_back(opp);
+	odx++;
     }
 
     // Initialize game rules
-    Rules rules = Rules();
     rules.setAgents(&opponents);
+    rules.setPlayer(&player);
 
-    Entity bigOpp = Entity();
+    RacerAI *propAI = new RacerAI();
+    Entity bigOpp = Entity(propAI);
+    bigOpp.setType(PROP_ENTITY);
     bigOpp.setObject(&obj[3]);
     bigOpp.setPosition(player.getPosition() + odx * 5.f);
     bigOpp.setMaterial(Materials::jade);
     bigOpp.setScale(glm::vec3(20.0,20.0,20.0));
     bigOpp.calculateBoundingSphereRadius();
+
+    // Initialize Props
+    vector<Entity> checkpoints;
+    int c = 0;
+    while (c < TRACK_LOCS) {
+	propAI->setType(RacerAI::PROP);
+        Entity prop = Entity(propAI);
+	prop.setType(PROP_ENTITY);
+	prop.setObject(&obj[0]);
+	prop.setScale(glm::vec3(5.,5.,5.));
+	prop.setPosition(track[c]);
+	checkpoints.push_back(prop);
+	c++;
+    }
+    int cIndices = initVBO(&checkpoints[0], CHECKPOINT);
+
+    // Initialize rules
+    rules.setPlayer(&player);
+    rules.setAgents(&opponents);
 
     float start = glfwGetTime();
     elapsed = 0;
@@ -764,14 +756,13 @@ int main(int argc, char **argv) {
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
-
         initBillboard();
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
         drawBillboard(&camera);
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 	// Update the rules and game state
-	rules.update();
+	rules.update(&camera);
 
     // Update the collisions
     collision.update();
@@ -794,8 +785,12 @@ int main(int argc, char **argv) {
 	   // Draw environment
  	    drawGround();
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-	    drawSky();
+		skybox->render(view, projection, camera.getPosition());
         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+
+	for (auto &checkpoint : checkpoints) {
+		drawVBO(&checkpoint, cIndices, CHECKPOINT);
+	}
         
 	   // Update camera
 	   camera.update();
@@ -807,7 +802,7 @@ int main(int argc, char **argv) {
       drawVBO(check, pIndices, PLANE);
 
       if(beginProjectile == true){
-         //cout << "MISSLE TIME: " << missleTime << endl;
+         //cout << "MISSILE TIME: " << missleTime << endl;
          //cout << "ELAPSED: " << elapsed << endl;
 
          int isDone = missle->runProjectile(false, elapsed - missleTime,
@@ -815,7 +810,7 @@ int main(int argc, char **argv) {
 
          Entity* ent = missle->getEntity();
 
-         drawVBO(ent, mIndices, MISSLE);
+         drawVBO(ent, mIndices, MISSILE);
 
          if(collision.detectEntityCollision(check, ent)){
             //Material m = check->getMaterial();

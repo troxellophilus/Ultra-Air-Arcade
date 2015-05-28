@@ -80,6 +80,12 @@ void main() {
 			outColor = calcColor(vec3(0.058, 0.725, 1.0), vec3(0.007, 0.407, 1.0), 250.0, 250.0);
 	} else if (renderObj == 2) {	// For rendering billboards
 			outColor = vec4(1.0, 1.0, 1.0, 0.5);
+	} else if (renderObj == 3) {
+		vec3 n = normalize(silh_vNor);
+    		vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
+
+    		if (dot(n, e) < 0.2)
+        		outColor = vec4(1.0, 0.0, 1.0, 1.0);
 	} else {								// Catch-all
 			outColor = vec4(vCol, 1.0);
 	}
