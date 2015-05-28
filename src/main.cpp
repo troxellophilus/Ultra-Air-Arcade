@@ -92,9 +92,9 @@ glm::mat4 depthMVP;
 float lightX = lightPosition.x, lightY = lightPosition.y, lightZ = lightPosition.z;
 
 // For renderscene and shadowmap shaders
-GLuint bPos;
+GLuint bPos = 0;
 GLuint shadowMapPos;
-GLuint bNor;
+GLuint bNor = 0;
 GLuint shadowLPos;
 GLuint shadowViewMatrix;
 GLuint shadowModelMatrix;
@@ -366,7 +366,6 @@ void drawBillboard(Camera *camera) {
 }
 
 void initGround() {
-
     terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 100.0, terPosBuf, terIndBuf, terNorBuf);
 
     glGenBuffers(1, &pbo[TERRAIN]);
@@ -395,7 +394,6 @@ void initShaderVars() {
     aNor = glGetAttribLocation(passThroughShaders, "aNor");
     bPos = glGetAttribLocation(renderSceneShaders, "aPos");
     bNor = glGetAttribLocation(renderSceneShaders, "aNor");
-    fprintf(stderr, "shadowNor: %d", shadowMapPos);
     shadowMapPos = glGetAttribLocation(depthCalcShaders, "aPos");
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     
@@ -541,7 +539,7 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
     
     glUniform3f(lPos, lightPosition.x, lightPosition.y, lightPosition.z);
     
-    glUniform1i(renderObj, 0);
+    glUniform1i(renderObj, 1);
 
     if (whichbo == CHECKPOINT)
 	glUniform1i(renderObj, 3);
@@ -594,9 +592,7 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 		glUseProgram(0);
 		assert(glGetError() == GL_NO_ERROR);
     } else {
-		glUseProgram(depthCalcShaders);
-		glEnable(GL_CULL_FACE);
-		
+    	glUseProgram(depthCalcShaders);
 		depthModelMatrix = SetModel(glm::vec3(0), glm::vec3(0,1,0), vec3(1), 1);
 		depthViewMatrix = glm::lookAt(lightPosition, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
@@ -606,7 +602,7 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 
 		glEnableVertexAttribArray(shadowMapPos);
 		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-		glVertexAttribPointer(bPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(shadowMapPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
@@ -615,10 +611,10 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 		// Done drawing shadow map
 
-		glUseProgram(renderSceneShaders);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, g_width, g_height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(renderSceneShaders);
 		glUniform3f(shadowLPos, lightPosition.x, lightPosition.y, lightPosition.z);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
@@ -640,22 +636,21 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 		glUniform1i(shadowMapID, 0);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-		fprintf(stderr, "shadowNor: %d", bNor);
-		glEnableVertexAttribArray(bNor);
-		glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-		glVertexAttribPointer(bNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
 		glEnableVertexAttribArray(bPos);
 		glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
 		glVertexAttribPointer(bPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
-		
+
+		GLSL::enableVertexAttribArray(bNor);
+		glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
+		glVertexAttribPointer(bNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
 		glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
-		
+	
 		GLSL::disableVertexAttribArray(bPos);
 		GLSL::disableVertexAttribArray(bNor);
-	}
+    }
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 }
 
@@ -747,9 +742,10 @@ int main(int argc, char **argv) {
 	skybox = new Skybox(skyBoxShaders);
 	skybox->initShaderVars();    
 
-    initGround();
+    
     initCollisions();
     initBillboard();
+    initGround();
     assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
     
     // Initialize player
@@ -855,8 +851,6 @@ int main(int argc, char **argv) {
         // Set projection matrix
         glm::mat4 projection = camera.getProjectionMatrix();
         glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
-
-        // Set view matrix
         glm::mat4 view = camera.getViewMatrix();
         glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
 
@@ -866,7 +860,6 @@ int main(int argc, char **argv) {
 
 		// Update the rules and game state
 		rules.update(&camera);
-
 		// Update the collisions
 		collision.update();
 

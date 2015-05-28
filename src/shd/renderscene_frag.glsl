@@ -8,11 +8,11 @@ in vec4 shadowCoord;
 in vec3 silh_vPos;
 in vec3 silh_vNor;
 
-out vec3 outColor;
-
 // Values that stay constant for the whole mesh.
 uniform sampler2DShadow shadowMap;
 uniform vec3 lPos;
+
+out vec3 outColor;
 
 vec3 forestDiffuse = vec3(0.1, 0.35, 0.1);
 vec3 forestAmbient = vec3(0.0, 0.0, 0.0) * forestDiffuse;
@@ -110,5 +110,4 @@ void main(){
     diffuse *= lightFactor * lightColor * shininess * Kt * floor( cosine * levels ) * scaleFactor;
     
 	outColor = (ambient + diffuse);//*intensity;
-	//outColor = vec3(1.0, 0.0, 0.0);
 }
