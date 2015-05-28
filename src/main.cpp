@@ -763,7 +763,6 @@ int main(int argc, char **argv) {
 	   camera.update();
        assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
-       /*
         pathPlane.runProjectile(true, elapsed, bigOpp.getPosition(), bigOpp.getPosition());
       Entity *check = pathPlane.getEntity();
 
@@ -800,7 +799,6 @@ int main(int argc, char **argv) {
             delete missle;
          }
       }
-      */
 
      assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
 
