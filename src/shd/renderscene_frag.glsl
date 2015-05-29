@@ -2,17 +2,18 @@
 
 in vec3 vPos;
 in vec3 vNor;
+
 in vec3 eye;
 in vec3 lightDirection;
 in vec4 shadowCoord;
 in vec3 silh_vPos;
 in vec3 silh_vNor;
+in vec3 lightPosition;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2DShadow shadowMap;
-uniform vec3 lPos;
 
-out vec3 outColor;
+out vec4 outColor;
 
 vec3 forestDiffuse = vec3(0.1, 0.35, 0.1);
 vec3 forestAmbient = vec3(0.0, 0.0, 0.0) * forestDiffuse;
@@ -77,13 +78,13 @@ void main(){
 
 	vec3 ambient = vec3(0.0);
 	vec3 diffuse = vec3(0.0);
-	vec3 lightVector = normalize(lPos - vPos);
+	vec3 lightVector = normalize(lightPosition - vPos);
 	float cosine = dot(lightVector, vNor);
 	float dotProduct = dot(normalize(vNor), vec3(0, 1, 0));
-	float dist = length(lPos - vPos);
+	float dist = length(lightPosition - vPos);
 	float intensity = (500 * dist) / (dist * dist + dist + 1);
     
-    if (vPos.y < 60) {
+    if (vPos.y < 30) {
     	if (dotProduct > 0.6) {
     		ambient = forestAmbient;
 			diffuse = forestDiffuse;
@@ -107,7 +108,12 @@ void main(){
     	}
     }
     
+    if (dot(normalize(silh_vNor), normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos )) < 0.15) {
+    	ambient = vec3(0.0, 0.0, 0.0);
+    	diffuse = vec3(0.0, 0.0, 0.0);
+    }
+    
     diffuse *= lightFactor * lightColor * shininess * Kt * floor( cosine * levels ) * scaleFactor;
     
-	outColor = (ambient + diffuse);//*intensity;
+	outColor = vec4((ambient + diffuse) * intensity, 1.0);
 }

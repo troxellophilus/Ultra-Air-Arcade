@@ -121,9 +121,9 @@ glm::mat4 depthMVP;
 float lightX = lightPosition.x, lightY = lightPosition.y, lightZ = lightPosition.z;
 
 // For renderscene and shadowmap shaders
-GLuint bPos = 0;
+GLuint shadowPos = 0;
 GLuint shadowMapPos;
-GLuint bNor = 0;
+GLuint shadowNor = 0;
 GLuint shadowLPos;
 GLuint shadowViewMatrix;
 GLuint shadowModelMatrix;
@@ -394,8 +394,8 @@ void initShaderVars() {
    // Set up the shader variables
    aPos = glGetAttribLocation(passThroughShaders, "aPos");
    aNor = glGetAttribLocation(passThroughShaders, "aNor");
-   bPos = glGetAttribLocation(renderSceneShaders, "aPos");
-   bNor = glGetAttribLocation(renderSceneShaders, "aNor");
+   shadowPos = glGetAttribLocation(renderSceneShaders, "aPos");
+   shadowNor = glGetAttribLocation(renderSceneShaders, "aNor");
    shadowMapPos = glGetAttribLocation(depthCalcShaders, "aPos");
    assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -638,20 +638,20 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
       glUniform1i(shadowMapID, 0);
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      glEnableVertexAttribArray(bPos);
+      glEnableVertexAttribArray(shadowPos);
       glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
-      glVertexAttribPointer(bPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+      glVertexAttribPointer(shadowPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      GLSL::enableVertexAttribArray(bNor);
+      GLSL::enableVertexAttribArray(shadowNor);
       glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
-      glVertexAttribPointer(bNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+      glVertexAttribPointer(shadowNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
       glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
 
-      GLSL::disableVertexAttribArray(bPos);
-      GLSL::disableVertexAttribArray(bNor);
+      GLSL::disableVertexAttribArray(shadowPos);
+      GLSL::disableVertexAttribArray(shadowNor);
    }
    assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 }
