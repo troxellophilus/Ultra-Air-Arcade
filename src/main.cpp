@@ -34,6 +34,7 @@
 #include "Scenery.hpp"
 #include "DrawText.h"
 #include "Frustum.h"
+#include "PlaneSound.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -142,6 +143,8 @@ vector<unsigned int> terIndBuf;
 Object obj[NUMSHAPES];
 
 Collision collision = Collision();
+PlaneSound planeSound = PlaneSound("../Assets/sound/MediumPropPlane.wav");
+
 Terrain terrain = Terrain();
 Skybox *skybox;
 DrawText *drawText;
@@ -388,6 +391,8 @@ void initGround() {
 
 void initCollisions() {
    collision = Collision(&terrain, &player, &opponents);
+
+   planeSound.playLooped();
 }
 
 void initShaderVars() {
