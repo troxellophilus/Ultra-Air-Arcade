@@ -1,39 +1,50 @@
-/*
- * Class to define and implement a Plane Sound component
- * Drew Troxell
- */
+#ifndef PLANESOUND_HPP
+#define PLANESOUND_HPP
 
-#ifndef PLANE_SOUND_H
-#define PLANE_SOUND_H
+#include <SFML/Audio.hpp>
 
-#include "Entity.hpp"
+using namespace std;
 
 class PlaneSound {
 private:
-
-public:
-    // Constructors
-    PlaneSound();
+    sf::SoundBuffer buffer;
+    sf::Sound sound;
     
-    // Methods
-    void update(Entity *agent);
+public:
+    PlaneSound();
+    PlaneSound(std::string filename);
+    virtual ~PlaneSound();
+    void play();
+    void playLooped();
+    void stop();
 };
 
-// Constructors
-PlaneSound::PlaneSound() {
+PlaneSound::PlaneSound() { }
+
+PlaneSound::PlaneSound(std::string filename) {
+	buffer = sf::SoundBuffer();
+	sound = sf::Sound();
+
+    if (!buffer.loadFromFile(filename)) {
+        cout << "Error loading " << filename << endl;
+    }
+    sound.setBuffer(buffer);
 }
 
-// Methods
-void PlaneSound::update(Entity *e, Entity *p) {
-    static unsigned int frames = 0;
+PlaneSound::~PlaneSound() { }
 
-    // Get entity info and play sounds accordingly for planes 
-
-    frames++;
+void PlaneSound::play() {
+    sound.setLoop(false);
+    sound.play();
 }
 
-// Getters
+void PlaneSound::playLooped() {
+    sound.setLoop(true);
+    sound.play();
+}
 
-// Setters
+void PlaneSound::stop() {
+    sound.stop();
+}
 
 #endif
