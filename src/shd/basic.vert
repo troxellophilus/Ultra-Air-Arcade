@@ -29,7 +29,7 @@ void main() {
 	vec3 lPos = vec3(256, 1000, 256);
 	// FOR PHONG SHADING 
 	if (renderObj == 0 || renderObj == 1) {				// For rendering Characters and Terrain
-		vec3 I_c = vec3(1.0, 1.0, 1.0);
+		vec3 I_c = vec3(1.0, 1.0, 0.7);
 		vPos = vec3(M * aPos);
 		silh_vPos = vec3(V * M * aPos);
 		vCol = I_c;
