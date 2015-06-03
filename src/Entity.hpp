@@ -6,6 +6,7 @@
 #define ENTITY_H
 
 #include <cstdlib>
+#include <cfloat>
 
 #include <GLFW/glfw3.h>
 
@@ -382,7 +383,7 @@ float Entity::getRadius() {
 void Entity::calculateBoundingSphereRadius() {
 
     glm::vec3 center = glm::vec3(object->shapes[0].mesh.positions[0], object->shapes[0].mesh.positions[1], object->shapes[0].mesh.positions[2]);
-    float calculatedRadius = 0.000000000001f;
+    float calculatedRadius = FLT_MIN;
     glm::vec3 pos, diff;
     float length, alpha, alphaSq;
 
