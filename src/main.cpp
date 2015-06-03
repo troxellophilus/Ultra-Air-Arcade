@@ -9,8 +9,6 @@
 #define GLFW_INCLUDE_GLCOREARB
 #endif
 
-#include <GLFW/glfw3.h>
-
 #define GLM_FORCE_RADIANS
 #define CELL 32
 
@@ -47,24 +45,7 @@
 #include <vector>
 #include <cmath>
 
-//#define _DEBUG
-
-#include <string>
-#include <iostream>
-#include <vector>
-#include <cmath>
-
-//#define _DEBUG
-
-#include <string>
-#include <iostream>
-#include <vector>
-#include <cmath>
-
-//#define _DEBUG
-
 using namespace std;
-//using namespace glm;
 
 enum { PLANE, MISSILE, CHECKPOINT, TERRAIN, ROCK, STONE1, STONE2, STONE3, STONE4, STONE5, TREE, NUM_VBO };
 
@@ -130,11 +111,6 @@ GLuint shadowModelMatrix;
 GLuint shadowProjMatrix;
 // End
 
-// HUD vars
-GLint h_aCoord;
-GLint h_uText;
-GLint h_uColor;
-
 vector<float> terPosBuf;
 vector<float> terNorBuf;
 vector<unsigned int> terIndBuf;
@@ -170,11 +146,15 @@ bool collisionDetectedOpponent = false;
 bool renderShadows;
 int collisionCount = 0;
 
+bool hud = false;
+bool debugHud = false;
+
 bool beginProjectile = false;
 Projectile *missle;
 Entity projectileEntity = Entity();
 float start;
 float elapsed;
+
 
 float randNum() {
    return ((float) rand() / (RAND_MAX)) * 600.0;
@@ -185,13 +165,13 @@ inline float clamp(float value, float minNum, float maxNum)
    return min(max(minNum, value), maxNum);
 }
 
-int initVBO(Entity *e, int i);
-
 // EVENT CALLBACKS
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
    // Check escape key
    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, GL_TRUE);
+
+   hud = true;
 
    // Check movement keys
    if (action == GLFW_REPEAT || action == GLFW_PRESS) {
@@ -249,16 +229,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                //cout << "New Projectile" << endl;
             }
          }
-         
          if (key == GLFW_KEY_P) {
             camera.setPlayer(&player);
          }
          if (key == GLFW_KEY_O) {
             camera.setPlayer(&(opponents[0]));
          }
-
          if (key == GLFW_KEY_N) {
             printf("glm::vec3(%f, %f, %f),\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+         }
+         if (key == GLFW_KEY_GRAVE_ACCENT) {
+            debugHud = !debugHud;
          }
       }
    }
@@ -447,6 +428,7 @@ void initShaderVars() {
 GLuint installShaders(const string &vShaderName, const string &fShaderName) {
    GLuint prog;
    GLint rc;
+   int whichShader = 1;
    GLSL::printError(__FILE__, __LINE__);
 
    // Create Vertex Array Object
@@ -656,46 +638,104 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
    assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 }
 
-void drawHUD(int fps, float pitch) {
+void countdown(int seconds) {
+   float start = glfwGetTime();
+   float elapsed = 0;
+   char text[2];
+   float numText;
+   int i;
+
+   // printf("Start: %f\n", start);
+   for (i = 0; i < seconds; ) {
+      elapsed = glfwGetTime() - start;
+
+      // printf("Elapsed: %f\n", elapsed);
+
+      if (int(elapsed) > i) {
+         i++;
+      }
+
+      numText = seconds - i;
+
+      if (numText) {
+         snprintf(text, sizeof(text), "%d", (int)numText);
+         drawText->addText(Text(text, g_width / 2, g_height / 2, 0, 3, 50, 1));
+         drawText->drawText();
+         glfwSwapBuffers(window);
+      }
+   }
+
+   start = glfwGetTime();
+   for (i = 0; i < 1; ) {
+      elapsed = glfwGetTime() - start;
+
+      // printf("Elapsed: %f\n", elapsed);
+
+      if (int(elapsed) > 1) {
+         i++;
+      }
+
+      drawText->addText(Text("Go!", g_width / 2, g_height / 2, 0, 3, 50, 1));
+      drawText->drawText();
+      glfwSwapBuffers(window);
+   }
+}
+
+void drawDebugHUD(int fps, int checkpointsDrawn, int checkpointsTotal, int planesDrawn, int planesTotal) {
+   char buffer[256], *text;
+
+   snprintf(buffer, sizeof(buffer), "%.02f, %.02f, %.02f", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+   int len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.75 * g_width, 0.05 * g_height, 0, 0, drawText->getFontSize(90), 1));
+
+   snprintf(buffer, sizeof(buffer), "Opponents Drawn: %d/%d", planesDrawn, planesTotal);
+   len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.05 * g_width, 0.97 * g_height, 0, 0, drawText->getFontSize(90), 1));   
+
+   snprintf(buffer, sizeof(buffer), "Checkpoints Drawn: %d/%d", checkpointsDrawn, checkpointsTotal);
+   len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.05 * g_width, 0.93 * g_height, 0, 0, drawText->getFontSize(90), 1));   
+
+   snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
+   len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText->getFontSize(90), 1));
+}
+
+void drawHUD(float pitch) {
    char buffer[256], *text;
 
    drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
    drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
 
-   // drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-   // drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
 
-   // snprintf(buffer, sizeof(buffer), "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10);
-   // int len = strlen(buffer) + 1;
-   // text = new char[len];
-   // strncpy(text, buffer, len);
-   // drawText->addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
+   snprintf(buffer, sizeof(buffer), "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10);
+   int len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
-   // drawText->addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
-   // drawText.addText(Text("Thrust: 25%", 0.025 * g_width, 0.98 * g_height, 0, 0, drawText.getFontSize(90), 1));
-   // drawText.addText(Text("Weapon: Gun", 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
+   drawText->addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
 
-   // snprintf(buffer, sizeof(buffer), "Collision Count: %d", collisionCount);
-   // len = strlen(buffer) + 1;
-   // text = new char[len];
-   // strncpy(text, buffer, len);
-   // drawText->addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText->getFontSize(45), 1));
+   drawText->addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   drawText->addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
 
-   // drawText->addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-   // drawText->addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   snprintf(buffer, sizeof(buffer), "%.0fm", player.getPosition().y * 10);
+   len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
-   // snprintf(buffer, sizeof(buffer), "%.0fm", player.getPosition().y * 10);
-   // len = strlen(buffer) + 1;
-   // text = new char[len];
-   // strncpy(text, buffer, len);
-   // drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
-
-   // snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
-   // drawText->addText(Text(buffer, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText->getFontSize(90), 1));
-
-   // glUniform1i(renderObj, 2);
    glDisable(GL_CULL_FACE);
-   glUseProgram(textShaders);
    drawText->drawText();
    glEnable(GL_CULL_FACE);
 }
@@ -712,8 +752,6 @@ int main(int argc, char **argv) {
       else renderShadows = true;
    } else renderShadows = true;
 
-   GLFWwindow* window;
-
    glfwSetErrorCallback(error_callback);
 
    int i;
@@ -727,11 +765,11 @@ int main(int argc, char **argv) {
       exit(EXIT_FAILURE);
    }
 
-   //glfwWindowHint(GLFW_SAMPLES, 4);
+   glfwWindowHint(GLFW_SAMPLES, 4);
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+   // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
    g_width = 640;
    g_height = 480;
 
@@ -742,7 +780,7 @@ int main(int argc, char **argv) {
       exit(EXIT_FAILURE);
    }
    glfwMakeContextCurrent(window);
-   glfwSwapInterval(1);
+   // glfwSwapInterval(1);
    GLSLProgram::checkForOpenGLError(__FILE__, __LINE__);
    // Set key and cursor callbacks
    glfwSetKeyCallback(window, key_callback);
@@ -880,26 +918,31 @@ int main(int argc, char **argv) {
    }
    int cIndices = initVBO(&checkpoints[0], CHECKPOINT);
 
-   // Initialize rules
-   rules.setPlayer(&player);
-   rules.setAgents(&opponents);
-
    unsigned int frames = 0;
    double lastTime = glfwGetTime();
    int fps = 0;
+   bool count = true;
 
    float start = glfwGetTime();
    elapsed = 0;
    float last = -1;
    float pitch = 0;
 
-
-   //Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
    bool color = false;
    // Frame loop
    while (!glfwWindowShouldClose(window)) {
       float ratio;
       int width, height;
+
+      double currentTime = glfwGetTime();
+      frames++;
+      if ( currentTime - lastTime >= 1.0 ) {
+
+         fps = frames;
+
+         frames = 0;
+         lastTime += 1.0;
+      }
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -928,8 +971,10 @@ int main(int argc, char **argv) {
       player.update();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
-      //checkPlayerCollisions();
+      // checkPlayerCollisions();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+
+      // printf("Pitch: %f\n", glm::pitch(player.getRotationQ()) / 3.14159);
 
       if (player.getPitch() > 0) {
          if (pitch > 0) {
@@ -956,15 +1001,14 @@ int main(int argc, char **argv) {
          }
       }
 
-
-      int i = 0, t = 0;
+      int o = 0, od = 0;
       // Update & draw opponents
       for (auto &opponent : opponents) {
-         t++;
+         o++;
          opponent.update();
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
-            i++;
+            od++;
          }
          //checkOpponentCollisions(opponent);
          assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
@@ -975,8 +1019,11 @@ int main(int argc, char **argv) {
       skybox->render(view, projection, camera.getPosition());
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
+      int c = 0, cd = 0;
       for (auto &checkpoint : checkpoints) {
+         c++;
          if (viewFrustum.sphereInFrustum(checkpoint.getPosition(), checkpoint.getRadius())) {
+            cd++;
             drawVBO(&checkpoint, cIndices, CHECKPOINT);
          }
       }
@@ -1023,8 +1070,20 @@ int main(int argc, char **argv) {
          }
       }
 
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+
+      glDepthMask(GL_FALSE);  // disable writes to Z-Buffer
+      glDisable(GL_DEPTH_TEST);  // disable depth-testing
       //Draw HUD
-      drawHUD(fps, pitch);
+      if (hud) {
+         if (debugHud) {
+            drawDebugHUD(fps, cd, c, od, o);
+         }
+         drawHUD(pitch);
+      }
+      glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_LESS);
+      glDepthMask(GL_TRUE);  // disable writes to Z-Buffer
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -1033,7 +1092,6 @@ int main(int argc, char **argv) {
 
       glfwSwapBuffers(window);
       glfwPollEvents();
-      frames++;
    }
 
    glDeleteFramebuffers(1, &fbo);
