@@ -857,6 +857,9 @@ int main(int argc, char **argv) {
       odx++;
    }
 
+   // Initialize collisions
+   collision.setOpponents(&opponents);
+
    // Initialize game rules
    rules.setAgents(&opponents);
    rules.setPlayer(&player);
@@ -926,8 +929,11 @@ int main(int argc, char **argv) {
 
       // Update the rules and game state
       rules.update(&camera);
-      // Update the collisions
-      collision.update();
+      
+      // Update the collisions if in race state
+      if (rules.getState() == Rules::RACE) {
+         collision.update();
+      }
 
       // Update & draw player
       player.update();
