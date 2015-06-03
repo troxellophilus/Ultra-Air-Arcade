@@ -380,7 +380,6 @@ float Entity::getRadius() {
 }
 
 void Entity::calculateBoundingSphereRadius() {
-    //radius = 0.05f;
 
     glm::vec3 center = glm::vec3(object->shapes[0].mesh.positions[0], object->shapes[0].mesh.positions[1], object->shapes[0].mesh.positions[2]);
     float calculatedRadius = 0.000000000001f;
@@ -411,9 +410,6 @@ void Entity::calculateBoundingSphereRadius() {
             center = center + ((length - calculatedRadius) / length * diff);
         }
     }
-
-    // printf("Radius: %.4f\n", calculatedRadius);
-    // printf("Scaled Radius: %.4f\n", calculatedRadius * scale.x);
 
     radius = calculatedRadius * scale.x;
 }

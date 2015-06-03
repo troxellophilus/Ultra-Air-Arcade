@@ -23,7 +23,7 @@ private:
     bool ptFlag; // True if player is being reset.
     Terrain *terrain; // Pointer to the terrain.
     Entity *player;
-    std::vector<Entity> *opponents;
+    vector<Entity> *opponents;
     int resetStep;
     glm::vec3 convertedNor;
     
@@ -31,6 +31,7 @@ public:
     Collision();
     Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer);
     virtual ~Collision();
+    void setOpponents(vector<Entity> *opp);
     void update();
     bool detectEntityCollision(Entity *player, Entity *object);
     bool detectTerrainCollision(Entity *object);
@@ -59,7 +60,16 @@ Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Enti
 
 Collision::~Collision() { }
 
+void Collision::setOpponents(vector<Entity> *opp) {
+    opponents = opp;
+}
+
 void Collision::update() {
+    // A soft ceiling for the player
+    if (player->getPosition().y > 50.f) {
+        player->setPosition(glm::vec3(player->getPosition().x, 50.f, player->getPosition().z));
+    }
+
     if (detectTerrainCollision(player)) {
         ptFlag = true;
         player->setMaterial(Materials::red);
@@ -93,9 +103,27 @@ void Collision::update() {
             // camera->setMode(Camera::CameraMode::TPC);
         }
     }
+
+    for (Entity opp : *opponents) {
+        if (detectEntityCollision(player, &opp)) {
+            if (opp.getPosition().x == opp.getPosition().x) {
+                if (opp.getPosition().y > player->getPosition().y) {
+                    player->pitch(40.f);
+                }
+                else {
+                    player->pitch(-40.f);
+                }
+            }
+        }
+    }
 }
 
 bool Collision::detectEntityCollision(Entity *player, Entity *object) {
+
+    bool anyOverlap = false;
+    bool xOverlap = true;
+    bool yOverlap = true;
+    bool zOverlap = true;
 
     glm::vec3 playerPosition = player->getPosition();
     glm::vec3 objectPosition = object->getPosition();
@@ -104,20 +132,20 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
 
     // Single operation
     // Spatial data structure for powerups and terrain objects
-    // if (fabs(objectPosition.x - playerPosition.x) > (objectRadius + playerRadius))
-    //     xOverlap = false;
-    // if (fabs(objectPosition.y - playerPosition.y) > (objectRadius + playerRadius))
-    //     yOverlap = false;
-    // if (fabs(objectPosition.z - playerPosition.z) > (objectRadius + playerRadius))
-    //     zOverlap = false;
+    if (fabs(objectPosition.x - playerPosition.x) > (objectRadius + playerRadius))
+        xOverlap = false;
+    if (fabs(objectPosition.y - playerPosition.y) > (objectRadius + playerRadius))
+        yOverlap = false;
+    if (fabs(objectPosition.z - playerPosition.z) > (objectRadius + playerRadius))
+        zOverlap = false;
 
-    return glm::distance(objectPosition, playerPosition) > (objectRadius + playerRadius);
+    //return glm::distance(objectPosition, playerPosition) > (objectRadius + playerRadius);
 
     //cout << xOverlap << " " << yOverlap << " " << zOverlap << endl;
     
-    //anyOverlap = xOverlap && yOverlap && zOverlap;
+    anyOverlap = xOverlap && yOverlap && zOverlap;
     
-    //return anyOverlap;
+    return anyOverlap;
 }
 
 bool Collision::detectTerrainCollision(Entity *object) {
