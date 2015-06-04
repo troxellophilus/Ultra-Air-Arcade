@@ -86,9 +86,11 @@ public:
     void setState(AIState s);
     void setType(AIType t);
     void setAvoidTarget(Entity *);
+    void setPlace(int p);
 
     // Getters
     int getLap();
+    int getNextIdx();
 
 private:
     int id;
@@ -201,7 +203,7 @@ void RacerAI::race(int frames, Entity *agent) {
     target = track[track_idx];// + glm::vec3(x, y, z);
 
     // Update track targets
-    if (glm::distance(agent->getPosition(), target) < 5.f) {
+    if (glm::distance(agent->getPosition(), target) < 8.f) {
         track_idx = next_idx;
         next_idx++;
 
@@ -218,6 +220,11 @@ void RacerAI::race(int frames, Entity *agent) {
         glm::quat q = glm::rotation(glm::vec3(0, 0, -1), todir);
         agent->setTargetRotationQ(q);
     }
+
+	if (type == PLAYER && frames % 15 == 0) {
+		printf("Player place: %d\n", place);
+		printf("Player lap: %d\n", lap);
+	}
 }
 
 void RacerAI::avoid(Entity *agent) {
@@ -249,6 +256,10 @@ int RacerAI::getLap() {
     return lap;
 }
 
+int RacerAI::getNextIdx() {
+    return next_idx;
+}
+
 // Setters
 void RacerAI::setState(AIState s) {
     state = s;
@@ -260,6 +271,10 @@ void RacerAI::setType(AIType t) {
 
 void RacerAI::setAvoidTarget(Entity *e) {
     avoid_target = e;
+}
+
+void RacerAI::setPlace(int p) {
+	place = p;
 }
 
 #endif

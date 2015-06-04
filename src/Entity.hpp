@@ -184,7 +184,7 @@ void Entity::update() {
     glm::vec3 fd;
 
     // If this is an AI entity, update it's state
-    if (type == AI_ENTITY)
+    if (type == AI_ENTITY || type == PLAYER_ENTITY)
         ai_->update(this);
     
     // Obtain the angle between the two quats, use this for proportional control of craft

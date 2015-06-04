@@ -199,6 +199,26 @@ void Rules::race(Camera *cam) {
         }
     }
 
+    // Update player placement
+    int player_next_idx = playerAI->getNextIdx();
+    float player_dist = glm::distance(global_track[player_next_idx], player->getPosition());
+
+    	int num_ahead = 0;
+    	for (Entity opp : *agents) {
+		if (((RacerAI *)opp.getAI())->getLap() > playerAI->getLap())
+			num_ahead++;
+		else if (((RacerAI *)opp.getAI())->getLap() == playerAI->getLap()) {
+			if (((RacerAI *)opp.getAI())->getNextIdx() > player_next_idx)
+				num_ahead++;
+			else if (((RacerAI *)opp.getAI())->getNextIdx() == player_next_idx) {
+				float d = glm::distance(opp.getPosition(), global_track[player_next_idx]);
+				if (d < player_dist)
+					num_ahead++;
+			}
+		}
+	}
+	playerAI->setPlace(num_ahead + 1);
+
     // When all racers have finish 3 laps, set state to finish
     if (playerAI->getLap() == 3) {
         int unfinished = 0;

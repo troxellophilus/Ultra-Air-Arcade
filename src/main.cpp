@@ -757,6 +757,7 @@ int main(int argc, char **argv) {
    loadShapes("../Assets/models/Pyro.obj", obj[2]);
    loadShapes("../Assets/models/Plane1.obj", obj[3]);
    loadShapes("../Assets/models/missile.obj", obj[4]);
+   loadShapes("../Assets/models/checkpoint.obj", obj[5]);
    std::cout << " loaded the objects " << endl;
 
    // Initialize GLEW
@@ -870,7 +871,7 @@ int main(int argc, char **argv) {
       propAI->setType(RacerAI::PROP);
       Entity prop = Entity(propAI);
       prop.setType(PROP_ENTITY);
-      prop.setObject(&obj[0]);
+      prop.setObject(&obj[5]);
       prop.setScale(glm::vec3(5., 5., 5.));
       prop.setPosition(global_track[c]);
       checkpoints.push_back(prop);
