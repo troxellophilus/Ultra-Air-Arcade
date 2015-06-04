@@ -845,6 +845,8 @@ int main(int argc, char **argv) {
          opp.setMaterial(Materials::stone);
       else if (odx % 5 == 3)
          opp.setMaterial(Materials::greenPlastic);
+		else if (odx % 5 == 4)
+			opp.setMaterial(Materials::red);
 
       opponents.push_back(opp);
       odx++;
