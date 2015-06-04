@@ -126,9 +126,9 @@ vec3 toonShade() {
         specular = (fresnel * geoAtt * roughness) / (NdotV * NdotL * 3.14);
     }
 
-    //return ambient + diffuse;
+    return ambient + diffuse;
 
-    return ambient + diffuse * max(NdotL, 0.0);// * (k + specular * (1.0 - k));
+    //return ambient + diffuse * max(NdotL, 0.0);// * (k + specular * (1.0 - k));
 }
 
 void main() {
