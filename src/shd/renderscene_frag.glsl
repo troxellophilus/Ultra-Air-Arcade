@@ -18,7 +18,7 @@ out vec4 outColor;
 vec3 forestDiffuse = vec3(0.1, 0.35, 0.1);
 vec3 forestAmbient = vec3(0.0, 0.0, 0.0) * forestDiffuse;
 
-vec3 sandDiffuse = vec3(0.5, 0.5, 0.0);
+vec3 sandDiffuse = vec3(0.7, 0.53, 0.24);
 vec3 sandAmbient = vec3(0.0, 0.0, 0.0) * sandDiffuse;
 
 vec3 rocksDiffuse = vec3(0.507, 0.507, 0.507);

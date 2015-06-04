@@ -27,7 +27,7 @@ void main(){
 	vPos = (M * vec4(aPos, 1.0)).xyz;
 	silh_vPos = vec3((V * M * vec4(aPos.xyz, 1.0)).xyz); // Delete here
     
-    eye = vec3(0,0,0) - ( V * M * vec4(aPos, 1)).xyz;
+	eye = vec3(0,0,0) - ( V * M * vec4(aPos, 1)).xyz;
 
 	lightDirection = (vec4(lPos, 0.0)).xyz;
 	silh_vNor = vec3(V * M * vec4(aNor, 0.0)); //Delete Here
