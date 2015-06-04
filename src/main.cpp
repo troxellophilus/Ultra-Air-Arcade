@@ -145,6 +145,7 @@ Object obj[NUMSHAPES];
 Collision collision = Collision();
 PlaneSound planeSound = PlaneSound("../Assets/sound/MediumPropPlane.wav");
 PlaneSound backgroundMusic = PlaneSound("../Assets/sound/destiny-short.wav");
+PlaneSound collisionSound = PlaneSound("../Assets/sound/explosion-01.wav");
 
 Terrain terrain = Terrain();
 Skybox *skybox;
@@ -401,6 +402,7 @@ void initCollisions() {
    backgroundMusic.playLooped();
 
    collision.setPlayerSound(&planeSound);
+   collision.setCollisionSound(&collisionSound);
 }
 
 void initShaderVars() {
