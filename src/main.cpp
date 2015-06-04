@@ -12,7 +12,7 @@
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
-#define CELL 32
+#define CELL 64
 
 #define SHADOWS_OFF '1'
 #define SHADOW_ON '2'
@@ -198,6 +198,24 @@ Entity projectileEntity = Entity();
 float start;
 float elapsed;
 
+int closestOpponent;
+
+#define POWER_LOCS 10
+
+// Track Target Positions
+glm::vec3 global_power[POWER_LOCS] = {
+   glm::vec3(290.921051, 19.244589, 174.749664),
+   glm::vec3(338.827698, 19.496173, 189.391266),
+   glm::vec3(346.579498, 18.759157, 227.580704),
+   glm::vec3(322.155670, 19.636541, 263.517548),
+   glm::vec3(273.451111, 17.642698, 322.880981),
+   glm::vec3(216.283661, 13.134801, 319.852386),
+   glm::vec3(190.124176, 16.910112, 324.708832),
+   glm::vec3(173.255203, 15.882312, 317.669006),
+   glm::vec3(173.500290, 17.169609, 284.294922),
+   glm::vec3(170.056442, 13.324112, 222.544495),
+};
+
 float randNum() {
    return ((float) rand() / (RAND_MAX)) * 600.0;
 }
@@ -264,10 +282,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                camera.setMode(Camera::TPC);
          }
 
-         if (action == GLFW_PRESS && key == GLFW_KEY_X) {
+         if (action == GLFW_PRESS && key == GLFW_KEY_X && player.hasPowerUp()) {
             if (!beginProjectile) {
                beginProjectile = true;
-               missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[1].getPosition());
+               missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[closestOpponent].getPosition());
                missleTime = elapsed;
                //cout << "MISSILE TIME: " << missleTime << endl;
                //cout << "New Projectile" << endl;
@@ -856,8 +874,8 @@ int main(int argc, char **argv) {
    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-   g_width = 640;
-   g_height = 480;
+   g_width = 640*2;
+   g_height = 480*2;
 
    // Open a window and create its OpenGL context
    window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
@@ -880,7 +898,7 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
     loadShapes("../Assets/models/Plane1.obj", obj[3]);
-    loadShapes("../Assets/models/missile.obj", obj[4]);
+    loadShapes("../Assets/models/sphere.obj", obj[4]);
     loadShapes("../Assets/models/Rock.obj", obj[5]);
     loadShapes("../Assets/models/stone1.obj", obj[6]);
     loadShapes("../Assets/models/stone2.obj", obj[7]);
@@ -970,22 +988,34 @@ int main(int argc, char **argv) {
    //cout << "Init\n";
    projectileEntity.setObject(&obj[4]);
    projectileEntity.setPosition(glm::vec3(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]));
-   projectileEntity.setScale(glm::vec3(2.0, 2.0, 2.0));
+   projectileEntity.setScale(glm::vec3(0.1, 0.1, 0.1));
    projectileEntity.setMaterial(Materials::emerald);
    int mIndices = initVBO(&projectileEntity, MISSILE);
    projectileEntity.calculateBoundingSphereRadius();
+
+   Entity powerUp[10];
+   for(int i = 0; i < 10; i++){
+      powerUp[i] = Entity();
+      powerUp[i].setObject(&obj[3]);
+      powerUp[i].setPosition(global_power[i]);
+      powerUp[i].setMaterial(Materials::jade);
+      powerUp[i].setScale(glm::vec3(2.0, 2.0, 2.0));
+      powerUp[i].calculateBoundingSphereRadius();
+   }
 
    // Initialize opponents
    RacerAI *ai;
    Entity opp;
    //Entity prop;
    int odx = 1;
+   int minDist = INT_MAX;
    while (odx <= NUM_OPPONENTS) {
       ai = new RacerAI();
       //printf("ai: %llu\n", (uint64_t)ai);
       opp = Entity(ai);
       opp.setType(AI_ENTITY);
       opp.setObject(&obj[3]);
+
       //glm::vec3 epos = player.getPosition();
       //opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
       opp.setScale(glm::vec3(0.25, 0.25, 0.25));
@@ -1095,16 +1125,34 @@ int main(int argc, char **argv) {
 
       // Update the rules and game state
       rules.update(&camera);
-      
+
+
       // Update the collisions if in race state
       if (rules.getState() == Rules::RACE) {
          collision.update();
       }
 
       // Update & draw player
+      
+      glm::vec3 prevPlayerPos = player.getPosition();
       player.update();
+      glm::vec3 playerDirection = prevPlayerPos - player.getPosition();
+
+
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
+
+      if(!player.hasPowerUp()){
+         for(int i = 0; i < 10; i++){
+            //cout << "WOO!\n";
+            drawVBO(&powerUp[i], mIndices, MISSILE);
+   
+            if(collision.detectEntityCollision(&powerUp[i], &player)){
+               player.getPowerUp();
+            }   
+         }
+      }
+
       //rol *= glm::angleAxis(-0.75f, glm::vec3(0, 0, 1));
       //player_prop.setPosition(player.getPosition() + 0.27f * player.getDirection());
       //player_prop.setTargetRotationQ(player.getRotationQ() * rol);
@@ -1144,6 +1192,17 @@ int main(int argc, char **argv) {
       for (auto &opponent : opponents) {
          t++;
          opponent.update();
+         glm::vec3 playerPos = player.getPosition();
+         glm::vec3 opponentPos = opponent.getPosition();      
+
+         float distance = sqrt(((playerPos[0] - opponentPos[0]) * (playerPos[0] - opponentPos[0])) +
+          ((playerPos[1] - opponentPos[1]) * (playerPos[1] - opponentPos[1])) +
+          ((playerPos[2] - opponentPos[2]) * (playerPos[2] - opponentPos[2]))
+          ); 
+         if(distance < minDist){
+             minDist = distance;
+             closestOpponent = i; 
+         }
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
 	    //opp_props[i].setRotationQ(opponent.getRotationQ());
@@ -1184,13 +1243,15 @@ int main(int argc, char **argv) {
          //cout << "ELAPSED: " << elapsed << endl;
 
          int isDone = missle->runProjectile(elapsed - missleTime,
-                                            player.getPosition(), opponents[0].getPosition());
+                                            player.getPosition(), 
+                                            opponents[closestOpponent].getPosition(),
+                                            playerDirection);
 
          Entity* ent = missle->getEntity();
 
          drawVBO(ent, mIndices, MISSILE);
 
-         if (collision.detectEntityCollision(&opponents[0], ent)) {
+         if (collision.detectEntityCollision(&opponents[closestOpponent], ent) || collision.detectTerrainCollision(ent)) {
             //Material m = check->getMaterial();
             //if(color == false){
             //cout << "IN\n" << endl;
@@ -1207,6 +1268,7 @@ int main(int argc, char **argv) {
 
             missleTime = 0;
             beginProjectile = false;
+            player.removePowerUp();
             delete missle;
          }
       }

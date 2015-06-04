@@ -38,7 +38,7 @@ private:
     Object    *object;  // obj vertices
     Material  material; // Material of the entity
     glm::vec3 scale;    // scale of the object model
-
+    bool hasPower; 
     // Components
     AIComponent *ai_;
 
@@ -113,6 +113,10 @@ public:
     // Methods
     void update();
     
+    void getPowerUp();
+    void removePowerUp();    
+    bool hasPowerUp();
+
     void pitch(float dy);
     void yaw(float dx);
     void turn(float dx);
@@ -189,6 +193,18 @@ Entity::Entity(AIComponent *ai) {
     ai_ = ai;
 
     collisionFlag = false;
+}
+
+bool Entity::hasPowerUp(){
+   return hasPower;
+}
+
+void Entity::getPowerUp(){
+   hasPower = true;   
+}
+
+void Entity::removePowerUp(){
+   hasPower = false;
 }
 
 void Entity::update() {
