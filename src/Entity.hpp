@@ -117,7 +117,7 @@ public:
     void throttleUp();
     void throttleDown();
     
-    void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
+    void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *,std::vector<float> *);
 
     void calculateBoundingSphereRadius();
 };
@@ -279,11 +279,15 @@ void Entity::turn(float dx) {
     target_rotation *= glm::mix(rot, rol, 0.6f);
 }
 
-void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo) {
+void Entity::packVertices(vector<float> *pbo, vector<float> *nbo, vector<unsigned int> *ibo, std::vector<float> *tbo = NULL) {
     int iboIdx = 0;
     for (size_t i=0; i < object->shapes.size(); i++) {
         pbo->insert(pbo->end(), object->shapes[i].mesh.positions.begin(), object->shapes[i].mesh.positions.end());
         nbo->insert(nbo->end(), object->shapes[i].mesh.normals.begin(), object->shapes[i].mesh.normals.end());
+        
+        if(tbo)
+            tbo->insert(tbo->end(), object->shapes[i].mesh.texcoords.begin(), object->shapes[i].mesh.texcoords.end());
+
         for (size_t j=0; j < object->shapes[i].mesh.indices.size(); j++)
             ibo->push_back(iboIdx + object->shapes[i].mesh.indices[j]);
         

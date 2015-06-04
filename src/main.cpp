@@ -62,6 +62,8 @@
 
 //#define _DEBUG
 
+#define GLDEBUG assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+
 using namespace std;
 //using namespace glm;
 
@@ -75,6 +77,7 @@ GLuint skyBoxShaders;
 GLuint textShaders;
 GLuint propShaders;
 
+
 GLFWwindow* window;
 
 //Various data buffers
@@ -82,6 +85,7 @@ GLuint vao;
 GLuint pbo[NUM_VBO];
 GLuint nbo[NUM_VBO];
 GLuint ibo[NUM_VBO];
+GLuint tbo[NUM_VBO];
 
 //common glsl variable ids
 GLint aPos = 0;
@@ -130,6 +134,16 @@ GLuint shadowLPos;
 GLuint shadowViewMatrix;
 GLuint shadowModelMatrix;
 GLuint shadowProjMatrix;
+
+//for props
+GLuint pPos;
+GLuint pNor;
+GLuint propV;
+GLuint propM;
+GLuint propP;
+GLuint prop_light_position;
+GLuint propTexture;
+GLuint tbo_tex;
 // End
 
 // HUD vars
@@ -187,7 +201,7 @@ inline float clamp(float value, float minNum, float maxNum)
    return min(max(minNum, value), maxNum);
 }
 
-int initVBO(Entity *e, int i);
+int initVBO(Entity *e, int i, bool textures);
 
 // EVENT CALLBACKS
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -301,11 +315,13 @@ glm::mat4 SetModel(vec3 trans, glm::vec3 rot, vec3 sc, int num) {
    return com;
 }
 
-int initVBO(Entity *e, int whichbo) {
-   vector<float> posBuf, norBuf;
+int initVBO(Entity *e, int whichbo, bool textures = false) {
+   vector<float> posBuf, norBuf, texBuf;
    vector<unsigned int> indBuf;
-
-   e->packVertices(&posBuf, &norBuf, &indBuf);
+   if(textures)
+      e->packVertices(&posBuf, &norBuf, &indBuf, &texBuf);
+   else
+      e->packVertices(&posBuf, &norBuf, &indBuf);
 
    // Send the position array to the GPU
    glGenBuffers(1, &pbo[whichbo]);
@@ -327,6 +343,22 @@ int initVBO(Entity *e, int whichbo) {
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
    GLSL::checkVersion();
    assert(glGetError() == GL_NO_ERROR);
+
+   if(textures)
+   {
+      // Generate a texture buffer object
+      glGenBuffers(1, &tbo[whichbo]);
+      GLDEBUG
+      // Bind the current texture to be the newly generated texture object
+    
+      glBindBuffer(GL_TEXTURE_BUFFER, tbo[whichbo]);
+      glBufferData(GL_TEXTURE_BUFFER, sizeof(tbo[whichbo]), &tbo[whichbo], GL_STATIC_DRAW);
+
+       glGenTextures(1, &tbo_tex);
+
+      // Unbind
+      glBindTexture(GL_TEXTURE_2D, 0);
+   }
 
    return (int)indBuf.size();
 }
@@ -394,12 +426,22 @@ void initCollisions() {
 
 void initShaderVars() {
    // Set up the shader variables
+    GLDEBUG
+    // Set up the shader variables
+   pPos = glGetAttribLocation(propShaders, "prop_position");
+   pNor = glGetAttribLocation(propShaders, "prop_normal");
+
+   propV = glGetUniformLocation(propShaders, "V");
+   propM = glGetUniformLocation(propShaders, "M");
+   propP = glGetUniformLocation(propShaders, "P");
+   prop_light_position = glGetUniformLocation(propShaders, "lPos");
+   propTexture = glGetUniformLocation(propShaders, "texture");
+
    aPos = glGetAttribLocation(passThroughShaders, "aPos");
    aNor = glGetAttribLocation(passThroughShaders, "aNor");
    shadowPos = glGetAttribLocation(renderSceneShaders, "aPos");
    shadowNor = glGetAttribLocation(renderSceneShaders, "aNor");
    shadowMapPos = glGetAttribLocation(depthCalcShaders, "aPos");
-   assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
    uViewMatrix = glGetUniformLocation(passThroughShaders, "V");
    uModelMatrix = glGetUniformLocation(passThroughShaders, "M");
@@ -425,6 +467,8 @@ void initShaderVars() {
    shadowProjMatrix = glGetUniformLocation(renderSceneShaders, "P");
    shadowLPos = glGetUniformLocation(renderSceneShaders, "lPos");
    depthMatrixID = glGetUniformLocation(depthCalcShaders, "depthMVP");
+
+  
 
    if (renderShadows) {
       glGenFramebuffers(1, &fbo);
@@ -562,28 +606,82 @@ void drawPassthrough(Entity* entity, int nIndices, int whichbo)
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void drawProp(Entity* entity, int nIndices, int whichbo)
+{
+   
+
+   glEnableVertexAttribArray(pPos);
+   glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
+   glVertexAttribPointer(pPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+   // Enable and bind normal array for drawing
+   glEnableVertexAttribArray(pNor);
+   glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
+   glVertexAttribPointer(pNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+   GLDEBUG
+
+
+   // Bind index array for drawing
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
+
+   glUniform3f(prop_light_position, lightPosition.x, lightPosition.y, lightPosition.z);
+
+   //bind textures
+   glActiveTexture(GL_TEXTURE0);
+   GLDEBUG
+   glBindTexture(GL_TEXTURE_BUFFER, tbo_tex);
+   GLDEBUG
+   glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, tbo[whichbo]);
+   GLDEBUG
+   glUniform1i(propTexture,0);
+   GLDEBUG
+
+
+
+   glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
+   glm::mat4 Orient = entity->getRotationM();
+   glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
+   glm::mat4 com = Trans * Orient * Sc;
+   glUniformMatrix4fv(propM, 1, GL_FALSE, glm::value_ptr(com));
+
+   glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
+
+
+   // Disable and unbind
+   GLSL::disableVertexAttribArray(pNor);
+   GLSL::disableVertexAttribArray(pPos);
+   glBindBuffer(GL_ARRAY_BUFFER, 0);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+   glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void drawVBO(Entity *entity, int nIndices, int whichbo, GLuint shader = passThroughShaders) {
    glUseProgram(shader);
 
    if(shader == passThroughShaders)
       drawPassthrough(entity, nIndices, whichbo);
+   else if(shader == propShaders)
+      drawProp(entity,nIndices,whichbo);
 
    glUseProgram(0);
-   assert(glGetError() == GL_NO_ERROR);
+   GLDEBUG
 }
 
 void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
    if (!renderShadows) {
       glUseProgram(passThroughShaders);
       glEnable(GL_CULL_FACE);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       glEnableVertexAttribArray(aPos);
       glBindBuffer(GL_ARRAY_BUFFER, pbo[TERRAIN]);
       glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       GLSL::enableVertexAttribArray(aNor);
       glBindBuffer(GL_ARRAY_BUFFER, nbo[TERRAIN]);
       glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[TERRAIN]);
 
@@ -591,14 +689,17 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
       SetMaterial(Materials::wood);
       SetModel(glm::vec3(0), glm::vec3(0, 1, 0), vec3(1));
       glDrawElements(GL_TRIANGLES, (int)terIndBuf.size(), GL_UNSIGNED_INT, 0);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       GLSL::disableVertexAttribArray(aPos);
       GLSL::disableVertexAttribArray(aNor);
       glBindBuffer(GL_ARRAY_BUFFER, 0);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       glUseProgram(0);
-      assert(glGetError() == GL_NO_ERROR);
+      assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+
    } else {
       glUseProgram(depthCalcShaders);
       depthModelMatrix = SetModel(glm::vec3(0), glm::vec3(0, 1, 0), vec3(1), 1);
@@ -818,7 +919,8 @@ int main(int argc, char **argv) {
    for(int i = 0; i < 7; i++){
         Entity dumb;
         dumb.setObject(&obj[i+5]);
-        indices[i] = initVBO(&dumb, ROCK + i);
+        indices[i] = initVBO(&dumb, ROCK + i, true);
+        GLDEBUG
     }
 
     std::vector<int> typeProp;
@@ -929,13 +1031,21 @@ int main(int argc, char **argv) {
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glUseProgram(passThroughShaders);
+
 
       // Set projection matrix
       glm::mat4 projection = camera.getProjectionMatrix();
-      glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
+      
       glm::mat4 view = camera.getViewMatrix();
+      
+
+      glUseProgram(passThroughShaders);
+      glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
       glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
+
+      glUseProgram(propShaders);
+      glUniformMatrix4fv(propP, 1, GL_FALSE, glm::value_ptr(projection));
+      glUniformMatrix4fv(propV, 1, GL_FALSE, glm::value_ptr(view));
 
       // Set View Frustum
       viewFrustum.setFrustum(view, projection);
@@ -999,7 +1109,7 @@ int main(int argc, char **argv) {
       //update scenery
        for(int i = 0; i < props.size(); i++){
           //cout << indices[typeProp[i]] << endl;
-          drawVBO(&props[i], indices[typeProp[i]], ROCK + typeProp[i]);
+          drawVBO(&props[i], indices[typeProp[i]], ROCK + typeProp[i], propShaders);
        }
 
       //update skybox 

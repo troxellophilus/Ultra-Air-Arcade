@@ -3,7 +3,7 @@
 
 #include "ext/tiny_obj_loader.h"
 
-#define NUMSHAPES 5
+#define NUMSHAPES 12
 
 typedef struct Object {
     std::vector<tinyobj::shape_t> shapes;
