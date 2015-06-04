@@ -12,6 +12,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "Entity.hpp"
+#include "PlaneSound.hpp"
 
 #define TRACK_LOCS 52
 
@@ -86,9 +87,11 @@ public:
     void setState(AIState s);
     void setType(AIType t);
     void setAvoidTarget(Entity *);
+    void setPlace(int p);
 
     // Getters
     int getLap();
+    int getNextIdx();
 
 private:
     int id;
@@ -103,6 +106,8 @@ private:
     int type;
     glm::vec3 start_loc;
     Entity *avoid_target;
+
+    PlaneSound bink = PlaneSound("../Assets/sound/Ding.wav");
 
     void splash(Entity *);
     void setup(Entity *);
@@ -187,6 +192,8 @@ void RacerAI::setup(Entity *agent) {
     track_idx = 0;
     next_idx = 1;
     agent->setPosition(start_loc);
+    agent->setThrust(0);
+    agent->setVelocity(glm::vec3(0, 0, 0));
 }
 
 void RacerAI::race(int frames, Entity *agent) {
@@ -201,9 +208,13 @@ void RacerAI::race(int frames, Entity *agent) {
     target = track[track_idx];// + glm::vec3(x, y, z);
 
     // Update track targets
-    if (glm::distance(agent->getPosition(), target) < 5.f) {
+    if (glm::distance(agent->getPosition(), target) < 8.f) {
         track_idx = next_idx;
         next_idx++;
+        if (type == PLAYER) {
+            bink.setVolume(50.f);
+            bink.play();
+        }
 
         if (next_idx > TRACK_LOCS - 1) {
             next_idx = 0;
@@ -218,6 +229,11 @@ void RacerAI::race(int frames, Entity *agent) {
         glm::quat q = glm::rotation(glm::vec3(0, 0, -1), todir);
         agent->setTargetRotationQ(q);
     }
+
+	if (type == PLAYER && frames % 15 == 0) {
+		printf("Player place: %d\n", place);
+		printf("Player lap: %d\n", lap);
+	}
 }
 
 void RacerAI::avoid(Entity *agent) {
@@ -249,6 +265,10 @@ int RacerAI::getLap() {
     return lap;
 }
 
+int RacerAI::getNextIdx() {
+    return next_idx;
+}
+
 // Setters
 void RacerAI::setState(AIState s) {
     state = s;
@@ -260,6 +280,10 @@ void RacerAI::setType(AIType t) {
 
 void RacerAI::setAvoidTarget(Entity *e) {
     avoid_target = e;
+}
+
+void RacerAI::setPlace(int p) {
+	place = p;
 }
 
 #endif

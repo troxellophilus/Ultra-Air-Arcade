@@ -31,20 +31,21 @@ void main() {
 	if (renderObj == 0 || renderObj == 1) {				// For rendering Characters and Terrain
 		vec3 I_c = vec3(1.0, 1.0, 0.7);
 		vPos = vec3(M * aPos);
-		silh_vPos = vec3(V * M * aPos);
 		vCol = I_c;
 		vNor = vec3(M * vec4(aNor, 0.0));
+
+		silh_vPos = vec3(V * M * aPos);
 		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
 		gl_Position = P * V * M * aPos;
 	} else if (renderObj == 1) {	// For rendering airplanes
 		float dotProduct = dot(normalize(aNor), vec3(0, 1, 0));
-		//if (dotProduct > 0.5) vCol = vec3(1, 0, 0);
-		//else vCol = vec3(0, 0, 1);
+		if (dotProduct > 0.5) vCol = vec3(1, 0, 0);
+		else vCol = vec3(0, 0, 1);
 		
-		vPos = vec3(M * aPos);
+		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
 		silh_vPos = vec3(V * M * aPos);
 		vNor = vec3(M * vec4(aNor, 0.0));
-		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
+		vPos = vec3(M * aPos);
 		gl_Position = P * V * M * aPos;
 	} else if (renderObj == 42) { // For rendering billboard
 		vec3 particleCenter_wordspace = BillboardPos;
@@ -53,10 +54,6 @@ void main() {
 			particleCenter_wordspace
 			+ CameraRight_worldspace * aPos.x * BillboardSize.x
 			+ CameraUp_worldspace * aPos.y * BillboardSize.y;
-
-
-	// Output position of the vertex
-	//gl_Position = V*P * vec4(vertexPosition_worldspace, 1.0f);
 		gl_Position = P * V * vec4(vertexPosition_worldspace, 1.0f);
 	} else if (renderObj == 3) {
 		silh_vPos = vec3(V * M * aPos);
@@ -65,9 +62,10 @@ void main() {
 	} else {								// Catch-all
 		vec3 I_c = vec3(1.0, 1.0, 1.0);
 		vPos = vec3(M * aPos);
-		silh_vPos = vec3(V * M * aPos);
 		vCol = I_c;
 		vNor = vec3(M * vec4(aNor, 0.0));
+
+		silh_vPos = vec3(V * M * aPos);
 		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
 		gl_Position = P * V * M * aPos;
 	}

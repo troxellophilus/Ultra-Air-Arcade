@@ -28,13 +28,13 @@ vec3 snowDiffuse = vec3(0.5, 0.5, 0.5);
 vec3 snowAmbient = vec3(0.05, 0.05, 0.05) * snowDiffuse;
 
 vec3 woodDiffuse = vec3(0.3, 0.2, 0.05);
-vec3 woodAmbient = vec3(0.6, 0.41, 0.29) * woodDiffuse;
+vec3 woodAmbient = vec3(0.6, 0.41, 0.29);// * woodDiffuse;
 
 vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
 vec3 waterAmbient = vec3(0.0, 0.05, 0.07) * waterDiffuse;
 
-const int levels = 20;					// Delete here
-const float scaleFactor = 1.0 / levels; //Delete here
+const int levels = 20;
+const float scaleFactor = 1.0 / levels;
 
 vec2 poissonFilter[16] = vec2[]( 
    vec2( -0.94201624, -0.39906216 ), 
@@ -54,6 +54,10 @@ vec2 poissonFilter[16] = vec2[](
    vec2( 0.19984126, 0.78641367 ), 
    vec2( 0.14383161, -0.14100790 ) 
 );
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(13,78))) * 4375);
+}
 
 void main(){
 
@@ -84,10 +88,17 @@ void main(){
 	float dist = length(lightPosition - vPos);
 	float intensity = (500 * dist) / (dist * dist + dist + 1);
     
-    if (vPos.y < 30) {
+    if (vPos.y < 40) {
     	if (dotProduct > 0.6) {
-    		ambient = forestAmbient;
-			diffuse = forestDiffuse;
+    		if (vPos.y < 0.5) {
+				float num = rand(vPos.xz);
+				ambient = waterAmbient;
+				if (num > 0.5) diffuse = waterDiffuse * num;
+				else diffuse = waterDiffuse;
+			} else {
+				ambient = forestAmbient;
+				diffuse = forestDiffuse;
+			}
     	} else if (dotProduct > 0.25) {
     		ambient = sandAmbient;
 			diffuse = sandDiffuse;

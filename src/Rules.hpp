@@ -12,6 +12,7 @@
 #include "Entity.hpp"
 #include "Collision.hpp"
 #include "RacerAI.hpp"
+#include "PlaneSound.hpp"
 
 class Rules {
 public:
@@ -40,6 +41,8 @@ private:
     RacerAI *playerAI;
     vector<Entity> *agents; // Pointer to the vector of agents in main
     vector<RacerAI *> agentsAI;
+
+    PlaneSound countdown = PlaneSound("../Assets/sound/beep.wav");
 
     // state methods
     void splash(Camera *);
@@ -144,22 +147,32 @@ void Rules::setup(Camera *cam) {
 	cam->setMode(Camera::TPC);
 
 	printf("RACE BEGIN!\n5\n");
+    countdown.setPitch(1.f);
+    countdown.play();
     }
+
+    start_count++;
 
     if (start_count == 30)
 	printf("4\n");
 
-    if (start_count == 60)
+    if (start_count == 60) {
         printf("3\n");
+        countdown.play();
+    }   
 
     if (start_count == 90)
 	printf("2\n");
 
-    if (start_count == 120)
-	printf("1\n");
+    if (start_count == 120) {
+        printf("1\n");
+        countdown.play();
+    }
 
-    if (start_count == 150) {
+    if (start_count == 180) {
 	printf("GO!\n");
+        countdown.setPitch(2.f);
+        countdown.play();
 
 	playerAI->setState(RacerAI::RACE);
 	for (RacerAI *opp : agentsAI) {
@@ -169,8 +182,6 @@ void Rules::setup(Camera *cam) {
 	state = RACE;
 	start_count = 0;
     }
-
-    start_count++;
 }
 
 void Rules::race(Camera *cam) {
@@ -198,6 +209,26 @@ void Rules::race(Camera *cam) {
 	    }
         }
     }
+
+    // Update player placement
+    int player_next_idx = playerAI->getNextIdx();
+    float player_dist = glm::distance(global_track[player_next_idx], player->getPosition());
+
+    	int num_ahead = 0;
+    	for (Entity opp : *agents) {
+		if (((RacerAI *)opp.getAI())->getLap() > playerAI->getLap())
+			num_ahead++;
+		else if (((RacerAI *)opp.getAI())->getLap() == playerAI->getLap()) {
+			if (((RacerAI *)opp.getAI())->getNextIdx() > player_next_idx)
+				num_ahead++;
+			else if (((RacerAI *)opp.getAI())->getNextIdx() == player_next_idx) {
+				float d = glm::distance(opp.getPosition(), global_track[player_next_idx]);
+				if (d < player_dist)
+					num_ahead++;
+			}
+		}
+	}
+	playerAI->setPlace(num_ahead + 1);
 
     // When all racers have finish 3 laps, set state to finish
     if (playerAI->getLap() == 3) {

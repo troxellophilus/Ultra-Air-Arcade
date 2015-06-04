@@ -33,6 +33,7 @@
 #include "Scenery.hpp"
 #include "DrawText.h"
 #include "Frustum.h"
+#include "PlaneSound.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -158,6 +159,10 @@ vector<unsigned int> terIndBuf;
 Object obj[NUMSHAPES];
 
 Collision collision = Collision();
+PlaneSound planeSound = PlaneSound("../Assets/sound/MediumPropPlane.wav");
+PlaneSound backgroundMusic = PlaneSound("../Assets/sound/destiny-short.wav");
+PlaneSound collisionSound = PlaneSound("../Assets/sound/explosion-01.wav");
+
 Terrain terrain = Terrain();
 Skybox *skybox;
 DrawText *drawText;
@@ -169,6 +174,7 @@ Entity player = Entity(&playerAI);
 Frustum viewFrustum = Frustum();
 
 vector<Entity> opponents;
+vector<Entity> opp_props;
 
 static float g_width, g_height;
 
@@ -212,27 +218,29 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
    // Check movement keys
    if (action == GLFW_REPEAT || action == GLFW_PRESS) {
       // Check Game State
-      if (rules.getState() == Rules::SPLASH) {
+      if (action == GLFW_PRESS && rules.getState() == Rules::SPLASH) {
          rules.setState(Rules::CSEL);
       }
-      if (rules.getState() == Rules::CSEL) {
+      else if (action == GLFW_PRESS && rules.getState() == Rules::CSEL) {
          rules.setState(Rules::SETUP);
       }
-      if (rules.getState() == Rules::FINISH) {
+      else if (action == GLFW_PRESS && rules.getState() == Rules::FINISH) {
          rules.setState(Rules::LEADERBOARD);
       }
 
-      if (rules.getState() == Rules::LEADERBOARD) {
+      else if (action == GLFW_PRESS && rules.getState() == Rules::LEADERBOARD) {
          rules.setState(Rules::SPLASH);
       }
-      if (rules.getState() == Rules::RACE) {
+      else if (rules.getState() == Rules::RACE) {
          // Check movement keys
          if (key == GLFW_KEY_W) {
             camera.move(Camera::FORWARD);
+            planeSound.changePitch(1);
             player.throttleUp();
          }
          if (key == GLFW_KEY_S) {
             camera.move(Camera::BACK);
+            planeSound.changePitch(-1);
             player.throttleDown();
          }
          if (key == GLFW_KEY_A) {
@@ -256,7 +264,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                camera.setMode(Camera::TPC);
          }
 
-         if (key == GLFW_KEY_X) {
+         if (action == GLFW_PRESS && key == GLFW_KEY_X) {
             if (!beginProjectile) {
                beginProjectile = true;
                missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[1].getPosition());
@@ -422,6 +430,14 @@ void initGround() {
 
 void initCollisions() {
    collision = Collision(&terrain, &player, &opponents);
+
+   planeSound.playLooped();
+
+   backgroundMusic.setVolume(50.f);
+   backgroundMusic.playLooped();
+
+   collision.setPlayerSound(&planeSound);
+   collision.setCollisionSound(&collisionSound);
 }
 
 void initShaderVars() {
@@ -818,7 +834,7 @@ int main(int argc, char **argv) {
       argv++;
       if (**argv == SHADOWS_OFF) renderShadows = false;
       else renderShadows = true;
-   } else renderShadows = false;
+   } else renderShadows = true;
 
    GLFWwindow* window;
 
@@ -873,7 +889,6 @@ int main(int argc, char **argv) {
     loadShapes("../Assets/models/stone5.obj", obj[10]);
     loadShapes("../Assets/models/tree.obj", obj[11]);
     std::cout << " loaded the objects " << endl;
-
 
 
    // Initialize GLEW
@@ -936,6 +951,15 @@ int main(int argc, char **argv) {
    player.calculateBoundingSphereRadius();
    pIndices = initVBO(&player, PLANE);
 
+   /*
+   Entity player_prop = Entity();
+   player_prop.setType(PROP_ENTITY);
+   player_prop.setObject(&obj[5]);
+   player_prop.setScale(glm::vec3(0.15, 0.15, 0.15));
+   player_prop.setMaterial(Materials::obsidian);
+   int propIndices = initVBO(&player_prop, PLANE_PROP);
+   */
+
    // Initialize camera
    camera.setMode(Camera::TPC);
    camera.setPosition(glm::vec3(0, 0, -10));
@@ -954,6 +978,7 @@ int main(int argc, char **argv) {
    // Initialize opponents
    RacerAI *ai;
    Entity opp;
+   //Entity prop;
    int odx = 1;
    while (odx <= NUM_OPPONENTS) {
       ai = new RacerAI();
@@ -973,10 +998,23 @@ int main(int argc, char **argv) {
          opp.setMaterial(Materials::stone);
       else if (odx % 5 == 3)
          opp.setMaterial(Materials::greenPlastic);
+		else if (odx % 5 == 4)
+			opp.setMaterial(Materials::red);
 
       opponents.push_back(opp);
       odx++;
+	/*
+      prop = Entity();
+      prop.setType(PROP_ENTITY);
+      prop.setObject(&obj[5]);
+      prop.setScale(glm::vec3(0.25, 0.25, 0.25));
+      prop.setMaterial(Materials::obsidian);
+      opp_props.push_back(prop);
+      */
    }
+
+   // Initialize collisions
+   collision.setOpponents(&opponents);
 
    // Initialize game rules
    rules.setAgents(&opponents);
@@ -1019,6 +1057,7 @@ int main(int argc, char **argv) {
    float last = -1;
    float pitch = 0;
 
+   glm::quat rol = glm::angleAxis(-0.15f, glm::vec3(0, 0, 1));
 
    //Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
    bool color = false;
@@ -1056,13 +1095,21 @@ int main(int argc, char **argv) {
 
       // Update the rules and game state
       rules.update(&camera);
-      // Update the collisions
-      collision.update();
+      
+      // Update the collisions if in race state
+      if (rules.getState() == Rules::RACE) {
+         collision.update();
+      }
 
       // Update & draw player
       player.update();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
+      //rol *= glm::angleAxis(-0.75f, glm::vec3(0, 0, 1));
+      //player_prop.setPosition(player.getPosition() + 0.27f * player.getDirection());
+      //player_prop.setTargetRotationQ(player.getRotationQ() * rol);
+      //player_prop.update();
+      //drawVBO(&player_prop, propIndices, PLANE_PROP);
       //checkPlayerCollisions();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -1099,6 +1146,10 @@ int main(int argc, char **argv) {
          opponent.update();
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
+	    //opp_props[i].setRotationQ(opponent.getRotationQ());
+	    //opp_props[i].setPosition(opponent.getPosition());
+	    //opp_props[i].rollRight();
+	    //drawVBO(&opp_props[i], propIndices, PLANE_PROP);
             i++;
          }
          //checkOpponentCollisions(opponent);

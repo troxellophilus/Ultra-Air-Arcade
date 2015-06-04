@@ -6,6 +6,7 @@
 #define ENTITY_H
 
 #include <cstdlib>
+#include <cfloat>
 
 #include <GLFW/glfw3.h>
 
@@ -65,6 +66,9 @@ private:
 
     // Bounding sphere radius
     float radius;
+
+	// Game state properties
+	int ammunition;
     
 public:
     // Constructor
@@ -98,6 +102,7 @@ public:
     void setPosition(glm::vec3);
     void setScale(glm::vec3);
     void setTargetRotationQ(glm::quat);
+    void setRotationQ(glm::quat);
     
     void setVelocity(glm::vec3);
     void setThrust(float a);
@@ -120,12 +125,15 @@ public:
     void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *,std::vector<float> *);
 
     void calculateBoundingSphereRadius();
+	void addAmmo(int);
+	int getAmmo();
+	void subtractAmmo(int);
+    
+    bool collisionFlag;
 };
 
 Entity::Entity() {
     object = NULL;
-	// Zach - removed Material:: from the call to the Material constructor - 
-	// Would not allow my version to compile
     material = Material();
     
     position = glm::vec3(0, 0, 0);
@@ -138,6 +146,7 @@ Entity::Entity() {
     force = glm::vec3(0, 0, 0);
     drag = 1.5f; // sphere for now
     carea = 25.f;
+	ammunition = 0;
     
     thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
@@ -148,6 +157,8 @@ Entity::Entity() {
     radius = 0.f;
 
     ai_ = NULL;
+
+    collisionFlag = false;
 }
 
 Entity::Entity(AIComponent *ai) {
@@ -165,6 +176,7 @@ Entity::Entity(AIComponent *ai) {
     force = glm::vec3(0, 0, 0);
     drag = 1.5f; // sphere for now
     carea = 25.f;
+	ammunition = 0;
     
     thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
@@ -175,27 +187,31 @@ Entity::Entity(AIComponent *ai) {
     radius = 0.f;
 
     ai_ = ai;
+
+    collisionFlag = false;
 }
 
 void Entity::update() {
+	static float last_time = glfwGetTime();
     float dt = 1 / 60.f; // fixed time step
     float dot;
     glm::vec3 vn;
     glm::vec3 fd;
 
     // If this is an AI entity, update it's state
-    if (type == AI_ENTITY)
+    if (type == AI_ENTITY || type == PLAYER_ENTITY)
         ai_->update(this);
     
     // Obtain the angle between the two quats, use this for proportional control of craft
     dot = glm::dot(rotation, target_rotation);
-    dot = glm::abs(dot) > 30.f ? 30.f : glm::abs(dot);
+    dot = glm::abs(dot) > 20.f ? 20.f : glm::abs(dot);
     
     // Control loop the rotation to the desired rotation
-    rotation = glm::shortMix(rotation, target_rotation, glm::abs(dot) / 30.f);
+    rotation = glm::shortMix(rotation, target_rotation, glm::abs(dot) / 20.f);
     
     // Update the position by moving velocity in direction
-    position += (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0.0001f, 0);
+	glm::vec3 tempPos = (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0.0001f, 0);
+	if (tempPos.y + position.y <= 45) position += tempPos;
     vn = glm::vec3(0, 0, 1);
     fd = -0.5f * glm::vec3(0, 0, -1) * 1.293f * drag * carea * velocity * velocity;
     force = thrust * vn * mass;
@@ -355,6 +371,10 @@ void Entity::setTargetRotationQ(glm::quat r) {
     target_rotation = r;
 }
 
+void Entity::setRotationQ(glm::quat r) {
+	rotation = r;
+}
+
 void Entity::setVelocity(glm::vec3 vel) {
     velocity = glm::vec3(vel);
 }
@@ -384,10 +404,9 @@ float Entity::getRadius() {
 }
 
 void Entity::calculateBoundingSphereRadius() {
-    //radius = 0.05f;
 
     glm::vec3 center = glm::vec3(object->shapes[0].mesh.positions[0], object->shapes[0].mesh.positions[1], object->shapes[0].mesh.positions[2]);
-    float calculatedRadius = 0.000000000001f;
+    float calculatedRadius = FLT_MIN;
     glm::vec3 pos, diff;
     float length, alpha, alphaSq;
 
@@ -416,10 +435,20 @@ void Entity::calculateBoundingSphereRadius() {
         }
     }
 
-    // printf("Radius: %.4f\n", calculatedRadius);
-    // printf("Scaled Radius: %.4f\n", calculatedRadius * scale.x);
-
     radius = calculatedRadius * scale.x;
+}
+
+void Entity::addAmmo(int amount) {
+	ammunition += amount;
+}
+
+int Entity::getAmmo() {
+	return ammunition;
+}
+
+void Entity::subtractAmmo(int amount) {
+	if (ammunition - amount < 0) ammunition = 0;
+	else ammunition -= amount;
 }
 
 #endif
