@@ -144,6 +144,7 @@ Object obj[NUMSHAPES];
 
 Collision collision = Collision();
 PlaneSound planeSound = PlaneSound("../Assets/sound/MediumPropPlane.wav");
+PlaneSound backgroundMusic = PlaneSound("../Assets/sound/destiny-short.wav");
 
 Terrain terrain = Terrain();
 Skybox *skybox;
@@ -216,10 +217,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
          // Check movement keys
          if (key == GLFW_KEY_W) {
             camera.move(Camera::FORWARD);
+            planeSound.changePitch(1);
             player.throttleUp();
          }
          if (key == GLFW_KEY_S) {
             camera.move(Camera::BACK);
+            planeSound.changePitch(-1);
             player.throttleDown();
          }
          if (key == GLFW_KEY_A) {
@@ -393,6 +396,11 @@ void initCollisions() {
    collision = Collision(&terrain, &player, &opponents);
 
    planeSound.playLooped();
+
+   backgroundMusic.setVolume(50.f);
+   backgroundMusic.playLooped();
+
+   collision.setPlayerSound(&planeSound);
 }
 
 void initShaderVars() {

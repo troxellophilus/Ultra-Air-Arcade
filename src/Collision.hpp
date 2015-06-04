@@ -14,6 +14,7 @@
 #include "Entity.hpp"
 #include "Terrain.h"
 #include "RacerAI.hpp"
+#include "PlaneSound.hpp"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ private:
     Terrain *terrain; // Pointer to the terrain.
     Entity *player;
     vector<Entity> *opponents;
+    PlaneSound *planeSound;
     int resetStep;
     glm::vec3 convertedNor;
     
@@ -32,6 +34,7 @@ public:
     Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer);
     virtual ~Collision();
     void setOpponents(vector<Entity> *opp);
+    void setPlayerSound(PlaneSound *sound);
     void update();
     bool detectEntityCollision(Entity *player, Entity *object);
     bool detectTerrainCollision(Entity *object);
@@ -64,6 +67,10 @@ void Collision::setOpponents(vector<Entity> *opp) {
     opponents = opp;
 }
 
+void Collision::setPlayerSound(PlaneSound *sound) {
+    planeSound = sound;
+}
+
 void Collision::update() {
     // A soft ceiling for the player
     if (player->getPosition().y > 50.f) {
@@ -71,22 +78,24 @@ void Collision::update() {
     }
 
     if (detectTerrainCollision(player)) {
-        ptFlag = true;
+        player->collisionFlag = true;
         player->setMaterial(Materials::red);
         glm::vec3 playerPos = player->getPosition();
         Eigen::Vector3f convertedPos = Eigen::Vector3f(playerPos.x, playerPos.y, playerPos.z);
         Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
         convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
+        planeSound->changePitch(0);
         // camera->setMode(Camera::CameraMode::FREE);
         // for (int i = 0; i < 100; i++)
         //     camera->move(Camera::CameraDirection::BACK);
     }
 
-    if (ptFlag) {
+    if (player->collisionFlag) {
         glm::vec3 playerPos = player->getPosition();
         player->setPosition(playerPos + (convertedNor * 0.0167f));
         player->setThrust(0.f);
         player->setVelocity(glm::vec3(0.f, 0.f, 0.f));
+        planeSound->changePitch(0);
 
         if (resetStep % 20 == 0) {
             player->setMaterial(Materials::red);
@@ -97,7 +106,7 @@ void Collision::update() {
         }
 
         if (resetStep++ > 180) {
-            ptFlag = false;
+            player->collisionFlag = false;
             resetStep = 0;
             player->setMaterial(Materials::emerald);
             // camera->setMode(Camera::CameraMode::TPC);
@@ -108,12 +117,24 @@ void Collision::update() {
         if (detectEntityCollision(player, &opp)) {
             if (opp.getPosition().x == opp.getPosition().x) {
                 if (opp.getPosition().y > player->getPosition().y) {
-                    player->pitch(40.f);
+                    //player->pitch(40.f);
                 }
                 else {
-                    player->pitch(-40.f);
+                    //player->pitch(-40.f);
                 }
             }
+        }
+
+        if (detectTerrainCollision(&opp)) {
+            //opp.collisionFlag = true;
+            opp.setMaterial(Materials::red);
+            glm::vec3 oppPos = opp.getPosition();
+            Eigen::Vector3f convertedPos = Eigen::Vector3f(oppPos.x, oppPos.y, oppPos.z);
+            Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
+            glm::vec3 collisionNormal = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
+            opp.setPosition(oppPos + (convertedNor * 3.f));
+            opp.setThrust(0.f);
+            opp.setVelocity(glm::vec3(0.f, 0.f, 0.f));
         }
     }
 }

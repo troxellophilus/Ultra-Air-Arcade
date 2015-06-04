@@ -121,6 +121,7 @@ public:
     void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
 
     void calculateBoundingSphereRadius();
+    bool collisionFlag;
 };
 
 Entity::Entity() {
@@ -149,6 +150,8 @@ Entity::Entity() {
     radius = 0.f;
 
     ai_ = NULL;
+
+    collisionFlag = false;
 }
 
 Entity::Entity(AIComponent *ai) {
@@ -176,6 +179,8 @@ Entity::Entity(AIComponent *ai) {
     radius = 0.f;
 
     ai_ = ai;
+
+    collisionFlag = false;
 }
 
 void Entity::update() {
