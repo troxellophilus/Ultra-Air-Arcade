@@ -710,7 +710,7 @@ int main(int argc, char **argv) {
       argv++;
       if (**argv == SHADOWS_OFF) renderShadows = false;
       else renderShadows = true;
-   } else renderShadows = false;
+   } else renderShadows = true;
 
    GLFWwindow* window;
 
