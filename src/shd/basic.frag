@@ -33,17 +33,20 @@ vec3 snowDiffuse = vec3(0.5, 0.5, 0.5);
 vec3 snowAmbient = vec3(0.05, 0.05, 0.05) * snowDiffuse;
 
 vec3 woodDiffuse = vec3(0.3, 0.2, 0.05);
-vec3 woodAmbient = vec3(0.6, 0.41, 0.29);// * woodDiffuse;
+vec3 woodAmbient = vec3(0.6, 0.41, 0.29);
 
 vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
 vec3 waterAmbient = vec3(0.0, 0.05, 0.07) * waterDiffuse;
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(13,78))) * 4375);
+}
 
 vec3 toonShade() {
     vec3 n = normalize(silh_vNor);
     vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
-    if (dot(n, e) < 0.15)
-        return vec3(0.0, 0.0, 0.0);
+    if (dot(n, e) < 0.15) return vec3(0.0, 0.0, 0.0);
 
     vec3 lightVector = normalize(lPos.xyz - vPos);
     vec3 ambient;
@@ -51,48 +54,43 @@ vec3 toonShade() {
     float cosine = dot(lightVector, vNor);
     float dotProduct = dot(normalize(vNor), vec3(0, 1, 0));
 
+	if (renderObj == 1) { // Rendering for airplanes
+		float cosine = dot(lightVector, vNor);
+		return UaColor + UdColor * floor( cosine * levels ) * scaleFactor; 
+	}
+
     if (vPos.y < 40) {
     	if (dotProduct > 0.6) {
 			if (vPos.y < 0.5) {
+				float num = rand(vPos.xz);
 				ambient = waterAmbient;
-				diffuse = waterDiffuse;
+				if (num > 0.5) diffuse = waterDiffuse * num;
+				else diffuse = waterDiffuse;
 			} else {
 				ambient = forestAmbient;
 				diffuse = forestDiffuse;
 			}
     	} else if (dotProduct > 0.35) {
     		ambient = sandAmbient;
-		diffuse = sandDiffuse;
+			diffuse = sandDiffuse;
     	} else {
     		ambient = woodAmbient;
-		diffuse = woodDiffuse;
+			diffuse = woodDiffuse;
     	}
     } else {
     	if (dotProduct > 0.6) {
     		ambient = snowAmbient;
-		diffuse = snowDiffuse;
+			diffuse = snowDiffuse;
     	} else if (dotProduct > 0.25) {
     		ambient = rocksAmbient;
-		diffuse = rocksDiffuse;
+			diffuse = rocksDiffuse;
     	} else {
     		ambient = woodAmbient;
-		diffuse = woodDiffuse;
+			diffuse = woodDiffuse;
     	}
     }
     
     diffuse *= floor( cosine * levels ) * scaleFactor;
-    
-	if (renderObj == 1) { // Rendering for airplanes
-		ambient = UaColor;
-		float cosine = dot(lightVector, vNor);
-		diffuse = UdColor * floor( cosine * levels ) * scaleFactor; 
-	}
-
-    if (dot(n, e) < 0.15)
-    {
-    	ambient = vec3(0.0f,0.0f,0.0f);
-    	diffuse = vec3(0.0f,0.0f,0.0f);
-    }
 
     return ambient + diffuse;
 }
@@ -115,15 +113,14 @@ void main() {
         	else
         		outColor = vec4(0.0,0.0,0.0,0.0);
 	} 
-	else if(renderObj == 4)
-	{
+	else if(renderObj == 4)	{
 		vec3 n = normalize(silh_vNor);
-    		vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
+    	vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
-    		if (dot(n, e) < 0.2)
-        		outColor = vec4(0.0, 0.0, 0.0, 1.0);
-        	else
-        		outColor = vec4(forestDiffuse,1.0);
+		if (dot(n, e) < 0.2)
+    		outColor = vec4(0.0, 0.0, 0.0, 1.0);
+    	else
+    		outColor = vec4(forestDiffuse,1.0);
 	}
 	else {								// Catch-all
 			outColor = vec4(vCol, 1.0);

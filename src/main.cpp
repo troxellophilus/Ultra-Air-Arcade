@@ -34,6 +34,7 @@
 #include "Scenery.hpp"
 #include "DrawText.h"
 #include "Frustum.h"
+#include "PlaneSound.hpp"
 
 #include "helper.h"
 #include "GLSL.h"
@@ -142,6 +143,10 @@ vector<unsigned int> terIndBuf;
 Object obj[NUMSHAPES];
 
 Collision collision = Collision();
+PlaneSound planeSound = PlaneSound("../Assets/sound/MediumPropPlane.wav");
+PlaneSound backgroundMusic = PlaneSound("../Assets/sound/destiny-short.wav");
+PlaneSound collisionSound = PlaneSound("../Assets/sound/explosion-01.wav");
+
 Terrain terrain = Terrain();
 Skybox *skybox;
 DrawText *drawText;
@@ -214,10 +219,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
          // Check movement keys
          if (key == GLFW_KEY_W) {
             camera.move(Camera::FORWARD);
+            planeSound.changePitch(1);
             player.throttleUp();
          }
          if (key == GLFW_KEY_S) {
             camera.move(Camera::BACK);
+            planeSound.changePitch(-1);
             player.throttleDown();
          }
          if (key == GLFW_KEY_A) {
@@ -389,6 +396,14 @@ void initGround() {
 
 void initCollisions() {
    collision = Collision(&terrain, &player, &opponents);
+
+   planeSound.playLooped();
+
+   backgroundMusic.setVolume(50.f);
+   backgroundMusic.playLooped();
+
+   collision.setPlayerSound(&planeSound);
+   collision.setCollisionSound(&collisionSound);
 }
 
 void initShaderVars() {
@@ -711,7 +726,7 @@ int main(int argc, char **argv) {
       argv++;
       if (**argv == SHADOWS_OFF) renderShadows = false;
       else renderShadows = true;
-   } else renderShadows = false;
+   } else renderShadows = true;
 
    GLFWwindow* window;
 
@@ -856,6 +871,8 @@ int main(int argc, char **argv) {
          opp.setMaterial(Materials::stone);
       else if (odx % 5 == 3)
          opp.setMaterial(Materials::greenPlastic);
+		else if (odx % 5 == 4)
+			opp.setMaterial(Materials::red);
 
       opponents.push_back(opp);
       odx++;
@@ -868,6 +885,9 @@ int main(int argc, char **argv) {
       opp_props.push_back(prop);
       */
    }
+
+   // Initialize collisions
+   collision.setOpponents(&opponents);
 
    // Initialize game rules
    rules.setAgents(&opponents);
@@ -939,8 +959,11 @@ int main(int argc, char **argv) {
 
       // Update the rules and game state
       rules.update(&camera);
-      // Update the collisions
-      collision.update();
+      
+      // Update the collisions if in race state
+      if (rules.getState() == Rules::RACE) {
+         collision.update();
+      }
 
       // Update & draw player
       player.update();
