@@ -166,8 +166,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, GL_TRUE);
 
-   hud = true;
-
    // Check movement keys
    if (action == GLFW_REPEAT || action == GLFW_PRESS) {
       // Check Game State
@@ -225,6 +223,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
          }
          if (key == GLFW_KEY_N) {
             printf("glm::vec3(%f, %f, %f),\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+         }
+         if(key == GLFW_KEY_H) {
+            hud = !hud;
          }
          if (key == GLFW_KEY_GRAVE_ACCENT) {
             debugHud = !debugHud;
@@ -590,26 +591,27 @@ void drawDebugHUD(int fps, int checkpointsDrawn, int checkpointsTotal, int plane
    strncpy(text, buffer, len);
    drawText->addText(Text(text, 0.75 * g_width, 0.05 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
+   snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
+   len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.75 * g_width, 0.08 * g_height, 0, 0, drawText->getFontSize(90), 1));
+
    snprintf(buffer, sizeof(buffer), "Opponents Drawn: %d/%d", planesDrawn, planesTotal);
    len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.05 * g_width, 0.97 * g_height, 0, 0, drawText->getFontSize(90), 1));   
+   drawText->addText(Text(text, 0.75 * g_width, 0.11 * g_height, 0, 0, drawText->getFontSize(90), 1));   
 
    snprintf(buffer, sizeof(buffer), "Checkpoints Drawn: %d/%d", checkpointsDrawn, checkpointsTotal);
    len = strlen(buffer) + 1;
    text = new char[len];
    strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.05 * g_width, 0.93 * g_height, 0, 0, drawText->getFontSize(90), 1));   
+   drawText->addText(Text(text, 0.75 * g_width, 0.14 * g_height, 0, 0, drawText->getFontSize(90), 1));   
 
-   snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText->getFontSize(90), 1));
 }
 
-void drawHUD(float pitch) {
+void drawHUD(float pitch, float time) {
    char buffer[256], *text;
 
    drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
@@ -635,9 +637,17 @@ void drawHUD(float pitch) {
    strncpy(text, buffer, len);
    drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
 
-   glDisable(GL_CULL_FACE);
-   drawText->drawText();
-   glEnable(GL_CULL_FACE);
+   snprintf(buffer, sizeof(buffer), "Lap: 1/3");
+   len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.8 * g_width, 0.9 * g_height, 0, 0, drawText->getFontSize(45), 1));
+
+   snprintf(buffer, sizeof(buffer), "%f", time);
+   len = strlen(buffer) + 1;
+   text = new char[len];
+   strncpy(text, buffer, len);
+   drawText->addText(Text(text, 0.05 * g_width, 0.9 * g_height, 0, 0, drawText->getFontSize(60), 1));
 }
 
 int main(int argc, char **argv) {
@@ -877,28 +887,13 @@ int main(int argc, char **argv) {
       // printf("Pitch: %f\n", glm::pitch(player.getRotationQ()) / 3.14159);
 
       if (player.getPitch() > 0) {
-         if (pitch > 0) {
-            pitch -= 0.4;
-         }
-         else {
-            pitch -= 0.2;
-         }
+         pitch -= (pitch > 0 ? 0.4 : 0.2);
       }
       else if (player.getPitch() < 0) {
-         if (pitch > 0) {
-            pitch += 0.4;
-         }
-         else {
-            pitch += 0.8;
-         }
+         pitch += (pitch > 0 ? 0.4 : 0.8);
       }
       else {
-         if (pitch > 0) {
-            pitch -= 0.2;
-         }
-         else if (pitch < 0) {
-            pitch += 0.2;
-         } 
+         pitch += (pitch > 0 ? -0.2 : (pitch < 0 ? 0.2 : 0));
       }
 
       int o = 0, od = 0;
@@ -979,11 +974,14 @@ int main(int argc, char **argv) {
       glDisable(GL_DEPTH_TEST);  // disable depth-testing
       //Draw HUD
       if (hud) {
-         if (debugHud) {
-            drawDebugHUD(fps, cd, c, od, o);
-         }
-         drawHUD(pitch);
+         drawHUD(pitch, elapsed);
       }
+      if (debugHud) {
+         drawDebugHUD(fps, cd, c, od, o);
+      }
+      glDisable(GL_CULL_FACE);
+      drawText->drawText();
+      glEnable(GL_CULL_FACE);
       glEnable (GL_DEPTH_TEST);
       glDepthFunc (GL_LESS);
       glDepthMask(GL_TRUE);  // disable writes to Z-Buffer
