@@ -53,25 +53,30 @@ vec3 toonShade() {
 
     if (vPos.y < 40) {
     	if (dotProduct > 0.6) {
-    		ambient = forestAmbient;
-			diffuse = forestDiffuse;
+			if (vPos.y < 0.5) {
+				ambient = waterAmbient;
+				diffuse = waterDiffuse;
+			} else {
+				ambient = forestAmbient;
+				diffuse = forestDiffuse;
+			}
     	} else if (dotProduct > 0.35) {
     		ambient = sandAmbient;
-			diffuse = sandDiffuse;
+		diffuse = sandDiffuse;
     	} else {
     		ambient = woodAmbient;
-			diffuse = woodDiffuse;
+		diffuse = woodDiffuse;
     	}
     } else {
     	if (dotProduct > 0.6) {
     		ambient = snowAmbient;
-			diffuse = snowDiffuse;
+		diffuse = snowDiffuse;
     	} else if (dotProduct > 0.25) {
     		ambient = rocksAmbient;
-			diffuse = rocksDiffuse;
+		diffuse = rocksDiffuse;
     	} else {
     		ambient = woodAmbient;
-			diffuse = woodDiffuse;
+		diffuse = woodDiffuse;
     	}
     }
     
