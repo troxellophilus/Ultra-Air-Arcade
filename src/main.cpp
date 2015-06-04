@@ -159,7 +159,7 @@ vector<unsigned int> terIndBuf;
 Object obj[NUMSHAPES];
 
 Collision collision = Collision();
-PlaneSound planeSound = PlaneSound("../Assets/sound/MediumPropPlane.wav");
+PlaneSound planeSound = PlaneSound("../Assets/sound/JetEngine.wav");
 PlaneSound backgroundMusic = PlaneSound("../Assets/sound/destiny-short.wav");
 PlaneSound collisionSound = PlaneSound("../Assets/sound/explosion-01.wav");
 
