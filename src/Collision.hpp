@@ -128,12 +128,27 @@ void Collision::update() {
         if (detectEntityCollision(player, &opp)) {
             if (opp.getPosition().x == opp.getPosition().x) {
                 if (opp.getPosition().y > player->getPosition().y) {
-                    //player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y - 0.001f, player->getPosition().z));
-                    player->pitch(20.f);
+                    player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y - 0.001f, player->getPosition().z));
+                    //player->pitch(20.f);
                 }
                 else {
-                    //player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y + 0.001f, player->getPosition().z));
-                    player->pitch(-20.f);
+                    player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y + 0.001f, player->getPosition().z));
+                    //player->pitch(-20.f);
+                }
+            }
+        }
+
+        for (Entity opp1 : *opponents) {
+            if (opp1.getPosition() != opp.getPosition()) {
+                if (detectEntityCollision(&opp, &opp1)) {
+                    if (opp.getPosition().y > opp1.getPosition().y) {
+                        opp.pitch(20.f);
+                        opp1.pitch(-20.f);
+                    }
+                    else {
+                        opp.pitch(-20.f);
+                        opp1.pitch(20.f);
+                    }
                 }
             }
         }
@@ -161,8 +176,8 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
 
     glm::vec3 playerPosition = player->getPosition();
     glm::vec3 objectPosition = object->getPosition();
-    float playerRadius = player->getRadius() - 0.03f;
-    float objectRadius = object->getRadius() - 0.03f;
+    float playerRadius = player->getRadius();
+    float objectRadius = object->getRadius();
 
     // Single operation
     // Spatial data structure for powerups and terrain objects
