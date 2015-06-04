@@ -159,7 +159,7 @@ vector<unsigned int> terIndBuf;
 Object obj[NUMSHAPES];
 
 Collision collision = Collision();
-PlaneSound planeSound = PlaneSound("../Assets/sound/MediumPropPlane.wav");
+PlaneSound planeSound = PlaneSound("../Assets/sound/JetEngine.wav");
 PlaneSound backgroundMusic = PlaneSound("../Assets/sound/destiny-short.wav");
 PlaneSound collisionSound = PlaneSound("../Assets/sound/explosion-01.wav");
 
@@ -488,7 +488,7 @@ void initShaderVars() {
    propM = glGetUniformLocation(propShaders, "M");
    propP = glGetUniformLocation(propShaders, "P");
    prop_light_position = glGetUniformLocation(propShaders, "lPos");
-   propTexture = glGetUniformLocation(propShaders, "texture");
+   propTexture = glGetUniformLocation(propShaders, "tex_un");
 
    aPos = glGetAttribLocation(passThroughShaders, "aPos");
    aNor = glGetAttribLocation(passThroughShaders, "aNor");
@@ -912,12 +912,11 @@ int main(int argc, char **argv) {
    // Ensure we can capture the escape key being pressed below
    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-   // Load 3D models
     loadShapes("../Assets/models/sphere.obj", obj[0]);
     loadShapes("../Assets/models/cube.obj", obj[1]);
     loadShapes("../Assets/models/Pyro.obj", obj[2]);
-    loadShapes("../Assets/models/Plane1.obj", obj[3]);
-    loadShapes("../Assets/models/sphere.obj", obj[4]);
+    loadShapes("../Assets/models/mig.obj", obj[3]);
+    loadShapes("../Assets/models/missile.obj", obj[4]);
     loadShapes("../Assets/models/Rock.obj", obj[5]);
     loadShapes("../Assets/models/stone1.obj", obj[6]);
     loadShapes("../Assets/models/stone2.obj", obj[7]);
@@ -1047,8 +1046,8 @@ int main(int argc, char **argv) {
          opp.setMaterial(Materials::stone);
       else if (odx % 5 == 3)
          opp.setMaterial(Materials::greenPlastic);
-		else if (odx % 5 == 4)
-			opp.setMaterial(Materials::red);
+	else if (odx % 5 == 4)
+		opp.setMaterial(Materials::red);
 
       opponents.push_back(opp);
       odx++;
