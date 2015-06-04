@@ -146,6 +146,8 @@ void Rules::setup(Camera *cam) {
 	printf("RACE BEGIN!\n5\n");
     }
 
+    start_count++;
+
     if (start_count == 30)
 	printf("4\n");
 
@@ -169,8 +171,6 @@ void Rules::setup(Camera *cam) {
 	state = RACE;
 	start_count = 0;
     }
-
-    start_count++;
 }
 
 void Rules::race(Camera *cam) {

@@ -98,6 +98,7 @@ public:
     void setPosition(glm::vec3);
     void setScale(glm::vec3);
     void setTargetRotationQ(glm::quat);
+    void setRotationQ(glm::quat);
     
     void setVelocity(glm::vec3);
     void setThrust(float a);
@@ -178,6 +179,7 @@ Entity::Entity(AIComponent *ai) {
 }
 
 void Entity::update() {
+	static float last_time = glfwGetTime();
     float dt = 1 / 60.f; // fixed time step
     float dot;
     glm::vec3 vn;
@@ -189,10 +191,10 @@ void Entity::update() {
     
     // Obtain the angle between the two quats, use this for proportional control of craft
     dot = glm::dot(rotation, target_rotation);
-    dot = glm::abs(dot) > 30.f ? 30.f : glm::abs(dot);
+    dot = glm::abs(dot) > 20.f ? 20.f : glm::abs(dot);
     
     // Control loop the rotation to the desired rotation
-    rotation = glm::shortMix(rotation, target_rotation, glm::abs(dot) / 30.f);
+    rotation = glm::shortMix(rotation, target_rotation, glm::abs(dot) / 20.f);
     
     // Update the position by moving velocity in direction
     position += (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0.0001f, 0);
@@ -349,6 +351,10 @@ void Entity::setScale(glm::vec3 sc) {
 
 void Entity::setTargetRotationQ(glm::quat r) {
     target_rotation = r;
+}
+
+void Entity::setRotationQ(glm::quat r) {
+	rotation = r;
 }
 
 void Entity::setVelocity(glm::vec3 vel) {
