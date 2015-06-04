@@ -86,8 +86,13 @@ void main(){
     
     if (vPos.y < 30) {
     	if (dotProduct > 0.6) {
-    		ambient = forestAmbient;
-			diffuse = forestDiffuse;
+    		if (vPos.y < 0.5) {
+				ambient = waterAmbient;
+				diffuse = waterDiffuse;
+			} else {
+				ambient = forestAmbient;
+				diffuse = forestDiffuse;
+			}
     	} else if (dotProduct > 0.25) {
     		ambient = sandAmbient;
 			diffuse = sandDiffuse;
