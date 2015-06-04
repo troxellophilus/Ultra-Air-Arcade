@@ -62,21 +62,21 @@ vec3 toonShade() {
 			}
     	} else if (dotProduct > 0.35) {
     		ambient = sandAmbient;
-		diffuse = sandDiffuse;
+			diffuse = sandDiffuse;
     	} else {
     		ambient = woodAmbient;
-		diffuse = woodDiffuse;
+			diffuse = woodDiffuse;
     	}
     } else {
     	if (dotProduct > 0.6) {
     		ambient = snowAmbient;
-		diffuse = snowDiffuse;
+			diffuse = snowDiffuse;
     	} else if (dotProduct > 0.25) {
     		ambient = rocksAmbient;
-		diffuse = rocksDiffuse;
+			diffuse = rocksDiffuse;
     	} else {
     		ambient = woodAmbient;
-		diffuse = woodDiffuse;
+			diffuse = woodDiffuse;
     	}
     }
     
@@ -88,8 +88,7 @@ vec3 toonShade() {
 		diffuse = UdColor * floor( cosine * levels ) * scaleFactor; 
 	}
 
-    if (dot(n, e) < 0.15)
-    {
+    if (dot(n, e) < 0.15) {
     	ambient = vec3(0.0f,0.0f,0.0f);
     	diffuse = vec3(0.0f,0.0f,0.0f);
     }
@@ -115,15 +114,14 @@ void main() {
         	else
         		outColor = vec4(0.0,0.0,0.0,0.0);
 	} 
-	else if(renderObj == 4)
-	{
+	else if(renderObj == 4)	{
 		vec3 n = normalize(silh_vNor);
-    		vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
+    	vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
-    		if (dot(n, e) < 0.2)
-        		outColor = vec4(0.0, 0.0, 0.0, 1.0);
-        	else
-        		outColor = vec4(forestDiffuse,1.0);
+		if (dot(n, e) < 0.2)
+    		outColor = vec4(0.0, 0.0, 0.0, 1.0);
+    	else
+    		outColor = vec4(forestDiffuse,1.0);
 	}
 	else {								// Catch-all
 			outColor = vec4(vCol, 1.0);
