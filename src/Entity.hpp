@@ -127,6 +127,8 @@ public:
 	void addAmmo(int);
 	int getAmmo();
 	void subtractAmmo(int);
+    
+    bool collisionFlag;
 };
 
 Entity::Entity() {
@@ -154,6 +156,8 @@ Entity::Entity() {
     radius = 0.f;
 
     ai_ = NULL;
+
+    collisionFlag = false;
 }
 
 Entity::Entity(AIComponent *ai) {
@@ -182,6 +186,8 @@ Entity::Entity(AIComponent *ai) {
     radius = 0.f;
 
     ai_ = ai;
+
+    collisionFlag = false;
 }
 
 void Entity::update() {

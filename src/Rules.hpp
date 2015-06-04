@@ -12,6 +12,7 @@
 #include "Entity.hpp"
 #include "Collision.hpp"
 #include "RacerAI.hpp"
+#include "PlaneSound.hpp"
 
 class Rules {
 public:
@@ -40,6 +41,8 @@ private:
     RacerAI *playerAI;
     vector<Entity> *agents; // Pointer to the vector of agents in main
     vector<RacerAI *> agentsAI;
+
+    PlaneSound countdown = PlaneSound("../Assets/sound/beep.wav");
 
     // state methods
     void splash(Camera *);
@@ -144,22 +147,29 @@ void Rules::setup(Camera *cam) {
 	cam->setMode(Camera::TPC);
 
 	printf("RACE BEGIN!\n5\n");
+    countdown.play();
     }
 
     if (start_count == 30)
 	printf("4\n");
 
-    if (start_count == 60)
+    if (start_count == 60) {
         printf("3\n");
+        countdown.play();
+    }   
 
     if (start_count == 90)
 	printf("2\n");
 
-    if (start_count == 120)
-	printf("1\n");
+    if (start_count == 120) {
+        printf("1\n");
+        countdown.play();
+    }
 
-    if (start_count == 150) {
+    if (start_count == 180) {
 	printf("GO!\n");
+        countdown.setPitch(2.f);
+        countdown.play();
 
 	playerAI->setState(RacerAI::RACE);
 	for (RacerAI *opp : agentsAI) {
