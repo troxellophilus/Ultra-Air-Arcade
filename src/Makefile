@@ -7,7 +7,7 @@ LIB_OSX= -framework OpenGL
 
 
 all:
-	$(CC) $(CFLAGS) *.cpp ext/*.cpp ext/*.cc $(LIB)
+	$(CC) $(CFLAGS) $(INC) *.cpp ext/*.cpp ext/*.cc $(LIB)
 
 
 osx:

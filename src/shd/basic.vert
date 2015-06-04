@@ -68,7 +68,7 @@ void main() {
 		silh_vPos = vec3(V * M * aPos);
 		vCol = I_c;
 		vNor = vec3(M * vec4(aNor, 0.0));
-		silh_vNor = vec3(V * M * vec4(aNor, 0.`));
+		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
 		gl_Position = P * V * M * aPos;
 	}
 }

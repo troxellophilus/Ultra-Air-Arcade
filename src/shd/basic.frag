@@ -128,7 +128,7 @@ vec3 toonShade() {
 
     //return ambient + diffuse;
 
-    return ambient + diffuse * max(NdotL, 0.0) * (k + specular * (1.0 - k));
+    return ambient + diffuse * max(NdotL, 0.0);// * (k + specular * (1.0 - k));
 }
 
 void main() {
