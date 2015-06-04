@@ -117,12 +117,12 @@ class Skybox {
 };
 
 Skybox::Skybox(GLuint prog) {
-	cubeMap = new CubeMapTexture("../Assets/models/hourglass_right.jpg",
-								"../Assets/models/hourglass_left.jpg",
-								"../Assets/models/hourglass_top.jpg",
-								"../Assets/models/hourglass_top.jpg",
-								"../Assets/models/hourglass_front.jpg",
-								"../Assets/models/hourglass_back.jpg",
+	cubeMap = new CubeMapTexture("../Assets/models/grand_canyon_right.jpg",
+								"../Assets/models/grand_canyon_left.jpg",
+								"../Assets/models/grand_canyon_top.jpg",
+								"../Assets/models/grand_canyon_top.jpg",
+								"../Assets/models/grand_canyon_front.jpg",
+								"../Assets/models/grand_canyon_back.jpg",
 								&textureObj);
 
 	program = prog;
