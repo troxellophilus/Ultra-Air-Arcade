@@ -91,6 +91,7 @@ public:
     // Getters
     int getLap();
     int getNextIdx();
+    int getPlace();
 
 private:
     int id;
@@ -258,6 +259,10 @@ int RacerAI::getLap() {
 
 int RacerAI::getNextIdx() {
     return next_idx;
+}
+
+int RacerAI::getPlace() {
+    return place;
 }
 
 // Setters

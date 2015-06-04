@@ -91,6 +91,9 @@ GLfloat4 DrawText::setFontColor(int c) {
         case 2: //transparent green
             color = GLfloat4(0, 1, 0, 0.5);
             break;
+         case 3: //blue
+            color = GLfloat4(0, 0, 1, 1);
+            break;
         default:
             break;
     }
