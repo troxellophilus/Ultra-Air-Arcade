@@ -147,6 +147,7 @@ void Rules::setup(Camera *cam) {
 	cam->setMode(Camera::TPC);
 
 	printf("RACE BEGIN!\n5\n");
+    countdown.setPitch(1.f);
     countdown.play();
     }
 

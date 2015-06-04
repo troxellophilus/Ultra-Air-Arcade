@@ -127,14 +127,8 @@ void Collision::update() {
     for (Entity opp : *opponents) {
         if (detectEntityCollision(player, &opp)) {
             if (opp.getPosition().x == opp.getPosition().x) {
-                if (opp.getPosition().y > player->getPosition().y) {
-                    player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y - 0.001f, player->getPosition().z));
-                    //player->pitch(20.f);
-                }
-                else {
-                    player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y + 0.001f, player->getPosition().z));
-                    //player->pitch(-20.f);
-                }
+                glm::vec3 vec_away_opp = glm::normalize(player->getPosition() - opp.getPosition());
+                player->setTargetRotationQ(glm::shortMix(player->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
             }
         }
 
@@ -142,12 +136,20 @@ void Collision::update() {
             if (opp1.getPosition() != opp.getPosition()) {
                 if (detectEntityCollision(&opp, &opp1)) {
                     if (opp.getPosition().y > opp1.getPosition().y) {
-                        opp.pitch(20.f);
-                        opp1.pitch(-20.f);
+                        // opp.pitch(20.f);
+                        // opp1.pitch(-20.f);
+                        glm::vec3 vec_away_opp = glm::normalize(opp.getPosition() - opp1.getPosition());
+                        opp.setTargetRotationQ(glm::shortMix(opp.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
+                        glm::vec3 vec_away_opp1 = glm::normalize(opp1.getPosition() - opp.getPosition());
+                        opp1.setTargetRotationQ(glm::shortMix(opp1.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp1), 0.8f));
                     }
                     else {
-                        opp.pitch(-20.f);
-                        opp1.pitch(20.f);
+                        // opp.pitch(-20.f);
+                        // opp1.pitch(20.f);
+                        glm::vec3 vec_away_opp = glm::normalize(opp.getPosition() - opp1.getPosition());
+                        opp.setTargetRotationQ(glm::shortMix(opp.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
+                        glm::vec3 vec_away_opp1 = glm::normalize(opp1.getPosition() - opp.getPosition());
+                        opp1.setTargetRotationQ(glm::shortMix(opp1.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp1), 0.8f));
                     }
                 }
             }
@@ -176,8 +178,8 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
 
     glm::vec3 playerPosition = player->getPosition();
     glm::vec3 objectPosition = object->getPosition();
-    float playerRadius = player->getRadius();
-    float objectRadius = object->getRadius();
+    float playerRadius = player->getRadius() - 0.06f;
+    float objectRadius = object->getRadius() - 0.06f;
 
     // Single operation
     // Spatial data structure for powerups and terrain objects

@@ -12,6 +12,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "Entity.hpp"
+#include "PlaneSound.hpp"
 
 #define TRACK_LOCS 52
 
@@ -105,6 +106,8 @@ private:
     int type;
     glm::vec3 start_loc;
     Entity *avoid_target;
+
+    PlaneSound bink = PlaneSound("../Assets/sound/Ding.wav");
 
     void splash(Entity *);
     void setup(Entity *);
@@ -206,6 +209,10 @@ void RacerAI::race(int frames, Entity *agent) {
     if (glm::distance(agent->getPosition(), target) < 8.f) {
         track_idx = next_idx;
         next_idx++;
+        if (type == PLAYER) {
+            bink.setVolume(50.f);
+            bink.play();
+        }
 
         if (next_idx > TRACK_LOCS - 1) {
             next_idx = 0;
