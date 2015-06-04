@@ -192,6 +192,8 @@ void RacerAI::setup(Entity *agent) {
     track_idx = 0;
     next_idx = 1;
     agent->setPosition(start_loc);
+    agent->setThrust(0);
+    agent->setVelocity(glm::vec3(0, 0, 0));
 }
 
 void RacerAI::race(int frames, Entity *agent) {

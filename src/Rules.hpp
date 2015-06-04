@@ -151,6 +151,8 @@ void Rules::setup(Camera *cam) {
     countdown.play();
     }
 
+    start_count++;
+
     if (start_count == 30)
 	printf("4\n");
 
@@ -180,8 +182,6 @@ void Rules::setup(Camera *cam) {
 	state = RACE;
 	start_count = 0;
     }
-
-    start_count++;
 }
 
 void Rules::race(Camera *cam) {
