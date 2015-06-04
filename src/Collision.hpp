@@ -27,7 +27,9 @@ private:
     vector<Entity> *opponents;
     PlaneSound *planeSound;
     int resetStep;
+    int enemyStep;
     glm::vec3 convertedNor;
+    PlaneSound *collisionSound;
     
 public:
     Collision();
@@ -35,6 +37,7 @@ public:
     virtual ~Collision();
     void setOpponents(vector<Entity> *opp);
     void setPlayerSound(PlaneSound *sound);
+    void setCollisionSound(PlaneSound *sound);
     void update();
     bool detectEntityCollision(Entity *player, Entity *object);
     bool detectTerrainCollision(Entity *object);
@@ -50,6 +53,7 @@ Collision::Collision() {
     player = NULL;
     opponents = NULL;
     resetStep = 0;
+    enemyStep = 0;
 }
 
 Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer) {
@@ -59,6 +63,7 @@ Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Enti
     player = playerPointer;
     opponents = opponentsPointer;
     resetStep = 0;
+    enemyStep = 0;
 }
 
 Collision::~Collision() { }
@@ -69,6 +74,10 @@ void Collision::setOpponents(vector<Entity> *opp) {
 
 void Collision::setPlayerSound(PlaneSound *sound) {
     planeSound = sound;
+}
+
+void Collision::setCollisionSound(PlaneSound *sound) {
+    collisionSound = sound;
 }
 
 void Collision::update() {
@@ -85,6 +94,7 @@ void Collision::update() {
         Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
         convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
         planeSound->changePitch(0);
+        collisionSound->play();
         // camera->setMode(Camera::CameraMode::FREE);
         // for (int i = 0; i < 100; i++)
         //     camera->move(Camera::CameraDirection::BACK);
@@ -99,13 +109,14 @@ void Collision::update() {
 
         if (resetStep % 20 == 0) {
             player->setMaterial(Materials::red);
+
         }
 
         else if (resetStep % 10 == 0) {
             player->setMaterial(Materials::stone);
         }
 
-        if (resetStep++ > 180) {
+        if (resetStep++ > 120) {
             player->collisionFlag = false;
             resetStep = 0;
             player->setMaterial(Materials::emerald);
@@ -117,10 +128,12 @@ void Collision::update() {
         if (detectEntityCollision(player, &opp)) {
             if (opp.getPosition().x == opp.getPosition().x) {
                 if (opp.getPosition().y > player->getPosition().y) {
-                    //player->pitch(40.f);
+                    //player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y - 0.001f, player->getPosition().z));
+                    player->pitch(20.f);
                 }
                 else {
-                    //player->pitch(-40.f);
+                    //player->setPosition(glm::vec3(player->getPosition().x, opp.getPosition().y + 0.001f, player->getPosition().z));
+                    player->pitch(-20.f);
                 }
             }
         }
@@ -132,7 +145,7 @@ void Collision::update() {
             Eigen::Vector3f convertedPos = Eigen::Vector3f(oppPos.x, oppPos.y, oppPos.z);
             Eigen::Vector3f normalVec = terrain->getNormal(convertedPos);
             glm::vec3 collisionNormal = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
-            opp.setPosition(oppPos + (convertedNor * 3.f));
+            opp.setPosition(oppPos + (collisionNormal * 2.f));
             opp.setThrust(0.f);
             opp.setVelocity(glm::vec3(0.f, 0.f, 0.f));
         }
@@ -148,8 +161,8 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
 
     glm::vec3 playerPosition = player->getPosition();
     glm::vec3 objectPosition = object->getPosition();
-    float playerRadius = player->getRadius();
-    float objectRadius = object->getRadius();
+    float playerRadius = player->getRadius() - 0.03f;
+    float objectRadius = object->getRadius() - 0.03f;
 
     // Single operation
     // Spatial data structure for powerups and terrain objects
