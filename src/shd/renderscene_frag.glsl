@@ -55,6 +55,10 @@ vec2 poissonFilter[16] = vec2[](
    vec2( 0.14383161, -0.14100790 ) 
 );
 
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(13,78))) * 4375);
+}
+
 void main(){
 
 	// Light emission properties
@@ -87,8 +91,10 @@ void main(){
     if (vPos.y < 40) {
     	if (dotProduct > 0.6) {
     		if (vPos.y < 0.5) {
+				float num = rand(vPos.xz);
 				ambient = waterAmbient;
-				diffuse = waterDiffuse;
+				if (num > 0.5) diffuse = waterDiffuse * num;
+				else diffuse = waterDiffuse;
 			} else {
 				ambient = forestAmbient;
 				diffuse = forestDiffuse;

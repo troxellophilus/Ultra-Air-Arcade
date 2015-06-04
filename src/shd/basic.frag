@@ -38,6 +38,10 @@ vec3 woodAmbient = vec3(0.6, 0.41, 0.29);
 vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
 vec3 waterAmbient = vec3(0.0, 0.05, 0.07) * waterDiffuse;
 
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(13,78))) * 4375);
+}
+
 vec3 toonShade() {
     vec3 n = normalize(silh_vNor);
     vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
@@ -58,8 +62,10 @@ vec3 toonShade() {
     if (vPos.y < 40) {
     	if (dotProduct > 0.6) {
 			if (vPos.y < 0.5) {
+				float num = rand(vPos.xz);
 				ambient = waterAmbient;
-				diffuse = waterDiffuse;
+				if (num > 0.5) diffuse = waterDiffuse * num;
+				else diffuse = waterDiffuse;
 			} else {
 				ambient = forestAmbient;
 				diffuse = forestDiffuse;
