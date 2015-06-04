@@ -210,7 +210,8 @@ void Entity::update() {
     rotation = glm::shortMix(rotation, target_rotation, glm::abs(dot) / 20.f);
     
     // Update the position by moving velocity in direction
-    position += (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0.0001f, 0);
+	glm::vec3 tempPos = (position.y >= 0.f) ? rotation * velocity * dt : glm::vec3(0, 0.0001f, 0);
+	if (tempPos.y + position.y <= 45) position += tempPos;
     vn = glm::vec3(0, 0, 1);
     fd = -0.5f * glm::vec3(0, 0, -1) * 1.293f * drag * carea * velocity * velocity;
     force = thrust * vn * mass;
