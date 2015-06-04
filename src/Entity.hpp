@@ -65,6 +65,9 @@ private:
 
     // Bounding sphere radius
     float radius;
+
+	// Game state properties
+	int ammunition;
     
 public:
     // Constructor
@@ -120,12 +123,13 @@ public:
     void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *);
 
     void calculateBoundingSphereRadius();
+	void addAmmo(int);
+	int getAmmo();
+	void subtractAmmo(int);
 };
 
 Entity::Entity() {
     object = NULL;
-	// Zach - removed Material:: from the call to the Material constructor - 
-	// Would not allow my version to compile
     material = Material();
     
     position = glm::vec3(0, 0, 0);
@@ -138,6 +142,7 @@ Entity::Entity() {
     force = glm::vec3(0, 0, 0);
     drag = 1.5f; // sphere for now
     carea = 25.f;
+	ammunition = 0;
     
     thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
@@ -165,6 +170,7 @@ Entity::Entity(AIComponent *ai) {
     force = glm::vec3(0, 0, 0);
     drag = 1.5f; // sphere for now
     carea = 25.f;
+	ammunition = 0;
     
     thrust = 0.f;
     velocity = glm::vec3(0, 0, 0);
@@ -416,6 +422,19 @@ void Entity::calculateBoundingSphereRadius() {
     // printf("Scaled Radius: %.4f\n", calculatedRadius * scale.x);
 
     radius = calculatedRadius * scale.x;
+}
+
+void Entity::addAmmo(int amount) {
+	ammunition += amount;
+}
+
+int Entity::getAmmo() {
+	return ammunition;
+}
+
+void Entity::subtractAmmo(int amount) {
+	if (ammunition - amount < 0) ammunition = 0;
+	else ammunition -= amount;
 }
 
 #endif
