@@ -67,20 +67,23 @@ using namespace std;
 
 enum { PLANE, MISSILE, CHECKPOINT, TERRAIN, ROCK, STONE1, STONE2, STONE3, STONE4, STONE5, TREE, NUM_VBO };
 
-// Program IDsterrain
+//Shader IDs
 GLuint passThroughShaders;
 GLuint depthCalcShaders;
 GLuint renderSceneShaders;
 GLuint skyBoxShaders;
 GLuint textShaders;
+GLuint propShaders;
 
 GLFWwindow* window;
 
+//Various data buffers
 GLuint vao;
 GLuint pbo[NUM_VBO];
 GLuint nbo[NUM_VBO];
 GLuint ibo[NUM_VBO];
 
+//common glsl variable ids
 GLint aPos = 0;
 GLint aNor = 0;
 GLint lPos = 0;
@@ -522,11 +525,9 @@ void SetMaterial(Material mat) {
    glUniform1f(h_uMatShine, shn);
 }
 
-void drawVBO(Entity *entity, int nIndices, int whichbo) {
-   glUseProgram(passThroughShaders);
-
-   // Enable and bind position array for drawing
-   glEnableVertexAttribArray(aPos);
+void drawPassthrough(Entity* entity, int nIndices, int whichbo)
+{
+    glEnableVertexAttribArray(aPos);
    glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
    glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -559,8 +560,14 @@ void drawVBO(Entity *entity, int nIndices, int whichbo) {
    GLSL::disableVertexAttribArray(aNor);
    glBindBuffer(GL_ARRAY_BUFFER, 0);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
 
-   // Last lines
+void drawVBO(Entity *entity, int nIndices, int whichbo, GLuint shader = passThroughShaders) {
+   glUseProgram(shader);
+
+   if(shader == passThroughShaders)
+      drawPassthrough(entity, nIndices, whichbo);
+
    glUseProgram(0);
    assert(glGetError() == GL_NO_ERROR);
 }
@@ -702,6 +709,7 @@ void drawHUD(int fps, float pitch) {
 int main(int argc, char **argv) {
    const GLubyte* renderer;
    const GLubyte* version;
+   int indices[7];
 
    srand(time(NULL));
 
@@ -751,12 +759,21 @@ int main(int argc, char **argv) {
    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
    // Load 3D models
-   loadShapes("../Assets/models/sphere.obj", obj[0]);
-   loadShapes("../Assets/models/cube.obj", obj[1]);
-   loadShapes("../Assets/models/Pyro.obj", obj[2]);
-   loadShapes("../Assets/models/Plane1.obj", obj[3]);
-   loadShapes("../Assets/models/missile.obj", obj[4]);
-   std::cout << " loaded the objects " << endl;
+    loadShapes("../Assets/models/sphere.obj", obj[0]);
+    loadShapes("../Assets/models/cube.obj", obj[1]);
+    loadShapes("../Assets/models/Pyro.obj", obj[2]);
+    loadShapes("../Assets/models/Plane1.obj", obj[3]);
+    loadShapes("../Assets/models/missile.obj", obj[4]);
+    loadShapes("../Assets/models/Rock.obj", obj[5]);
+    loadShapes("../Assets/models/stone1.obj", obj[6]);
+    loadShapes("../Assets/models/stone2.obj", obj[7]);
+    loadShapes("../Assets/models/stone3.obj", obj[8]);
+    loadShapes("../Assets/models/stone4.obj", obj[9]);
+    loadShapes("../Assets/models/stone5.obj", obj[10]);
+    loadShapes("../Assets/models/tree.obj", obj[11]);
+    std::cout << " loaded the objects " << endl;
+
+
 
    // Initialize GLEW
    glewExperimental = GL_TRUE;
@@ -783,6 +800,7 @@ int main(int argc, char **argv) {
    passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
    skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
    textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
+   propShaders = installShaders("shd/propShader.vert", "shd/propShader.frag");
 
    initShaderVars();
    skybox = new Skybox(skyBoxShaders);
@@ -796,6 +814,15 @@ int main(int argc, char **argv) {
    initBillboard();
    initGround();
    assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
+
+   for(int i = 0; i < 7; i++){
+        Entity dumb;
+        dumb.setObject(&obj[i+5]);
+        indices[i] = initVBO(&dumb, ROCK + i);
+    }
+
+    std::vector<int> typeProp;
+    std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
 
    // Initialize player
    playerAI.setType(RacerAI::PLAYER);
@@ -893,6 +920,7 @@ int main(int argc, char **argv) {
 
    //Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
    bool color = false;
+
    // Frame loop
    while (!glfwWindowShouldClose(window)) {
       float ratio;
@@ -966,12 +994,19 @@ int main(int argc, char **argv) {
          //checkOpponentCollisions(opponent);
          assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       }
-      // std::cout << "Planes Drawn: " << i << " Total Planes: " << t << std::endl;
 
 
+      //update scenery
+       for(int i = 0; i < props.size(); i++){
+          //cout << indices[typeProp[i]] << endl;
+          drawVBO(&props[i], indices[typeProp[i]], ROCK + typeProp[i]);
+       }
+
+      //update skybox 
       skybox->render(view, projection, camera.getPosition());
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
+      //update checkpoints
       for (auto &checkpoint : checkpoints) {
          if (viewFrustum.sphereInFrustum(checkpoint.getPosition(), checkpoint.getRadius())) {
             drawVBO(&checkpoint, cIndices, CHECKPOINT);
@@ -982,12 +1017,7 @@ int main(int argc, char **argv) {
       camera.update();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      //pathPlane.runProjectile(elapsed, bigOpp.getPosition(), bigOpp.getPosition());
-
-      //Entity *check = pathPlane.getEntity();
-
-      //drawVBO(check, pIndices, PLANE);
-
+      //projectilw handling
       if (beginProjectile == true) {
          //cout << "MISSILE TIME: " << missleTime << endl;
          //cout << "ELAPSED: " << elapsed << endl;
