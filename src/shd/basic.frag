@@ -33,7 +33,7 @@ vec3 snowDiffuse = vec3(0.5, 0.5, 0.5);
 vec3 snowAmbient = vec3(0.05, 0.05, 0.05) * snowDiffuse;
 
 vec3 woodDiffuse = vec3(0.3, 0.2, 0.05);
-vec3 woodAmbient = vec3(0.6, 0.41, 0.29);// * woodDiffuse;
+vec3 woodAmbient = vec3(0.6, 0.41, 0.29);
 
 vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
 vec3 waterAmbient = vec3(0.0, 0.05, 0.07) * waterDiffuse;
@@ -42,14 +42,18 @@ vec3 toonShade() {
     vec3 n = normalize(silh_vNor);
     vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
-    if (dot(n, e) < 0.15)
-        return vec3(0.0, 0.0, 0.0);
+    if (dot(n, e) < 0.15) return vec3(0.0, 0.0, 0.0);
 
     vec3 lightVector = normalize(lPos.xyz - vPos);
     vec3 ambient;
     vec3 diffuse;
     float cosine = dot(lightVector, vNor);
     float dotProduct = dot(normalize(vNor), vec3(0, 1, 0));
+
+	if (renderObj == 1) { // Rendering for airplanes
+		float cosine = dot(lightVector, vNor);
+		return UaColor + UdColor * floor( cosine * levels ) * scaleFactor; 
+	}
 
     if (vPos.y < 40) {
     	if (dotProduct > 0.6) {
@@ -81,17 +85,6 @@ vec3 toonShade() {
     }
     
     diffuse *= floor( cosine * levels ) * scaleFactor;
-    
-	if (renderObj == 1) { // Rendering for airplanes
-		ambient = UaColor;
-		float cosine = dot(lightVector, vNor);
-		diffuse = UdColor * floor( cosine * levels ) * scaleFactor; 
-	}
-
-    if (dot(n, e) < 0.15) {
-    	ambient = vec3(0.0f,0.0f,0.0f);
-    	diffuse = vec3(0.0f,0.0f,0.0f);
-    }
 
     return ambient + diffuse;
 }
