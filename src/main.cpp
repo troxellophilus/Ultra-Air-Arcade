@@ -12,7 +12,7 @@
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
-#define CELL 64
+#define CELL 32
 
 #define SHADOWS_OFF '1'
 #define SHADOW_ON '2'
@@ -284,10 +284,28 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
          if (action == GLFW_PRESS && key == GLFW_KEY_X && player.hasPowerUp()) {
             if (!beginProjectile) {
-               beginProjectile = true;
-               missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[closestOpponent].getPosition());
-               missleTime = elapsed;
-               //cout << "MISSILE TIME: " << missleTime << endl;
+               int i = 0;
+               int minDist = INT_MAX;
+               for (auto &opponent : opponents) {
+                  opponent.update();
+                  glm::vec3 playerPos = player.getPosition();
+                  glm::vec3 opponentPos = opponent.getPosition();      
+
+                  float distance = sqrt(((playerPos[0] - opponentPos[0]) * (playerPos[0] - opponentPos[0])) +
+                   ((playerPos[1] - opponentPos[1]) * (playerPos[1] - opponentPos[1])) +
+                   ((playerPos[2] - opponentPos[2]) * (playerPos[2] - opponentPos[2]))
+                   ); 
+                   
+                   if(distance < minDist){
+                      minDist = distance;
+                      closestOpponent = i;
+                   }  
+                   i++;
+                }
+                beginProjectile = true;
+                missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[closestOpponent].getPosition());
+                missleTime = elapsed;
+                //cout << "MISSILE TIME: " << missleTime << endl;
                //cout << "New Projectile" << endl;
             }
          }
@@ -464,6 +482,7 @@ void initShaderVars() {
     // Set up the shader variables
    pPos = glGetAttribLocation(propShaders, "prop_position");
    pNor = glGetAttribLocation(propShaders, "prop_normal");
+   tbo_tex = glGetAttribLocation(propShaders, "vertTex")
 
    propV = glGetUniformLocation(propShaders, "V");
    propM = glGetUniformLocation(propShaders, "M");
@@ -1192,7 +1211,7 @@ int main(int argc, char **argv) {
       for (auto &opponent : opponents) {
          t++;
          opponent.update();
-         glm::vec3 playerPos = player.getPosition();
+         /*glm::vec3 playerPos = player.getPosition();
          glm::vec3 opponentPos = opponent.getPosition();      
 
          float distance = sqrt(((playerPos[0] - opponentPos[0]) * (playerPos[0] - opponentPos[0])) +
@@ -1202,7 +1221,7 @@ int main(int argc, char **argv) {
          if(distance < minDist){
              minDist = distance;
              closestOpponent = i; 
-         }
+         }*/
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
 	    //opp_props[i].setRotationQ(opponent.getRotationQ());

@@ -1,12 +1,12 @@
 #version 330
 
 uniform vec3 lPos;
-uniform sampler2D texture;
+uniform sampler3D texture;
 
 in vec3 vCol;
 in vec3 vNor;
 in vec3 vPos;
-in vec2 fragTex;
+in vec3 fragTex;
 
 out vec4 outColor;
 
@@ -16,7 +16,7 @@ void main()
 	vec3 light_direction = normalize(lPos - vPos);
 	float intensity = (1000 * dist) / (dist * dist + dist + 1);
 
-	vec3 tex = texture2D(texture, fragTex.st).rgb;
+	//vec3 tex = texture(texture, fragTex).rgb;
 	outColor = vec4(vCol * max(dot(vNor,light_direction) , 0.0), 1.0f);
 }
 
