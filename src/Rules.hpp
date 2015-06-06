@@ -185,11 +185,14 @@ void Rules::setup(Camera *cam) {
 }
 
 void Rules::race(Camera *cam) {
-    // Run a countdown before allowing the racers to control
-    playerAI->setState(RacerAI::RACE);
-    for (RacerAI *opp : agentsAI) {
-        opp->setState(RacerAI::RACE);
-    }
+	static int frames = 0;
+
+	if (frames == 0) {
+    		playerAI->setState(RacerAI::RACE);
+    		for (RacerAI *opp : agentsAI) {
+        		opp->setState(RacerAI::RACE);
+    		}
+	}
 
     // Keep track of racer positions
 
@@ -197,7 +200,9 @@ void Rules::race(Camera *cam) {
     for (Entity opp1 : *agents) {
         for (Entity opp2 : *agents) {
             float d = glm::distance(opp1.getPosition(), opp2.getPosition());
-            if (d < 1.f && d > 0.00001f) {
+            if (d < 1.f && d > 0.00001f &&
+			    ((RacerAI *)opp1.getAI())->getState() != RacerAI::BOUNCE &&
+			    ((RacerAI *)opp2.getAI())->getState() != RacerAI::BOUNCE) {
 		((RacerAI *)opp1.getAI())->setAvoidTarget(&opp2);
 		((RacerAI *)opp1.getAI())->setState(RacerAI::AVOID);
 		((RacerAI *)opp2.getAI())->setAvoidTarget(&opp1);

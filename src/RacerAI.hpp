@@ -74,7 +74,7 @@ glm::vec3(170.056442, 13.324112, 222.544495),
 
 class RacerAI : public AIComponent {
 public:
-    enum AIState { SPLASH, SETUP, RACE, AVOID, RECOVER, FINISH };
+    enum AIState { SPLASH, SETUP, RACE, AVOID, BOUNCE, RECOVER, FINISH };
     enum AIType { PLAYER, OPPONENT, PROP };
 
     // Constructors
@@ -87,11 +87,13 @@ public:
     void setState(AIState s);
     void setType(AIType t);
     void setAvoidTarget(Entity *);
+    void setBounceTarget(Entity *);
     void setPlace(int p);
 
     // Getters
     int getLap();
     int getNextIdx();
+    int getState();
 
 private:
     int id;
@@ -106,6 +108,7 @@ private:
     int type;
     glm::vec3 start_loc;
     Entity *avoid_target;
+    Entity *bounce_target;
 
     PlaneSound bink = PlaneSound("../Assets/sound/Ding.wav");
 
@@ -113,6 +116,7 @@ private:
     void setup(Entity *);
     void race(int, Entity *);
     void avoid(Entity *);
+    void bounce(Entity *);
     void recover(Entity *);
     void finish(Entity *);
 };
@@ -132,7 +136,7 @@ RacerAI::RacerAI() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::normal_distribution<> noise(0,1.0);
+    std::normal_distribution<> noise(0,2.0);
     float x = noise(gen);
     float y = noise(gen);
     float z = noise(gen);
@@ -168,6 +172,9 @@ void RacerAI::update(void *e) {
 	case AVOID:
 	    avoid(agent);
 	    break;
+	case BOUNCE:
+	    bounce(agent);
+		break;
 	case RECOVER:
 	    recover(agent);
 	    break;
@@ -183,7 +190,12 @@ void RacerAI::update(void *e) {
 }
 
 void RacerAI::splash(Entity *agent) {
-
+	// give player default track positions
+	if (type == PLAYER) {
+		start_loc = global_track[TRACK_LOCS - 1];
+    		for (int i = 0; i < TRACK_LOCS; i++)
+			track[i] = global_track[i];
+	}
 }
 
 void RacerAI::setup(Entity *agent) {
@@ -199,12 +211,6 @@ void RacerAI::setup(Entity *agent) {
 void RacerAI::race(int frames, Entity *agent) {
     static glm::vec3 target = track[track_idx];
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::normal_distribution<> noise(0,1.0);
-    //float x = noise(gen);
-    //float y = noise(gen);
-    //float z = noise(gen);
     target = track[track_idx];// + glm::vec3(x, y, z);
 
     // Update track targets
@@ -230,17 +236,14 @@ void RacerAI::race(int frames, Entity *agent) {
         agent->setTargetRotationQ(q);
     }
 
-	if (type == PLAYER && frames % 15 == 0) {
+	if (type == PLAYER && frames % 50 == 0) {
 		printf("Player place: %d\n", place);
 		printf("Player lap: %d\n", lap);
 	}
 }
 
 void RacerAI::avoid(Entity *agent) {
-    if (agent->getThrust() > -0.7f && rand() % 10 > 5)
-        agent->throttleDown();
-    else
-	agent->throttleUp();
+    agent->throttleDown();
 
     glm::vec3 vec_away_opp = glm::normalize(agent->getPosition() - avoid_target->getPosition());
 
@@ -250,9 +253,24 @@ void RacerAI::avoid(Entity *agent) {
 	state = RACE;
 }
 
+void RacerAI::bounce(Entity *agent) {
+	static int count = 0;
+
+	glm::vec3 vec_away_agent = glm::normalize(agent->getPosition() - bounce_target->getPosition());
+	agent->setTargetRotationQ(glm::shortMix(agent->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_agent), 0.8f));
+
+	count++;
+
+	if (count > 70) {
+		count = 0;
+		state = RACE;
+	}
+}
+
 void RacerAI::recover(Entity *agent) {
     // Set agent to last checkpoint
     agent->setPosition(track[track_idx - 1]);
+    agent->setVelocity(glm::vec3(0, 0, -3.f));
     state = RACE;
 }
 
@@ -269,6 +287,10 @@ int RacerAI::getNextIdx() {
     return next_idx;
 }
 
+int RacerAI::getState() {
+	return state;
+}
+
 // Setters
 void RacerAI::setState(AIState s) {
     state = s;
@@ -280,6 +302,10 @@ void RacerAI::setType(AIType t) {
 
 void RacerAI::setAvoidTarget(Entity *e) {
     avoid_target = e;
+}
+
+void RacerAI::setBounceTarget(Entity *e) {
+	bounce_target = e;
 }
 
 void RacerAI::setPlace(int p) {

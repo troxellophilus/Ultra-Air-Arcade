@@ -48,20 +48,7 @@
 #include <cmath>
 
 //#define _DEBUG
-
-#include <string>
-#include <iostream>
-#include <vector>
-#include <cmath>
-
-//#define _DEBUG
-
-#include <string>
-#include <iostream>
-#include <vector>
-#include <cmath>
-
-//#define _DEBUG
+#define NUM_PLAYER_MATS 5
 
 #define GLDEBUG assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -198,6 +185,14 @@ Entity projectileEntity = Entity();
 float start;
 float elapsed;
 
+Material p_mat_list[NUM_PLAYER_MATS] = {
+	Materials::brass,
+	Materials::turquoise,
+	Materials::pink,
+	Materials::emerald,
+	Materials::jade
+};
+
 float randNum() {
    return ((float) rand() / (RAND_MAX)) * 600.0;
 }
@@ -211,6 +206,7 @@ int initVBO(Entity *e, int i, bool textures);
 
 // EVENT CALLBACKS
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	static int mat_idx = 0;
    // Check escape key
    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, GL_TRUE);
@@ -222,7 +218,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
          rules.setState(Rules::CSEL);
       }
       else if (action == GLFW_PRESS && rules.getState() == Rules::CSEL) {
-         rules.setState(Rules::SETUP);
+		if (key == GLFW_KEY_RIGHT)
+			mat_idx++;
+		else if (key == GLFW_KEY_LEFT)
+			mat_idx--;
+		else
+			rules.setState(Rules::SETUP);
+
+		if (mat_idx < 0)
+			mat_idx = NUM_PLAYER_MATS - 1;
+		if (mat_idx == NUM_PLAYER_MATS)
+			mat_idx = 0;
+
+		player.setMaterial(p_mat_list[mat_idx]);
       }
       else if (action == GLFW_PRESS && rules.getState() == Rules::FINISH) {
          rules.setState(Rules::LEADERBOARD);
@@ -856,8 +864,8 @@ int main(int argc, char **argv) {
    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-   g_width = 640;
-   g_height = 480;
+   g_width = 1024;
+   g_height = 768;
 
    // Open a window and create its OpenGL context
    window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
@@ -925,21 +933,24 @@ int main(int argc, char **argv) {
    drawText = new DrawText(textShaders);
    drawText->initResources(g_width, g_height);
 
-
    initCollisions();
    initBillboard();
    initGround();
    assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
+   /*
    for(int i = 0; i < 7; i++){
         Entity dumb;
         dumb.setObject(&obj[i+5]);
         indices[i] = initVBO(&dumb, ROCK + i, true);
         GLDEBUG
     }
+    */
 
+   /*
     std::vector<int> typeProp;
     std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
+    */
 
    // Initialize player
    playerAI.setType(RacerAI::PLAYER);
@@ -950,15 +961,6 @@ int main(int argc, char **argv) {
    player.setMaterial(Materials::emerald);
    player.calculateBoundingSphereRadius();
    pIndices = initVBO(&player, PLANE);
-
-   /*
-   Entity player_prop = Entity();
-   player_prop.setType(PROP_ENTITY);
-   player_prop.setObject(&obj[5]);
-   player_prop.setScale(glm::vec3(0.15, 0.15, 0.15));
-   player_prop.setMaterial(Materials::obsidian);
-   int propIndices = initVBO(&player_prop, PLANE_PROP);
-   */
 
    // Initialize camera
    camera.setMode(Camera::TPC);
@@ -990,27 +992,10 @@ int main(int argc, char **argv) {
       //opp.setPosition(glm::vec3(epos.x + odx * 0.7f, epos.y, epos.z + odx * 0.4f));
       opp.setScale(glm::vec3(0.25, 0.25, 0.25));
       opp.calculateBoundingSphereRadius();
-      if (odx % 5 == 0)
-         opp.setMaterial(Materials::emerald);
-      else if (odx % 5 == 1)
-         opp.setMaterial(Materials::jade);
-      else if (odx % 5 == 2)
-         opp.setMaterial(Materials::stone);
-      else if (odx % 5 == 3)
-         opp.setMaterial(Materials::greenPlastic);
-	else if (odx % 5 == 4)
-		opp.setMaterial(Materials::red);
+      opp.setMaterial(p_mat_list[odx % NUM_PLAYER_MATS]);
 
       opponents.push_back(opp);
       odx++;
-	/*
-      prop = Entity();
-      prop.setType(PROP_ENTITY);
-      prop.setObject(&obj[5]);
-      prop.setScale(glm::vec3(0.25, 0.25, 0.25));
-      prop.setMaterial(Materials::obsidian);
-      opp_props.push_back(prop);
-      */
    }
 
    // Initialize collisions
@@ -1021,13 +1006,6 @@ int main(int argc, char **argv) {
    rules.setPlayer(&player);
 
    RacerAI *propAI = new RacerAI();
-   //Entity bigOpp = Entity(propAI);
-   //bigOpp.setType(PROP_ENTITY);
-   /*bigOpp.setObject(&obj[3]);
-   bigOpp.setPosition(player.getPosition() + odx * 5.f);
-   bigOpp.setMaterial(Materials::jade);
-   bigOpp.setScale(glm::vec3(20.0,20.0,20.0));
-   bigOpp.calculateBoundingSphereRadius();*/
 
    // Initialize Props
    vector<Entity> checkpoints;
@@ -1105,11 +1083,6 @@ int main(int argc, char **argv) {
       player.update();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
-      //rol *= glm::angleAxis(-0.75f, glm::vec3(0, 0, 1));
-      //player_prop.setPosition(player.getPosition() + 0.27f * player.getDirection());
-      //player_prop.setTargetRotationQ(player.getRotationQ() * rol);
-      //player_prop.update();
-      //drawVBO(&player_prop, propIndices, PLANE_PROP);
       //checkPlayerCollisions();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -1146,22 +1119,19 @@ int main(int argc, char **argv) {
          opponent.update();
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
-	    //opp_props[i].setRotationQ(opponent.getRotationQ());
-	    //opp_props[i].setPosition(opponent.getPosition());
-	    //opp_props[i].rollRight();
-	    //drawVBO(&opp_props[i], propIndices, PLANE_PROP);
             i++;
          }
          //checkOpponentCollisions(opponent);
          assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       }
 
-
+	/*
       //update scenery
        for(int i = 0; i < props.size(); i++){
           //cout << indices[typeProp[i]] << endl;
           drawVBO(&props[i], indices[typeProp[i]], ROCK + typeProp[i], propShaders);
        }
+       */
 
       //update skybox 
       skybox->render(view, projection, camera.getPosition());
@@ -1178,6 +1148,7 @@ int main(int argc, char **argv) {
       camera.update();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
+      /*
       //projectilw handling
       if (beginProjectile == true) {
          //cout << "MISSILE TIME: " << missleTime << endl;
@@ -1210,6 +1181,7 @@ int main(int argc, char **argv) {
             delete missle;
          }
       }
+      */
 
       //Draw HUD
       drawHUD(fps, pitch);

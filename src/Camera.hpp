@@ -76,8 +76,8 @@ Camera::Camera() {
     mode = TPC;
     
     // Initialize viewport
-    window_width = 640;
-    window_height = 480;
+    window_width = 1024;
+    window_height = 768;
     viewport_x = 0;
     viewport_y = 0;
     

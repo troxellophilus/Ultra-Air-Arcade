@@ -116,10 +116,12 @@ void Collision::update() {
             player->setMaterial(Materials::stone);
         }
 
-        if (resetStep++ > 120) {
+        if (resetStep++ > 30) {
             player->collisionFlag = false;
             resetStep = 0;
             player->setMaterial(Materials::emerald);
+	    player->setThrust(-1.f);
+	    player->setVelocity(glm::vec3(0.f, 0.f, -10.f));
             // camera->setMode(Camera::CameraMode::TPC);
         }
     }
@@ -128,29 +130,21 @@ void Collision::update() {
         if (detectEntityCollision(player, &opp)) {
             if (opp.getPosition().x == opp.getPosition().x) {
                 glm::vec3 vec_away_opp = glm::normalize(player->getPosition() - opp.getPosition());
-                player->setTargetRotationQ(glm::shortMix(player->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
+                player->setTargetRotationQ(glm::shortMix(player->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.2f));
+		((RacerAI *)opp.getAI())->setBounceTarget(player);
+		((RacerAI *)opp.getAI())->setState(RacerAI::BOUNCE);
             }
         }
 
         for (Entity opp1 : *opponents) {
             if (opp1.getPosition() != opp.getPosition()) {
                 if (detectEntityCollision(&opp, &opp1)) {
-                    if (opp.getPosition().y > opp1.getPosition().y) {
                         // opp.pitch(20.f);
                         // opp1.pitch(-20.f);
-                        glm::vec3 vec_away_opp = glm::normalize(opp.getPosition() - opp1.getPosition());
-                        opp.setTargetRotationQ(glm::shortMix(opp.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
-                        glm::vec3 vec_away_opp1 = glm::normalize(opp1.getPosition() - opp.getPosition());
-                        opp1.setTargetRotationQ(glm::shortMix(opp1.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp1), 0.8f));
-                    }
-                    else {
-                        // opp.pitch(-20.f);
-                        // opp1.pitch(20.f);
-                        glm::vec3 vec_away_opp = glm::normalize(opp.getPosition() - opp1.getPosition());
-                        opp.setTargetRotationQ(glm::shortMix(opp.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
-                        glm::vec3 vec_away_opp1 = glm::normalize(opp1.getPosition() - opp.getPosition());
-                        opp1.setTargetRotationQ(glm::shortMix(opp1.getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp1), 0.8f));
-                    }
+			((RacerAI *)opp.getAI())->setBounceTarget(&opp1);
+			((RacerAI *)opp.getAI())->setState(RacerAI::BOUNCE);
+			((RacerAI *)opp1.getAI())->setBounceTarget(&opp);
+			((RacerAI *)opp1.getAI())->setState(RacerAI::BOUNCE);
                 }
             }
         }
