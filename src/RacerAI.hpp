@@ -72,6 +72,32 @@ glm::vec3(172.338562, 9.600041, 242.724686),
 glm::vec3(170.056442, 13.324112, 222.544495),
 };
 
+class Plane3D {
+	public:
+		float A;
+		float B;
+		float C;
+		float D;
+
+		Plane3D() {
+
+		}
+
+		Plane3D(glm::vec3 p, glm::vec3 n) {
+			glm::vec3 norm = glm::normalize(n);
+			A = norm.x;
+			B = norm.y;
+			C = norm.z;
+			D = -1 * glm::dot(p, norm);
+		}
+
+		float dist(glm::vec3 p);
+};
+
+float Plane3D::dist(glm::vec3 p) {
+	return (A * p.x + B * p.y + C * p.z + D);
+}
+
 class RacerAI : public AIComponent {
 public:
     enum AIState { SPLASH, SETUP, RACE, AVOID, BOUNCE, RECOVER, FINISH };
@@ -94,6 +120,8 @@ public:
     int getLap();
     int getNextIdx();
     int getState();
+    int getTrackIdx();
+    int getPlace();
 
 private:
     int id;
@@ -103,6 +131,7 @@ private:
     int lap;
     int place;
     int track_idx;
+    Plane3D track_idx_plane;
     int next_idx;
     int state;
     int type;
@@ -136,7 +165,7 @@ RacerAI::RacerAI() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::normal_distribution<> noise(0,2.0);
+    std::normal_distribution<> noise(0,1.0);
     float x = noise(gen);
     float y = noise(gen);
     float z = noise(gen);
@@ -153,11 +182,6 @@ void RacerAI::update(void *e) {
     static unsigned int frames = 0;
 
     Entity *agent = (Entity *)e;
-
-    //if (frames % 30) {
-	//printf("AI Type: %d\n", type);
-        //printf("AI State: %d\n", state);
-    //}
 
     switch (state) {
 	case SPLASH:
@@ -206,17 +230,41 @@ void RacerAI::setup(Entity *agent) {
     agent->setPosition(start_loc);
     agent->setThrust(0);
     agent->setVelocity(glm::vec3(0, 0, 0));
+
+	track_idx_plane = Plane3D(global_track[track_idx], global_track[track_idx] - global_track[TRACK_LOCS - 1]);
 }
 
 void RacerAI::race(int frames, Entity *agent) {
     static glm::vec3 target = track[track_idx];
+    static int boost_count = 0;
+    static int boost_lasts = 50;
 
     target = track[track_idx];// + glm::vec3(x, y, z);
 
+    // update max thrust for hit rings
+	if (glm::distance(agent->getPosition(), global_track[track_idx]) < 2.f) {
+		agent->setMaxThrust(-2.0f);
+		boost_count++;
+		boost_lasts += 50;
+	}
+
+	if (boost_count > 0) {
+		boost_count++;
+		if (boost_count > boost_lasts) {
+			boost_count = 0;
+			boost_lasts = 50;
+			agent->setMaxThrust(-1.f);
+			agent->setThrust(-1.f);
+		}
+	}
+
     // Update track targets
-    if (glm::distance(agent->getPosition(), target) < 8.f) {
+    if (glm::abs(track_idx_plane.dist(agent->getPosition())) < 1.f) {
+    	track_idx_plane = Plane3D(global_track[next_idx], global_track[next_idx] - global_track[track_idx]);
+
         track_idx = next_idx;
         next_idx++;
+
         if (type == PLAYER) {
             bink.setVolume(50.f);
             bink.play();
@@ -249,7 +297,7 @@ void RacerAI::avoid(Entity *agent) {
 
     agent->setTargetRotationQ(glm::shortMix(agent->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.3f));
 
-    if (glm::distance(agent->getPosition(), avoid_target->getPosition()) > 3.0f)
+    if (glm::distance(agent->getPosition(), avoid_target->getPosition()) > 2.0f)
 	state = RACE;
 }
 
@@ -287,8 +335,16 @@ int RacerAI::getNextIdx() {
     return next_idx;
 }
 
+int RacerAI::getTrackIdx() {
+	return track_idx;
+}
+
 int RacerAI::getState() {
 	return state;
+}
+
+int RacerAI::getPlace() {
+	return place;
 }
 
 // Setters

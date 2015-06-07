@@ -58,6 +58,7 @@ private:
     
     // Movement properties
     float     thrust;   // thrust of the plane
+    float     max_thrust;
     glm::vec3 velocity; // x, y, z velocity of the entity u/s
     
     // Flags if necessary
@@ -106,6 +107,7 @@ public:
     
     void setVelocity(glm::vec3);
     void setThrust(float a);
+    void setMaxThrust(float a);
     
     void setFlag(EntityFlag new_flag);
     void setType(EntityType new_type);
@@ -149,6 +151,7 @@ Entity::Entity() {
 	ammunition = 0;
     
     thrust = 0.f;
+    max_thrust = -1.f;
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
@@ -179,6 +182,7 @@ Entity::Entity(AIComponent *ai) {
 	ammunition = 0;
     
     thrust = 0.f;
+    max_thrust = -1.f;
     velocity = glm::vec3(0, 0, 0);
     
     flag = C_FLAG;
@@ -219,23 +223,16 @@ void Entity::update() {
 }
 
 void Entity::throttleUp() {
-    float top_speed = -1.f;
-    float mod = 0.f;
-    if (type == AI_ENTITY) {
-	top_speed = -1.f;
-	mod = 0.05f;
-    }
-    if (type == PLAYER_ENTITY) {
-	top_speed = -1.2f;
-	mod = 0.1f;
-    }
+	static int set = 0;
+    float mod = 0.1f;
+
     // limit the maximum thrust
-    thrust -= thrust > -1.f ? mod : 0.f;
+    thrust -= (thrust > max_thrust ? mod : 0.f);
 }
 
 void Entity::throttleDown() {
     // limit the minimum thrust
-    thrust += thrust < 0 ? 0.1f : 0.f;
+    thrust += (thrust < 0 ? 0.1f : 0.f);
 }
 
 void Entity::pitch(float dy) {
@@ -381,6 +378,10 @@ void Entity::setVelocity(glm::vec3 vel) {
 
 void Entity::setThrust(float th) {
     thrust = th;
+}
+
+void Entity::setMaxThrust(float th) {
+	thrust = th;
 }
 
 void Entity::setMaterial(Material mat) {

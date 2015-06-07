@@ -108,8 +108,8 @@ void main() {
         vec3 n = normalize(silh_vNor);
             vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
-            if (dot(n, e) < 0.2)
-                outColor = vec4(1.0, 0.0, 1.0, 1.0);
+            if (dot(n, e) < 0.5)
+                outColor = vec4(1.0, 0.0, 1.0, 0.5);
             else
                 outColor = vec4(0.0,0.0,0.0,0.0);
     } 
