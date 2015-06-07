@@ -242,7 +242,7 @@ void Entity::throttleUp() {
 	mod = 0.05f;
     }
     if (type == PLAYER_ENTITY) {
-	top_speed = -1.f;
+	top_speed = -1.2f;
 	mod = 0.1f;
     }
     // limit the maximum thrust

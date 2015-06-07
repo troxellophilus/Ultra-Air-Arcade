@@ -69,6 +69,9 @@ public:
 	static Material obsidian;
 	static Material greenPlastic;
 	static Material red;
+	static Material brass;
+	static Material turquoise;
+	static Material pink;
 };
 
 Material Materials::emerald(glm::vec3(0.0315, 0.3745, 0.0315),
@@ -106,5 +109,20 @@ Material Materials::red = Material(glm::vec3(0.6, 0.0, 0.0),
 			glm::vec3(0.1, 0.35, 0.1),
 			glm::vec3(0.45, 0.55, 0.45),
 			100.0);
+
+Material Materials::brass = Material(glm::vec3(0.329412, 0.22352, 0.027451),
+				glm::vec3(0.780392, 0.568627, 0.113725),
+				glm::vec3(0.992157, 0.941176, 0.807843),
+				27.8974);
+
+Material Materials::turquoise = Material(glm::vec3(0.1, 0.18725,0.1745),
+				glm::vec3(0.396, 0.74151, 0.69102),
+				glm::vec3(0.297254, 0.30829, 0.306678),
+				12.8);
+
+Material Materials::pink = Material(glm::vec3(0.275, 0.255, 0.266),
+				glm::vec3(0.678, 0.3, 0.575),
+				glm::vec3(0.8, 0.8, 0.8),
+				30.0);
 
 #endif
