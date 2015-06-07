@@ -283,7 +283,6 @@ void Entity::yaw(float dx) {
 void Entity::rollRight() {
     // build roll quat
     glm::quat rol = glm::angleAxis(-0.15f, glm::vec3(0, 0, 1));
-    
     // Apply roll change
     target_rotation *= rol;
 }
