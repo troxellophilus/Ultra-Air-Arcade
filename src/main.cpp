@@ -482,7 +482,7 @@ void initShaderVars() {
     // Set up the shader variables
    pPos = glGetAttribLocation(propShaders, "prop_position");
    pNor = glGetAttribLocation(propShaders, "prop_normal");
-   tbo_tex = glGetAttribLocation(propShaders, "vertTex")
+   tbo_tex = glGetAttribLocation(propShaders, "vertTex");
 
    propV = glGetUniformLocation(propShaders, "V");
    propM = glGetUniformLocation(propShaders, "M");

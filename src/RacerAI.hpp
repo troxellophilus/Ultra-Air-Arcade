@@ -107,7 +107,7 @@ private:
     glm::vec3 start_loc;
     Entity *avoid_target;
 
-    PlaneSound bink = PlaneSound("../Assets/sound/beep.wav");
+    PlaneSound bink = PlaneSound("../Assets/sound/ding.wav");
 
     void splash(Entity *);
     void setup(Entity *);
