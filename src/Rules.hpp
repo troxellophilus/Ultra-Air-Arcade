@@ -237,14 +237,16 @@ void Rules::race(Camera *cam) {
 
     // When all racers have finish 3 laps, set state to finish
     if (playerAI->getLap() == 3) {
-        int unfinished = 0;
-        for (RacerAI *opp : agentsAI) {
-            if (opp->getLap() < 3)
-	        unfinished++;
-	}
-	if (unfinished == 0) {
-	    state = FINISH;
-	}
+        //int unfinished = 0;
+        //for (RacerAI *opp : agentsAI) {
+         //   if (opp->getLap() < 3)
+	//        unfinished++;
+	//}
+	//if (unfinished == 0) {
+	//    state = FINISH;
+	//}
+	state = FINISH;
+	printf("The race is complete!\nYou finished in %d place!\n", playerAI->getPlace());
     }
 }
 

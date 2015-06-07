@@ -1118,7 +1118,7 @@ int main(int argc, char **argv) {
       viewFrustum.setFrustum(view, projection);
 
       drawGround(projection, view);
-      drawBillboard(&camera);
+      //drawBillboard(&camera);
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       // Update the rules and game state
@@ -1221,11 +1221,16 @@ int main(int argc, char **argv) {
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       //update checkpoints
+      Entity p_cp = checkpoints[((RacerAI *)player.getAI())->getTrackIdx()];
+      if (viewFrustum.sphereInFrustum(p_cp.getPosition(), p_cp.getRadius()))
+	      drawVBO(&p_cp, cIndices, CHECKPOINT);
+      /*
       for (auto &checkpoint : checkpoints) {
          if (viewFrustum.sphereInFrustum(checkpoint.getPosition(), checkpoint.getRadius())) {
             drawVBO(&checkpoint, cIndices, CHECKPOINT);
          }
       }
+      */
 
       // Update camera
       camera.update();
