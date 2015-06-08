@@ -196,8 +196,10 @@ Entity::Entity(AIComponent *ai) {
 }
 
 void Entity::update() {
-	static float last_time = glfwGetTime();
-    float dt = 1 / 60.f; // fixed time step
+	static int frames = 0.f;
+	static float fps = 60.f;
+
+    float dt = 6.f * 1.f / fps; // fixed time step
     float dot;
     glm::vec3 vn;
     glm::vec3 fd;
@@ -220,6 +222,9 @@ void Entity::update() {
     fd = -0.5f * glm::vec3(0, 0, -1) * 1.293f * drag * carea * velocity * velocity;
     force = thrust * vn * mass;
     velocity += (force + fd) * (1.f / mass) * dt;
+
+    frames++;
+    fps = frames / glfwGetTime();
 }
 
 void Entity::throttleUp() {
