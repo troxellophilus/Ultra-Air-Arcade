@@ -144,7 +144,7 @@ Entity::Entity() {
     
     
     scale = glm::vec3(1, 1, 1);
-    mass = 5000.0f;
+    mass = 3000.0f;
     force = glm::vec3(0, 0, 0);
     drag = 1.5f; // sphere for now
     carea = 25.f;
@@ -196,10 +196,11 @@ Entity::Entity(AIComponent *ai) {
 }
 
 void Entity::update() {
-	static int frames = 0.f;
-	static float fps = 60.f;
+	static int frames = 0;
+	static float fps = 1 / 60.f;
 
-    float dt = 6.f * 1.f / fps; // fixed time step
+	float dt = 6.f * 1.f / fps; // fix time step according to the fps
+
     float dot;
     glm::vec3 vn;
     glm::vec3 fd;

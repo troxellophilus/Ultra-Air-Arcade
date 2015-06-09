@@ -1015,7 +1015,7 @@ int main(int argc, char **argv) {
       Entity prop = Entity(propAI);
       prop.setType(PROP_ENTITY);
       prop.setObject(&obj[0]);
-      prop.setScale(glm::vec3(5., 5., 5.));
+      prop.setScale(glm::vec3(2., 2., 2.));
       prop.setPosition(global_track[c]);
       checkpoints.push_back(prop);
       c++;

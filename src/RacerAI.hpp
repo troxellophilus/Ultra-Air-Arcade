@@ -165,12 +165,14 @@ RacerAI::RacerAI() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::normal_distribution<> noise(0,1.0);
+    std::normal_distribution<> noise(0,2.f);
     float x = noise(gen);
     float y = noise(gen);
     float z = noise(gen);
 
-    start_loc = global_track[TRACK_LOCS - 1] + glm::vec3(x, y, z);
+    start_loc = global_track[TRACK_LOCS - 1] + glm::vec3(x, 0, z);
+
+    noise = std::normal_distribution<>(0,1.2f);
 
     // Fill individual track locations with noise
     for (int i = 0; i < TRACK_LOCS; i++)
@@ -228,8 +230,11 @@ void RacerAI::setup(Entity *agent) {
     track_idx = 0;
     next_idx = 1;
     agent->setPosition(start_loc);
-    agent->setThrust(0);
-    agent->setVelocity(glm::vec3(0, 0, 0));
+    agent->setThrust(0.f);
+    agent->setVelocity(glm::vec3(0, 0, 0.f));
+
+    glm::vec3 vec_to_target = glm::normalize(track[1] - track[0]);
+    agent->setTargetRotationQ(glm::shortMix(agent->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_to_target), 0.3f));
 
 	track_idx_plane = Plane3D(global_track[track_idx], global_track[track_idx] - global_track[TRACK_LOCS - 1]);
 }
