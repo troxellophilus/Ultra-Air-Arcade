@@ -251,6 +251,12 @@ void RacerAI::race(int frames, Entity *agent) {
 		agent->setMaxThrust(-2.0f);
 		boost_count++;
 		boost_lasts += 50;
+
+		// only play dings if the player hits the speed boost
+	        if (type == PLAYER) {
+        		bink.setVolume(50.f);
+        		bink.play();
+        	}
 	}
 
 	if (boost_count > 0) {
@@ -269,11 +275,6 @@ void RacerAI::race(int frames, Entity *agent) {
 
         track_idx = next_idx;
         next_idx++;
-
-        if (type == PLAYER) {
-            bink.setVolume(50.f);
-            bink.play();
-        }
 
         if (next_idx > TRACK_LOCS - 1) {
             next_idx = 0;
