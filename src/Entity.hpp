@@ -145,7 +145,7 @@ Entity::Entity() {
     position = glm::vec3(0, 0, 0);
     rotation = glm::quat(1, 0, 0, 0);
     target_rotation = glm::quat(1, 0, 0, 0);
-    
+    flame = Particle();
     
     scale = glm::vec3(1, 1, 1);
     mass = 3000.0f;
@@ -173,6 +173,7 @@ Entity::Entity(AIComponent *ai) {
 	// Zach - removed Material:: from the call to the Material constructor - 
 	// Would not allow my version to compile
     material = Material();
+	flame = Particle();
     
     position = glm::vec3(0, 0, 0);
     rotation = glm::quat(1, 0, 0, 0);
