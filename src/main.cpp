@@ -64,7 +64,7 @@ GLuint renderSceneShaders;
 GLuint skyBoxShaders;
 GLuint textShaders;
 GLuint propShaders;
-
+GLuint particleShaders;
 
 GLFWwindow* window;
 
@@ -1086,6 +1086,7 @@ int main(int argc, char **argv) {
 		player.update();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		drawVBO(&player, pIndices, PLANE);
+      		player.drawExhaust();
 		//checkPlayerCollisions();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		
@@ -1122,6 +1123,7 @@ int main(int argc, char **argv) {
 			opponent.update();
 			if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
 				drawVBO(&opponent, pIndices, PLANE);
+            			opponent.drawExhaust();
 				i++;
 			}
 			//checkOpponentCollisions(opponent);
