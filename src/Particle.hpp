@@ -26,7 +26,6 @@ class Particle {
 
 		GLuint uProjMatrix;
 		GLuint uViewMatrix;
-		GLuint uModelMatrix;
 		// End list
 		//Stage particles[NUM_PARTICLES];
 		float randFactor[NUM_PARTICLES];
@@ -57,8 +56,6 @@ Particle::Particle() {
 
 	particleIndex = 0;
 	frameCount = 0;
-
-    assert(glGetError() == GL_NO_ERROR);
 }
 
 void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::vec3 pos) {
@@ -66,10 +63,7 @@ void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::
 	projMatrix = projMat;
 	position = pos;
 	quaternion = rot;
-	if (frameCount < NUM_PARTICLES) {
-		toRender[frameCount] = true;
-		frameCount++;
-	}
+	if (frameCount < NUM_PARTICLES) toRender[frameCount++] = true;
 }
 
 void Particle::draw(float thrust) {
@@ -85,8 +79,6 @@ void Particle::draw(float thrust) {
 
     // Set view matrix
     glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(0, 0, 0.2));
-    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(rotMatrix));
 
 	// Send position array to GPU
 	glEnableVertexAttribArray(posAttrib);
@@ -97,7 +89,7 @@ void Particle::draw(float thrust) {
 	for (i = 0; i < NUM_PARTICLES; i++) {
 		//glUniform3f(BillboardPosID, 200.0f + xtrans[i], 200.0f, 200.0f + ztrans[i]);
 		if (toRender[i]) {
-			float factor = (-thrust) * timeStep[i] * 0.07 / NUM_PARTICLES;
+			float factor = (-thrust) * randFactor[i] * timeStep[i] * 0.07 / NUM_PARTICLES;
 			glm::vec3 direction = (0.15f + factor) * glm::normalize(glm::vec3(0, -0.25, 1) * glm::inverse(quaternion));
 			glUniform3f(BillboardPosID, position.x + direction.x, position.y + direction.y, position.z + direction.z);
 			glUniform2f(BillboardSizeID, 0.025f, 0.025f);
@@ -132,7 +124,6 @@ void Particle::setShaderProg(GLuint programID) {
     posAttrib = glGetAttribLocation(prog, "position");
     uViewMatrix = glGetUniformLocation(prog, "V");
     uProjMatrix = glGetUniformLocation(prog, "P");
-    uModelMatrix = glGetUniformLocation(prog, "M");
 
 	// Shader variables for billboard
 	CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
