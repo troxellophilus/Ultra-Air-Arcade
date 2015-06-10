@@ -65,7 +65,6 @@ GLuint skyBoxShaders;
 GLuint textShaders;
 GLuint propShaders;
 
-
 GLFWwindow* window;
 
 //Various data buffers
@@ -644,7 +643,6 @@ void drawProp(Entity* entity, int nIndices, int whichbo)
    glVertexAttribPointer(pNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
    GLDEBUG
 
-
    // Bind index array for drawing
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
 
@@ -1190,7 +1188,6 @@ int main(int argc, char **argv) {
 
       //Draw HUD
       drawHUD(fps, pitch);
-
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       last = elapsed;
