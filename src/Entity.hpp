@@ -237,7 +237,7 @@ void Entity::update() {
 }
 
 void Entity::update(glm::mat4 viewMat, glm::mat4 projMat) {
-	flame.update(viewMat, projMat, glm::toMat4(rotation), position);
+	flame.update(viewMat, projMat, rotation, position);
 }
 
 void Entity::drawExhaust() {

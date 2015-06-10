@@ -33,11 +33,12 @@ class Particle {
 		glm::mat4 projMatrix;
 		glm::mat4 rotMatrix;
 		glm::vec3 position;
+		glm::quat quaternion;
 
 		float randNum();
 	public:
 		Particle();
-		void update(glm::mat4, glm::mat4, glm::mat4, glm::vec3);
+		void update(glm::mat4, glm::mat4, glm::quat, glm::vec3);
 		void draw();
 		void setShaderProg(GLuint);
 };
@@ -53,17 +54,22 @@ Particle::Particle() {
     assert(glGetError() == GL_NO_ERROR);
 }
 
-void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::mat4 rotMat, glm::vec3 pos) {
+void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::vec3 pos) {
 	viewMatrix = viewMat;
 	projMatrix = projMat;
-	rotMatrix = rotMat;
+	//rotMatrix = rotMat;
 	position = pos;
+	quaternion = rot;
 }
 
 void Particle::draw() {
 	glUseProgram(prog);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	/*glm::mat4 Trans = glm::translate( glm::mat4(1.0f), vec4(position, 1.0));
+	glm::mat4 Orient = rotMatrix;
+	glm::mat4 com = Trans * Orient;*/
 
 	glUniform3f(CameraRight_worldspace_ID, viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
 	glUniform3f(CameraUp_worldspace_ID   , viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
@@ -74,7 +80,7 @@ void Particle::draw() {
     // Set view matrix
     glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(0, 0, 0.2));
-    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(rotMatrix));
 
 	// Send position array to GPU
 	glEnableVertexAttribArray(posAttrib);
@@ -82,10 +88,13 @@ void Particle::draw() {
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	int i;
+	float xFactor, yFactor = 1.0;
 	for (i = 0; i < NUM_PARTICLES; i++) {
 		//glUniform3f(BillboardPosID, 200.0f + xtrans[i], 200.0f, 200.0f + ztrans[i]);
-		glUniform3f(BillboardPosID, position.x, position.y, position.z);
-		glUniform2f(BillboardSizeID, 0.1f, 0.1f);
+		
+		glm::vec3 direction = 0.18f * glm::normalize(glm::vec3(0 * xFactor, -0.25 * yFactor, 1) * glm::inverse(quaternion));
+		glUniform3f(BillboardPosID, position.x + direction.x, position.y + direction.y, position.z + direction.z);
+		glUniform2f(BillboardSizeID, 0.04f, 0.04f);
 
 		glEnableVertexAttribArray(posAttrib);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
