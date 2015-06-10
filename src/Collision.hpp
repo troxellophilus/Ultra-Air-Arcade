@@ -119,7 +119,7 @@ void Collision::update() {
         if (resetStep++ > 30) {
             player->collisionFlag = false;
             resetStep = 0;
-            player->setMaterial(player->getBaseMaterial());
+            player->setMaterial(Materials::emerald);
 	    player->setThrust(-1.f);
 	    player->setVelocity(glm::vec3(0.f, 0.f, -10.f));
             // camera->setMode(Camera::CameraMode::TPC);
