@@ -15,6 +15,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "Particle.hpp"
 #include "Materials.hpp"
 #include "types.h"
 
@@ -38,6 +39,7 @@ private:
 	Object    *object;  // obj vertices
 	Material  material; // Material of the entity
 	Material  base_material;
+	Particle flame; 	// Billboarded particle that will make up the jet exhause
 	glm::vec3 scale;    // scale of the object model
 	
 	// Components
@@ -114,9 +116,13 @@ public:
 	
 	void setFlag(EntityFlag new_flag);
 	void setType(EntityType new_type);
-	
+
+	void setParticleProg(GLuint);
+
 	// Methods
 	void update();
+	void update(glm::mat4, glm::mat4);
+	void drawExhaust();
 	
 	void pitch(float dy);
 	void yaw(float dx);
@@ -130,6 +136,7 @@ public:
 	void packVertices(vector<float> *, vector<float> *, vector<unsigned int> *,std::vector<float> *);
 	
 	void calculateBoundingSphereRadius();
+
 	void addAmmo(int);
 	int getAmmo();
 	void subtractAmmo(int);
@@ -200,6 +207,10 @@ Entity::Entity(AIComponent *ai) {
 	collisionFlag = false;
 }
 
+void Entity::setParticleProg(GLuint program) {
+	flame.setShaderProg(program);
+}
+
 void Entity::update() {
 	static int frames = 0;
 	static float fps = 1 / 60.f;
@@ -231,6 +242,14 @@ void Entity::update() {
 	
 	frames++;
 	fps = frames / glfwGetTime();
+}
+
+void Entity::update(glm::mat4 viewMat, glm::mat4 projMat) {
+	flame.update(viewMat, projMat, rotation, position);
+}
+
+void Entity::drawExhaust() {
+	flame.draw(thrust);
 }
 
 void Entity::throttleUp() {
