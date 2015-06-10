@@ -241,7 +241,7 @@ void Entity::update(glm::mat4 viewMat, glm::mat4 projMat) {
 }
 
 void Entity::drawExhaust() {
-	flame.draw();
+	flame.draw(thrust);
 }
 
 void Entity::throttleUp() {

@@ -46,7 +46,7 @@ class Particle {
 	public:
 		Particle();
 		void update(glm::mat4, glm::mat4, glm::quat, glm::vec3);
-		void draw();
+		void draw(float);
 		void setShaderProg(GLuint);
 };
 
@@ -75,7 +75,7 @@ void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::
 	}
 }
 
-void Particle::draw() {
+void Particle::draw(float thrust) {
 	glUseProgram(prog);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -100,7 +100,7 @@ void Particle::draw() {
 	for (i = 0; i < NUM_PARTICLES; i++) {
 		//glUniform3f(BillboardPosID, 200.0f + xtrans[i], 200.0f, 200.0f + ztrans[i]);
 		if (particles[i].toRender) {
-			float factor = particles[i].timeStep * 0.07 / NUM_PARTICLES;
+			float factor = (-thrust) * particles[i].timeStep * 0.07 / NUM_PARTICLES;
 			glm::vec3 direction = (0.15f + factor) * glm::normalize(glm::vec3(0, -0.25, 1) * glm::inverse(quaternion));
 			glUniform3f(BillboardPosID, position.x + direction.x, position.y + direction.y, position.z + direction.z);
 			glUniform2f(BillboardSizeID, 0.025f, 0.025f);
