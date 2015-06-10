@@ -59,8 +59,6 @@ Particle::Particle() {
 
 	particleIndex = 0;
 	frameCount = 0;
-
-    assert(glGetError() == GL_NO_ERROR);
 }
 
 void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::vec3 pos) {
