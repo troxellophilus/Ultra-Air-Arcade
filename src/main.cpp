@@ -992,7 +992,7 @@ int main(int argc, char **argv) {
       opp.setScale(glm::vec3(0.25, 0.25, 0.25));
       opp.calculateBoundingSphereRadius();
       opp.setMaterial(p_mat_list[odx % NUM_PLAYER_MATS]);
-      opp.setParticleProg(particleShaders);
+      //opp.setParticleProg(particleShaders);
 
       opponents.push_back(opp);
       odx++;
@@ -1121,7 +1121,7 @@ int main(int argc, char **argv) {
          opponent.update(camera.getViewMatrix(), camera.getProjectionMatrix());
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
-            opponent.drawExhaust();
+            //opponent.drawExhaust();
             i++;
          }
          //checkOpponentCollisions(opponent);

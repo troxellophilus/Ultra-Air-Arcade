@@ -9,12 +9,6 @@
 #include <SOIL/SOIL.h>
 #include <png.h>
 
-typedef struct Stage {
-	int timeStep;
-	bool toRender;
-	float randFactor;
-} Stage;
-
 class Particle {
 	private:
 		int particleIndex;
@@ -34,7 +28,10 @@ class Particle {
 		GLuint uViewMatrix;
 		GLuint uModelMatrix;
 		// End list
-		Stage particles[NUM_PARTICLES];
+		//Stage particles[NUM_PARTICLES];
+		float randFactor[NUM_PARTICLES];
+		bool toRender[NUM_PARTICLES];
+		int timeStep[NUM_PARTICLES];
 
 		glm::mat4 viewMatrix;
 		glm::mat4 projMatrix;
@@ -53,9 +50,9 @@ class Particle {
 Particle::Particle() {
 	int i;
 	for (i = 0; i < NUM_PARTICLES; i++) {
-		particles[i].timeStep = 0;
-		particles[i].toRender = false;
-		particles[i].randFactor = randNum();
+		timeStep[i] = 0;
+		toRender[i] = false;
+		randFactor[i] = randNum();
 	} 
 
 	particleIndex = 0;
@@ -70,8 +67,8 @@ void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::
 	position = pos;
 	quaternion = rot;
 	if (frameCount < NUM_PARTICLES) {
+		toRender[frameCount] = true;
 		frameCount++;
-		particles[frameCount].toRender = true;
 	}
 }
 
@@ -99,15 +96,15 @@ void Particle::draw(float thrust) {
 	int i;
 	for (i = 0; i < NUM_PARTICLES; i++) {
 		//glUniform3f(BillboardPosID, 200.0f + xtrans[i], 200.0f, 200.0f + ztrans[i]);
-		if (particles[i].toRender) {
-			float factor = (-thrust) * particles[i].timeStep * 0.07 / NUM_PARTICLES;
+		if (toRender[i]) {
+			float factor = (-thrust) * timeStep[i] * 0.07 / NUM_PARTICLES;
 			glm::vec3 direction = (0.15f + factor) * glm::normalize(glm::vec3(0, -0.25, 1) * glm::inverse(quaternion));
 			glUniform3f(BillboardPosID, position.x + direction.x, position.y + direction.y, position.z + direction.z);
 			glUniform2f(BillboardSizeID, 0.025f, 0.025f);
-			glUniform1i(TimeStepID, particles[i].timeStep);
+			glUniform1i(TimeStepID, timeStep[i]);
 
-			if (particles[i].timeStep == NUM_PARTICLES -1) particles[i].timeStep = 0;
-			else particles[i].timeStep++;
+			if (timeStep[i] == NUM_PARTICLES -1) timeStep[i] = 0;
+			else timeStep[i]++;
 
 			glEnableVertexAttribArray(posAttrib);
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -148,7 +145,7 @@ void Particle::setShaderProg(GLuint programID) {
 		-0.5f, -0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
 		-0.5f, 0.5f, 0.0f,
-		0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f
 	};
 	
 	glGenBuffers(1, &vbo);
