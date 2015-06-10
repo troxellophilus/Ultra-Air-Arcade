@@ -4,7 +4,6 @@ in vec3 position;
 
 uniform mat4 P;
 uniform mat4 V;
-uniform mat4 M;
 uniform vec3 CameraRight_worldspace;
 uniform vec3 CameraUp_worldspace;
 uniform vec3 particlePos;

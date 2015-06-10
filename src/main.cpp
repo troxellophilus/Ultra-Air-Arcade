@@ -926,6 +926,7 @@ int main(int argc, char **argv) {
 	skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
 	textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
 	propShaders = installShaders("shd/propShader.vert", "shd/propShader.frag");
+	particleShaders = installShaders("shd/particle_vert.glsl", "shd/particle_frag.glsl");
 	
 	initShaderVars();
 	skybox = new Skybox(skyBoxShaders);
@@ -961,6 +962,7 @@ int main(int argc, char **argv) {
 	player.setScale(glm::vec3(0.25, 0.25, 0.25));
 	player.setMaterial(p_mat_list[0]);
 	player.setBaseMaterial(p_mat_list[0]);
+	player.setParticleProg(particleShaders);
 	player.calculateBoundingSphereRadius();
 	pIndices = initVBO(&player, PLANE);
 	
@@ -996,6 +998,7 @@ int main(int argc, char **argv) {
 		opp.calculateBoundingSphereRadius();
 		opp.setMaterial(p_mat_list[odx % NUM_PLAYER_MATS]);
 		opp.setBaseMaterial(p_mat_list[odx % NUM_PLAYER_MATS]);
+		opp.setParticleProg(particleShaders);
 		
 		opponents.push_back(opp);
 		odx++;
@@ -1084,9 +1087,10 @@ int main(int argc, char **argv) {
 		
 		// Update & draw player
 		player.update();
+		player.update(view, projection);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		drawVBO(&player, pIndices, PLANE);
-      		player.drawExhaust();
+      	player.drawExhaust();
 		//checkPlayerCollisions();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		
@@ -1121,9 +1125,10 @@ int main(int argc, char **argv) {
 		for (auto &opponent : opponents) {
 			t++;
 			opponent.update();
+			opponent.update(view, projection);
 			if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
 				drawVBO(&opponent, pIndices, PLANE);
-            			opponent.drawExhaust();
+            	opponent.drawExhaust();
 				i++;
 			}
 			//checkOpponentCollisions(opponent);

@@ -32,7 +32,6 @@ class Particle {
 
 		GLuint uProjMatrix;
 		GLuint uViewMatrix;
-		GLuint uModelMatrix;
 		// End list
 		Stage particles[NUM_PARTICLES];
 
@@ -69,10 +68,7 @@ void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::
 	projMatrix = projMat;
 	position = pos;
 	quaternion = rot;
-	if (frameCount < NUM_PARTICLES) {
-		frameCount++;
-		particles[frameCount].toRender = true;
-	}
+	if (frameCount < NUM_PARTICLES) particles[frameCount++].toRender = true;
 }
 
 void Particle::draw(float thrust) {
@@ -88,9 +84,7 @@ void Particle::draw(float thrust) {
 
     // Set view matrix
     glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(0, 0, 0.2));
-    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(rotMatrix));
-
+	glUniform2f(BillboardSizeID, 0.025f, 0.025f);
 	// Send position array to GPU
 	glEnableVertexAttribArray(posAttrib);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -98,20 +92,15 @@ void Particle::draw(float thrust) {
 
 	int i;
 	for (i = 0; i < NUM_PARTICLES; i++) {
-		//glUniform3f(BillboardPosID, 200.0f + xtrans[i], 200.0f, 200.0f + ztrans[i]);
 		if (particles[i].toRender) {
-			float factor = (-thrust) * particles[i].timeStep * 0.07 / NUM_PARTICLES;
+			float factor = (-thrust) * particles[i].timeStep * particles[i].randFactor * 0.07 / NUM_PARTICLES;
 			glm::vec3 direction = (0.15f + factor) * glm::normalize(glm::vec3(0, -0.25, 1) * glm::inverse(quaternion));
 			glUniform3f(BillboardPosID, position.x + direction.x, position.y + direction.y, position.z + direction.z);
-			glUniform2f(BillboardSizeID, 0.025f, 0.025f);
 			glUniform1i(TimeStepID, particles[i].timeStep);
 
 			if (particles[i].timeStep == NUM_PARTICLES -1) particles[i].timeStep = 0;
 			else particles[i].timeStep++;
 
-			glEnableVertexAttribArray(posAttrib);
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		}
 	}
@@ -135,7 +124,6 @@ void Particle::setShaderProg(GLuint programID) {
     posAttrib = glGetAttribLocation(prog, "position");
     uViewMatrix = glGetUniformLocation(prog, "V");
     uProjMatrix = glGetUniformLocation(prog, "P");
-    uModelMatrix = glGetUniformLocation(prog, "M");
 
 	// Shader variables for billboard
 	CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
