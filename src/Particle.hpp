@@ -6,7 +6,6 @@
 #include <GLFW/glfw3.h>
 #include "helper.h"
 #include "GLSL.h"
-#include "Camera.hpp"
 #include <SOIL/SOIL.h>
 #include <png.h>
 
@@ -14,83 +13,36 @@ class Particle {
 	private:
 		// Items necessary for shaders
 		GLuint prog;
-		GLuint tbo;
 		GLuint vbo;
-		GLuint ebo;
-
-		GLuint texture;
-		GLuint texSamplerID;
-		const GLfloat vertices[8] = {
-	   		 //  Position   Color             Texcoords
-		    /*-0.5f,  0.5f, // Top-left
-		     0.5f,  0.5f, // Top-right
-		     0.5f, -0.5f, // Bottom-right
-		    -0.5f, -0.5f  // Bottom-left
-			*/
-			/*-0.5, -0.5,
-			-0.5, 0.5,
-			0.5, 0.5, 
-			0.5, -0.5*/
-			-0.5, -0.5, 
-			0.5, -0.5, 
-			-0.5, 0.5, 
-			0.5, 0.5
-    	};
-
-		const GLfloat texCoords[8] = {
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			0.0f, 1.0f,
-			1.0f, 1.0f
-		};
-
-		const GLuint elements[6] = {
-		    0, 1, 2,
-		    3, 0, 2
-		};
 
 		GLuint CameraRight_worldspace_ID;
 		GLuint CameraUp_worldspace_ID;
 		GLuint BillboardPosID;
 		GLuint BillboardSizeID;
-		GLuint billboard_vertex_buffer;
-		GLuint texture_vertex_buffer;
-
 		GLuint posAttrib;
-		GLuint texAttrib;
-		GLuint colAttrib;
 
 		GLuint uProjMatrix;
 		GLuint uViewMatrix;
+		GLuint uModelMatrix;
 		// End list
 		float xtrans[NUM_PARTICLES];
 		float ytrans[NUM_PARTICLES];
 		float ztrans[NUM_PARTICLES];
 
-		//GLuint loadTexture();
+		glm::mat4 viewMatrix;
+		glm::mat4 projMatrix;
+		glm::mat4 rotMatrix;
+		glm::vec3 position;
+
 		float randNum();
 	public:
 		Particle();
-		void draw(Camera*);
+		void update(glm::mat4, glm::mat4, glm::mat4, glm::vec3);
+		void draw();
+		void setShaderProg(GLuint);
 };
 
-Particle::Particle(GLuint program) {
-	prog = program;
-    glUseProgram(prog);
-    
-    // Set up the shader variables
-    posAttrib = glGetAttribLocation(prog, "position");
-	texAttrib = glGetAttribLocation(prog, "texcoord");
-    uViewMatrix = glGetUniformLocation(prog, "V");
-    uProjMatrix = glGetUniformLocation(prog, "P");
-
-	// Shader variables for billboard
-	CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
-	CameraUp_worldspace_ID  = glGetUniformLocation(prog, "CameraUp_worldspace");
-	BillboardPosID = glGetUniformLocation(prog, "BillboardPos");
-	BillboardSizeID = glGetUniformLocation(prog, "BillboardSize");
-	texSamplerID = glGetUniformLocation(prog, "myTextureSampler");
-    
+Particle::Particle() {
 	int i;
 	for (i = 0; i < NUM_PARTICLES; i++) {
 		xtrans[i] = randNum();
@@ -98,62 +50,46 @@ Particle::Particle(GLuint program) {
 		ztrans[i] = randNum();
 	} 
 
-/*
-	texture = SOIL_load_OGL_texture("cloud.bmp",
-									SOIL_LOAD_AUTO,
-									SOIL_CREATE_NEW_ID,
-									SOIL_FLAG_INVERT_Y);
-	//texture = SOIL_load_OGL_texture // load an image file directly as a new OpenGL texture
-    //(
-    //    "cloud.png",
-    //    SOIL_LOAD_AUTO,
-    //    SOIL_CREATE_NEW_ID,
-    //    SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-    //);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glUniform1i(texSamplerID, 0);
-*/
     assert(glGetError() == GL_NO_ERROR);
 }
 
-void Particle::draw(Camera *camera) {
+void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::mat4 rotMat, glm::vec3 pos) {
+	viewMatrix = viewMat;
+	projMatrix = projMat;
+	rotMatrix = rotMat;
+	position = pos;
+}
+
+void Particle::draw() {
 	glUseProgram(prog);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glm::mat4 view = camera->getViewMatrix();
-
-	glUniform3f(CameraRight_worldspace_ID, view[0][0], view[1][0], view[2][0]);
-	glUniform3f(CameraUp_worldspace_ID   , view[0][1], view[1][1], view[2][1]);
+	glUniform3f(CameraRight_worldspace_ID, viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
+	glUniform3f(CameraUp_worldspace_ID   , viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
 
 	// Set projection matrix
-    glm::mat4 projection = camera->getProjectionMatrix();
-    glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, glm::value_ptr(projMatrix));
 
     // Set view matrix
-    glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(0, 0, 0.2));
+    glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(model));
 
 	// Send position array to GPU
 	glEnableVertexAttribArray(posAttrib);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	int i;
 	for (i = 0; i < NUM_PARTICLES; i++) {
-		glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]);
-		glUniform2f(BillboardSizeID, 20.0f, 20.0f);
+		//glUniform3f(BillboardPosID, 200.0f + xtrans[i], 200.0f, 200.0f + ztrans[i]);
+		glUniform3f(BillboardPosID, position.x, position.y, position.z);
+		glUniform2f(BillboardSizeID, 0.1f, 0.1f);
 
-		/*glEnableVertexAttribArray(posAttrib);
+		glEnableVertexAttribArray(posAttrib);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);*/
+		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
@@ -167,6 +103,47 @@ void Particle::draw(Camera *camera) {
 
 float Particle::randNum() {
     return ((float) rand() / (RAND_MAX)) * 600.0;
+}
+
+void Particle::setShaderProg(GLuint programID) {
+	prog = programID;
+    glUseProgram(prog);
+    
+    // Set up the shader variables
+    posAttrib = glGetAttribLocation(prog, "position");
+    uViewMatrix = glGetUniformLocation(prog, "V");
+    uProjMatrix = glGetUniformLocation(prog, "P");
+    uModelMatrix = glGetUniformLocation(prog, "M");
+
+	// Shader variables for billboard
+	CameraRight_worldspace_ID  = glGetUniformLocation(prog, "CameraRight_worldspace");
+	CameraUp_worldspace_ID  = glGetUniformLocation(prog, "CameraUp_worldspace");
+	BillboardPosID = glGetUniformLocation(prog, "BillboardPos");
+	BillboardSizeID = glGetUniformLocation(prog, "BillboardSize");
+	
+	static constexpr GLfloat vertices[] = {
+		/*-0.5f,  0.5f, // Top-left
+		 0.5f,  0.5f, // Top-right
+		 0.5f, -0.5f, // Bottom-right
+		-0.5f, -0.5f  // Bottom-left
+		*/
+		/*-0.5, -0.5,
+		-0.5, 0.5,
+		0.5, 0.5, 
+		0.5, -0.5*/
+		/*-0.5f, -0.5f, 
+		0.5f, -0.5f, 
+		-0.5f, 0.5f, 
+		0.5f, 0.5f,*/
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
+	};
+	
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 }
 
 #endif

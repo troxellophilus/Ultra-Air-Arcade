@@ -64,7 +64,7 @@ GLuint renderSceneShaders;
 GLuint skyBoxShaders;
 GLuint textShaders;
 GLuint propShaders;
-
+GLuint particleShaders;
 
 GLFWwindow* window;
 
@@ -491,8 +491,6 @@ void initShaderVars() {
    shadowProjMatrix = glGetUniformLocation(renderSceneShaders, "P");
    shadowLPos = glGetUniformLocation(renderSceneShaders, "lPos");
    depthMatrixID = glGetUniformLocation(depthCalcShaders, "depthMVP");
-
-  
 
    if (renderShadows) {
       glGenFramebuffers(1, &fbo);
@@ -925,6 +923,7 @@ int main(int argc, char **argv) {
    skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
    textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
    propShaders = installShaders("shd/propShader.vert", "shd/propShader.frag");
+   particleShaders = installShaders("shd/particle_vert.glsl", "shd/particle_frag.glsl");
 
    initShaderVars();
    skybox = new Skybox(skyBoxShaders);
@@ -960,6 +959,7 @@ int main(int argc, char **argv) {
    player.setScale(glm::vec3(0.25, 0.25, 0.25));
    player.setMaterial(Materials::emerald);
    player.calculateBoundingSphereRadius();
+   player.setParticleProg(particleShaders);
    pIndices = initVBO(&player, PLANE);
 
    // Initialize camera
@@ -993,6 +993,7 @@ int main(int argc, char **argv) {
       opp.setScale(glm::vec3(0.25, 0.25, 0.25));
       opp.calculateBoundingSphereRadius();
       opp.setMaterial(p_mat_list[odx % NUM_PLAYER_MATS]);
+      opp.setParticleProg(particleShaders);
 
       opponents.push_back(opp);
       odx++;
@@ -1068,7 +1069,6 @@ int main(int argc, char **argv) {
       viewFrustum.setFrustum(view, projection);
 
       drawGround(projection, view);
-      //drawBillboard(&camera);
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
       // Update the rules and game state
@@ -1081,8 +1081,10 @@ int main(int argc, char **argv) {
 
       // Update & draw player
       player.update();
+      player.update(camera.getViewMatrix(), camera.getProjectionMatrix());
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
+      //player.drawExhaust();
       //checkPlayerCollisions();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -1117,8 +1119,10 @@ int main(int argc, char **argv) {
       for (auto &opponent : opponents) {
          t++;
          opponent.update();
+         opponent.update(camera.getViewMatrix(), camera.getProjectionMatrix());
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
+            //opponent.drawExhaust();
             i++;
          }
          //checkOpponentCollisions(opponent);
