@@ -1084,7 +1084,7 @@ int main(int argc, char **argv) {
       player.update(camera.getViewMatrix(), camera.getProjectionMatrix());
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       drawVBO(&player, pIndices, PLANE);
-      //player.drawExhaust();
+      player.drawExhaust();
       //checkPlayerCollisions();
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -1122,7 +1122,7 @@ int main(int argc, char **argv) {
          opponent.update(camera.getViewMatrix(), camera.getProjectionMatrix());
          if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
             drawVBO(&opponent, pIndices, PLANE);
-            //opponent.drawExhaust();
+            opponent.drawExhaust();
             i++;
          }
          //checkOpponentCollisions(opponent);
