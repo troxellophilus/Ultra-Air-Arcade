@@ -125,4 +125,5 @@ void main() {
     else {                              // Catch-all
             outColor = vec4(vCol, 1.0);
     }
+
 }
