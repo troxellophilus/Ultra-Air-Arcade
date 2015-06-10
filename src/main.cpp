@@ -85,13 +85,6 @@ GLint uProjMatrix = 0;
 GLint renderObj = 0;
 GLint h_uMatAmb, h_uMatDif, h_uMatSpec, h_uMatShine;
 
-// Billboard variables
-GLuint CameraRight_worldspace_ID;
-GLuint CameraUp_worldspace_ID;
-GLuint BillboardPosID;
-GLuint BillboardSizeID;
-GLuint billboard_vertex_buffer;
-
 // Shadow variables
 GLuint fbo;
 GLuint depthMatrixID;
@@ -169,9 +162,6 @@ unsigned int numObj = 0;
 unsigned int collisions = 0;
 unsigned int pIndices = 0;
 unsigned int whichShader = 0;
-
-float xtrans[100];
-float ztrans[100];
 float missleTime;
 
 bool collisionDetectedTerrain = false;
@@ -380,44 +370,6 @@ int initVBO(Entity *e, int whichbo, bool textures = false) {
 	return (int)indBuf.size();
 }
 
-void initBillboard() {
-	// Set up billboard
-	static const GLfloat g_vertex_buffer_data[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.5f, 0.5f, 0.0f,
-	};
-	
-	glGenBuffers(1, &billboard_vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
-}
-
-void drawBillboard(Camera *camera) {
-	glUseProgram(passThroughShaders);
-	glEnable(GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glUniform1i(renderObj, 2);
-	glm::mat4 ViewMatrix = camera->getViewMatrix();
-	glUniform3f(CameraRight_worldspace_ID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
-	glUniform3f(CameraUp_worldspace_ID   , ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
-	
-	int i;
-	
-	for (i = 0; i < 100; i++) {
-		glUniform3f(BillboardPosID, 200.0f + xtrans[i], 100.0f, 200.0f + ztrans[i]);
-		glUniform2f(BillboardSizeID, 20.0f, 20.0f);
-		
-		// Enable and bind position array for drawing
-		glEnableVertexAttribArray(aPos);
-		glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-		glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-	glDisableVertexAttribArray(0);
-}
-
 void initGround() {
 	terrain = Terrain("../Assets/heightmap/UltraAirArcade.bmp", 50.0, terPosBuf, terIndBuf, terNorBuf);
 	
@@ -478,12 +430,6 @@ void initShaderVars() {
 	h_uMatDif = glGetUniformLocation(passThroughShaders, "UdColor");
 	h_uMatSpec = glGetUniformLocation(passThroughShaders, "UsColor");
 	h_uMatShine = glGetUniformLocation(passThroughShaders, "Ushine");
-	
-	// Shader vars for billboard
-	CameraRight_worldspace_ID  = glGetUniformLocation(passThroughShaders, "CameraRight_worldspace");
-	CameraUp_worldspace_ID  = glGetUniformLocation(passThroughShaders, "CameraUp_worldspace");
-	BillboardPosID = glGetUniformLocation(passThroughShaders, "BillboardPos");
-	BillboardSizeID = glGetUniformLocation(passThroughShaders, "BillboardSize");
 	
 	depthBiasID =    glGetUniformLocation(renderSceneShaders, "depthBiasMVP");
 	shadowMapID =  glGetUniformLocation(renderSceneShaders, "shadowMap");
@@ -849,12 +795,6 @@ int main(int argc, char **argv) {
 	
 	glfwSetErrorCallback(error_callback);
 	
-	int i;
-	for (i = 0; i < 100; i++) {
-		xtrans[i] = randNum();
-		ztrans[i] = randNum();
-	}
-	
 	// Initialise GLFW
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
@@ -936,7 +876,6 @@ int main(int argc, char **argv) {
 	drawText->initResources(g_width, g_height);
 	
 	initCollisions();
-	initBillboard();
 	initGround();
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 	
@@ -1074,7 +1013,6 @@ int main(int argc, char **argv) {
 		viewFrustum.setFrustum(view, projection);
 		
 		drawGround(projection, view);
-		//drawBillboard(&camera);
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		
 		// Update the rules and game state

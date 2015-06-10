@@ -13,11 +13,6 @@ uniform vec3 UsColor;
 uniform vec3 UdColor;
 uniform float Ushine;
 
-uniform vec3 CameraRight_worldspace;
-uniform vec3 CameraUp_worldspace;
-uniform vec3 BillboardPos;
-uniform vec2 BillboardSize;
-
 out vec3 silh_vNor;
 out vec3 silh_vPos;
 
@@ -47,14 +42,6 @@ void main() {
 		vNor = vec3(M * vec4(aNor, 0.0));
 		vPos = vec3(M * aPos);
 		gl_Position = P * V * M * aPos;
-	} else if (renderObj == 42) { // For rendering billboard
-		vec3 particleCenter_wordspace = BillboardPos;
-	
-		vec3 vertexPosition_worldspace = 
-			particleCenter_wordspace
-			+ CameraRight_worldspace * aPos.x * BillboardSize.x
-			+ CameraUp_worldspace * aPos.y * BillboardSize.y;
-		gl_Position = P * V * vec4(vertexPosition_worldspace, 1.0f);
 	} else if (renderObj == 3) {
 		silh_vPos = vec3(V * M * aPos);
 		silh_vNor = vec3(V * M * vec4(aNor, 0.0));
