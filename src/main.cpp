@@ -33,6 +33,9 @@
 #include "DrawText.h"
 #include "Frustum.h"
 
+#include "texture.hpp"
+#include "text2D.hpp"
+
 #include "helper.h"
 #include "GLSL.h"
 #include "GLSLProgram.h"
@@ -683,50 +686,26 @@ void countdown(int seconds) {
 }
 
 void drawDebugHUD(int fps, int checkpointsDrawn, int checkpointsTotal, int planesDrawn, int planesTotal) {
-   char buffer[256], *text;
+   char text[256];
 
-   snprintf(buffer, sizeof(buffer), "%.02f, %.02f, %.02f", player.getPosition().x, player.getPosition().y, player.getPosition().z);
-   int len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.75 * g_width, 0.05 * g_height, 0, 0, drawText->getFontSize(90), 1));
+   sprintf(text, "%.02f, %.02f, %.02f", player.getPosition().x, player.getPosition().y, player.getPosition().z);
+   printText2D(text, 0.75 * g_width, 0.05 * g_height, 10);
 
-   snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.75 * g_width, 0.08 * g_height, 0, 0, drawText->getFontSize(90), 1));
+   sprintf(text, "FPS: %d", fps);
+   printText2D(text, 0.75 * g_width, 0.08 * g_height, 10);
 
-   snprintf(buffer, sizeof(buffer), "Opponents Drawn: %d/%d", planesDrawn, planesTotal);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.75 * g_width, 0.11 * g_height, 0, 0, drawText->getFontSize(90), 1));   
+   sprintf(text, "Opponents Drawn: %d/%d", planesDrawn, planesTotal);
+   printText2D(text, 0.75 * g_width, 0.11 * g_height, 10);
 
-   snprintf(buffer, sizeof(buffer), "Checkpoints Drawn: %d/%d", checkpointsDrawn, checkpointsTotal);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.75 * g_width, 0.14 * g_height, 0, 0, drawText->getFontSize(90), 1));   
-
+   sprintf(text, "Checkpoints Drawn: %d/%d", checkpointsDrawn, checkpointsTotal);
+   printText2D(text, 0.75 * g_width, 0.14 * g_height, 10);
 }
 
 void drawHUD(float pitch, float time) {
-   char buffer[256], *text;
+   char text[256];
 
-   drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
-   drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
-
-   drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-   drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
-
-   snprintf(buffer, sizeof(buffer), "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10);
-   int len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
-
-   // drawText->addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
+   sprintf(text, "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10 );
+   printText2D(text, 0.145 * g_width, 0.55 * g_height, 20);
 
    char suffix[2];
 
@@ -743,32 +722,17 @@ void drawHUD(float pitch, float time) {
       strncpy(suffix, "th", 2);
    }
 
-   snprintf(buffer, sizeof(buffer), "%d%s", playerAI.getPlace(), suffix);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
+   sprintf(text, "%d%s", playerAI.getPlace(), suffix);
+   printText2D(text, 0.05 * g_width, 0.1 * g_height, 40);
 
-   drawText->addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-   drawText->addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
+   sprintf(text, "%.0fm", player.getPosition().y * 10);
+   printText2D(text, 0.81 * g_width, 0.55 * g_height, 20);
 
-   snprintf(buffer, sizeof(buffer), "%.0fm", player.getPosition().y * 10);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
+   sprintf(text, "Lap: %d/3", playerAI.getLap() + 1);
+   printText2D(text, 0.75 * g_width, 0.9 * g_height, 20);
 
-   snprintf(buffer, sizeof(buffer), "Lap: %d/3", playerAI.getLap() + 1);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.8 * g_width, 0.9 * g_height, 0, 0, drawText->getFontSize(45), 1));
-
-   snprintf(buffer, sizeof(buffer), "%f", time);
-   len = strlen(buffer) + 1;
-   text = new char[len];
-   strncpy(text, buffer, len);
-   drawText->addText(Text(text, 0.05 * g_width, 0.9 * g_height, 0, 0, drawText->getFontSize(60), 1));
+   sprintf(text, "%d:%.03f", (int) time / 60, time);
+   printText2D(text, 0.05 * g_width, 0.9 * g_height, 30);
 }
 
 int main(int argc, char **argv) {
@@ -798,9 +762,9 @@ int main(int argc, char **argv) {
 
    glfwWindowHint(GLFW_SAMPLES, 4);
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-   // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
    g_width = 640;
    g_height = 480;
 
@@ -852,15 +816,21 @@ int main(int argc, char **argv) {
    renderSceneShaders = installShaders("shd/renderscene_vert.glsl", "shd/renderscene_frag.glsl");
    passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
    skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
-   textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
+   textShaders = installShaders("shd/TextVertexShader.vertexshader", "shd/TextVertexShader.fragmentshader");
 
    initShaderVars();
    skybox = new Skybox(skyBoxShaders);
    skybox->initShaderVars();
 
-   drawText = new DrawText(textShaders);
-   drawText->initResources(g_width, g_height);
+   GLuint VertexArrayID;
+   glGenVertexArrays(1, &VertexArrayID);
+   glBindVertexArray(VertexArrayID);
 
+   // Load the texture
+   GLuint Texture = loadDDS("Fonts/uvmap.DDS");
+
+   // Initialize our little text library with the Holstein font
+   initText2D( textShaders, "Fonts/Holstein.DDS" );
 
    initCollisions();
    initBillboard();
@@ -1088,21 +1058,18 @@ int main(int argc, char **argv) {
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      glDepthMask(GL_FALSE);  // disable writes to Z-Buffer
-      glDisable(GL_DEPTH_TEST);  // disable depth-testing
-      //Draw HUD
+      glUseProgram(textShaders);
+
+      // Bind our texture in Texture Unit 0
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, Texture);
+
       if (hud) {
          drawHUD(pitch, elapsed);
       }
       if (debugHud) {
          drawDebugHUD(fps, cd, c, od, o);
       }
-      glDisable(GL_CULL_FACE);
-      drawText->drawText();
-      glEnable(GL_CULL_FACE);
-      glEnable (GL_DEPTH_TEST);
-      glDepthFunc (GL_LESS);
-      glDepthMask(GL_TRUE);  // disable writes to Z-Buffer
 
       assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
