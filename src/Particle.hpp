@@ -27,7 +27,6 @@ class Particle {
 		GLuint uProjMatrix;
 		GLuint uViewMatrix;
 		// End list
-		//Stage particles[NUM_PARTICLES];
 		float randFactor[NUM_PARTICLES];
 		bool toRender[NUM_PARTICLES];
 		int timeStep[NUM_PARTICLES];
@@ -63,6 +62,7 @@ void Particle::update(glm::mat4 viewMat, glm::mat4 projMat, glm::quat rot, glm::
 	projMatrix = projMat;
 	position = pos;
 	quaternion = rot;
+
 	if (frameCount < NUM_PARTICLES) toRender[frameCount++] = true;
 }
 
@@ -79,6 +79,7 @@ void Particle::draw(float thrust) {
 
     // Set view matrix
     glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniform2f(BillboardSizeID, 0.025f, 0.025f);
 
 	// Send position array to GPU
 	glEnableVertexAttribArray(posAttrib);
@@ -87,7 +88,6 @@ void Particle::draw(float thrust) {
 
 	int i;
 	for (i = 0; i < NUM_PARTICLES; i++) {
-		//glUniform3f(BillboardPosID, 200.0f + xtrans[i], 200.0f, 200.0f + ztrans[i]);
 		if (toRender[i]) {
 			float factor = (-thrust) * randFactor[i] * timeStep[i] * 0.07 / NUM_PARTICLES;
 			glm::vec3 direction = (0.15f + factor) * glm::normalize(glm::vec3(0, -0.25, 1) * glm::inverse(quaternion));
@@ -98,9 +98,6 @@ void Particle::draw(float thrust) {
 			if (timeStep[i] == NUM_PARTICLES -1) timeStep[i] = 0;
 			else timeStep[i]++;
 
-			glEnableVertexAttribArray(posAttrib);
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		}
 	}

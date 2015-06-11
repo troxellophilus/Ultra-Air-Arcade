@@ -102,8 +102,6 @@ void main() {
         float intensity = (500 * dist) / (dist * dist + dist + 1);
 
         outColor = vec4(intensity * toonShade(), 1.0);
-    } else if (renderObj == 2) {    // For rendering billboards
-            outColor = vec4(1.0, 1.0, 1.0, 0.5);
     } else if (renderObj == 3) {
         vec3 n = normalize(silh_vNor);
             vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
@@ -125,4 +123,5 @@ void main() {
     else {                              // Catch-all
             outColor = vec4(vCol, 1.0);
     }
+
 }
