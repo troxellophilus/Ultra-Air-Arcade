@@ -238,10 +238,15 @@ void Rules::race(Camera *cam) {
 	playerAI->setPlace(num_ahead + 1);
 	
 	// When all racers have finish 3 laps, set state to finish
+	static int finish_count = 0;
 	if (playerAI->getLap() == 3) {
-		state = FINISH;
-		frames = 0;
-		printf("The race is complete!\nYou finished in %d place!\n", playerAI->getPlace());
+		finish_count++;
+		if (finish_count > 15) {
+			state = FINISH;
+			frames = 0;
+			finish_count = 0;
+			printf("The race is complete!\nYou finished in %d place!\n", playerAI->getPlace());
+		}
 	}
 }
 
