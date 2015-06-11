@@ -277,7 +277,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 				camera.setPlayer(&player);
 			}
 			if (key == GLFW_KEY_O) {
-				camera.setPlayer(&(opponents[0]));
+				static int which_opp = 0;
+				camera.setPlayer(&(opponents[which_opp++]));
 			}
 			
 			if (key == GLFW_KEY_N) {
