@@ -291,8 +291,6 @@ void RacerAI::race(int frames, Entity *agent) {
 		glm::vec3 todir = glm::normalize(target - agent->getPosition());
 		glm::quat q = glm::rotation(glm::vec3(0, 0, -1), todir);
 		agent->setTargetRotationQ(q);
-
-		printf("Opponent pos: %f, %f, %f\n", agent->getPosition().x, agent->getPosition().y, agent->getPosition().z);
 	}
 	
 	if (type == PLAYER && frames % 50 == 0) {
