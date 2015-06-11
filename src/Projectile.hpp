@@ -78,7 +78,7 @@ Projectile::Projectile(Entity &e, bool path, bool smart, glm::vec3 initPos, glm:
    distance = glm::distance(initPos, target);
    
    if(!path){
-      time = (distance/25);
+      time = (distance/5);
       cout << "Distance" << distance << endl;
       cout << "Time: " << time << endl;
       cout << "POS: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
@@ -116,12 +116,12 @@ void Projectile::updateCps(glm::vec3 pos, glm::vec3 targetPos, glm::vec3 initDir
       //cout << "startPos 2: "<< startPos[0] << ", " << startPos[1] << ", " << startPos[2] << endl; 
       setCps(startPos[0] - initDir[0] * 3, startPos[1] - initDir[1] * 3, startPos[2] - initDir[2] * 3, 1.0);   
       setCps(startPos[0] - initDir[0] * 3, startPos[1] - initDir[1] * 3, startPos[2] - initDir[2] * 3, 1.0);   
-      setCps(startPos[0] - initDir[0] * 100, startPos[1] - initDir[1] * 100, startPos[2] - initDir[2] * 100, 1.0);   
+      setCps(startPos[0] - initDir[0] * 100, startPos[1], startPos[2] - initDir[2] * 100, 1.0);   
       //setCps(pos[0], pos[1] - initDir[1] * 3, pos[2], 1.0);   
 
       //cout << "CPS: " << startPos[0] + initDir[0] * 100 <<  ", " << startPos[1] << ", " << startPos[2] + initDir[2] * 100 << endl;
       
-      for(int i = 0; i < 2; i++){
+      for(int i = 0; i < 5; i++){
          setCps(targetPos[0], targetPos[1], targetPos[2], 1.0);
       } 
 
@@ -191,13 +191,13 @@ void Projectile::buildTable(){
       float xi;
       float wi;
       usTable.push_back(make_pair(0, 0));
-		Eigen::Matrix4f B;      
-		B << 0, -1, 2, -1,
+      Eigen::Matrix4f B;      
+      B << 0, -1, 2, -1,
         2, 0, -5, 3,
         0, 1, 4, -3,
         0, 0, -1, 1;
    
-   	B /= 2;
+      B /= 2;
       Eigen::Vector3f pPrime;
       for(int itr = 0; itr+3 < ncps; itr++){
          G << cps[itr](0), cps[itr+1](0), cps[itr+2](0), cps[itr+3](0),
@@ -224,7 +224,7 @@ void Projectile::buildTable(){
                      wi = 5.0/9.0;
                      xi = glm::sqrt(3.0/5.0);
                   }
-						
+                  
                   float answer;
 
                   answer  = ((.2)/2.0) * xi + ((u + (u - .2))/2.0);
@@ -311,7 +311,7 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
    int ncps = (int)cps.size();
 
    //ROTATION ANGLE LOGIC SETUP WILL GO HERE LATER, WE WILL PUSH MORE INTO QUAT(QUATERNION)
-   //quats.push_back(q0);	
+   //quats.push_back(q0);  
 
    //glColor3f(1.0, 1.0, 1.0);
    
@@ -334,28 +334,28 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
 
       for(float u = 0.0; u < 1 && ncps > 3; u++){
          uVec << 1.0, u, u * u, u * u * u;
-         Eigen::Vector3f p = G * B * uVec;	
+         Eigen::Vector3f p = G * B * uVec;   
       }
    }
 
    //HAVE PROJECTILE FOLLOW THE SPLINE
    buildTable();
    
-	float sMax, s;
-	pair<float,float> row = usTable[(int)usTable.size()-1];
-	sMax = row.second;	
-	float tNorm = std::fmod((double)t, (double)time) / time;
+   float sMax, s;
+   pair<float,float> row = usTable[(int)usTable.size()-1];
+   sMax = row.second;   
+   float tNorm = std::fmod((double)t, (double)time) / time;
 
-	float sNorm = tNorm;
+   float sNorm = tNorm;
 
-	s = sMax * sNorm;	
-		
+   s = sMax * sNorm; 
+      
    float kfloat;
    float u = s2u(s);
-	//cout << "U: " << u << endl;
+   //cout << "U: " << u << endl;
    
    int k = (int)std::floor(u);
-	u = u - k;	
+   u = u - k;  
    
    //cout << "K: " << k << endl;
    G << cps[k](0), cps[k+1](0), cps[k+2](0), cps[k+3](0),   
@@ -370,26 +370,26 @@ int Projectile::launchSplineBased(float elapsed, glm::vec3 myPos, glm::vec3 targ
    uVecPrime << 0, 1, 2 * u, 3 * (u * u);
    Eigen::Vector3f pPrime = G * B * uVecPrime;
    Eigen::Vector3f Tu = pPrime.normalized();   
-	
+   
    q0 = Eigen::AngleAxisf(M_PI, Tu);
    for(int i = 0; i < 4; i++){
       quats.push_back(q0);   
    }
-	Eigen::Matrix4f gq;
-		
-	gq << quats[k].w(), quats[k+1].w(), quats[k+2].w(), quats[k+3].w(),   
+   Eigen::Matrix4f gq;
+      
+   gq << quats[k].w(), quats[k+1].w(), quats[k+2].w(), quats[k+3].w(),   
          quats[k].x(), quats[k+1].x(), quats[k+2].x(), quats[k+3].x(),
          quats[k].y(), quats[k+1].y(), quats[k+2].y(), quats[k+3].y(),
-			quats[k].z(), quats[k+1].z(), quats[k+2].z(), quats[k+3].z();			
+         quats[k].z(), quats[k+1].z(), quats[k+2].z(), quats[k+3].z();        
    
-	
+   
    Eigen::Vector4f qVec = (gq * (B * uVec));
-	Eigen::Quaternionf quaternion;
-	quaternion.w() = qVec(0);
+   Eigen::Quaternionf quaternion;
+   quaternion.w() = qVec(0);
    quaternion.vec() = qVec.segment<3>(1);
-	quaternion.normalize();
+   quaternion.normalize();
 
-	Eigen::Matrix4f RLoc2 = Eigen::Matrix4f::Identity();
+   Eigen::Matrix4f RLoc2 = Eigen::Matrix4f::Identity();
    RLoc2.block<3,3>(0,0) = quaternion.toRotationMatrix();
    
    

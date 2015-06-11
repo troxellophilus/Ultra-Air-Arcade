@@ -30,6 +30,9 @@ private:
     int enemyStep;
     glm::vec3 convertedNor;
     PlaneSound *collisionSound;
+    PlaneSound *enemyCollisionSound;
+	glm::vec3 sphereTranslations[5];
+	float sphereRadius[5];
     
 public:
     Collision();
@@ -38,6 +41,7 @@ public:
     void setOpponents(vector<Entity> *opp);
     void setPlayerSound(PlaneSound *sound);
     void setCollisionSound(PlaneSound *sound);
+    void setEnemyCollisionSound(PlaneSound *sound);
     void update();
     bool detectEntityCollision(Entity *player, Entity *object);
     bool detectTerrainCollision(Entity *object);
@@ -54,6 +58,17 @@ Collision::Collision() {
     opponents = NULL;
     resetStep = 0;
     enemyStep = 0;
+
+	sphereTranslations[0] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[0] = 0.04;
+	sphereTranslations[1] = glm::vec3(-0.18, -0.025, 0.05);
+	sphereRadius[1] = 0.04;
+	sphereTranslations[2] = glm::vec3(0.0, -0.025, -0.2);
+	sphereRadius[2] = 0.04;
+	sphereTranslations[3] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[3] = 0.04;
+	sphereTranslations[4] = glm::vec3(0.0);
+	sphereRadius[4] = 0.04;
 }
 
 Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer) {
@@ -64,6 +79,17 @@ Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Enti
     opponents = opponentsPointer;
     resetStep = 0;
     enemyStep = 0;
+
+	sphereTranslations[0] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[0] = 0.04;
+	sphereTranslations[1] = glm::vec3(-0.18, -0.025, 0.05);
+	sphereRadius[1] = 0.04;
+	sphereTranslations[2] = glm::vec3(0.0, -0.025, -0.2);
+	sphereRadius[2] = 0.04;
+	sphereTranslations[3] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[3] = 0.04;
+	sphereTranslations[4] = glm::vec3(0.0);
+	sphereRadius[4] = 0.04;
 }
 
 Collision::~Collision() { }
@@ -78,6 +104,10 @@ void Collision::setPlayerSound(PlaneSound *sound) {
 
 void Collision::setCollisionSound(PlaneSound *sound) {
     collisionSound = sound;
+}
+
+void Collision::setEnemyCollisionSound(PlaneSound *sound) {
+    enemyCollisionSound = sound;
 }
 
 void Collision::update() {
@@ -119,7 +149,7 @@ void Collision::update() {
         if (resetStep++ > 30) {
             player->collisionFlag = false;
             resetStep = 0;
-            player->setMaterial(Materials::emerald);
+            player->setMaterial(player->getBaseMaterial());
 	    player->setThrust(-1.f);
 	    player->setVelocity(glm::vec3(0.f, 0.f, -10.f));
             // camera->setMode(Camera::CameraMode::TPC);
@@ -133,6 +163,7 @@ void Collision::update() {
                 player->setTargetRotationQ(glm::shortMix(player->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.2f));
 		((RacerAI *)opp.getAI())->setBounceTarget(player);
 		((RacerAI *)opp.getAI())->setState(RacerAI::BOUNCE);
+                enemyCollisionSound->play();
             }
         }
 
@@ -190,6 +221,29 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
     
     anyOverlap = xOverlap && yOverlap && zOverlap;
     
+	// For hierarchical bounding spheres
+	if (anyOverlap) {
+		int i;
+		for (i = 0; i < 5; i++) {
+			glm::quat rot = player->getRotationQ();
+			glm::vec3 directionx = sphereTranslations[i].x * glm::normalize(glm::vec3(1, 0, 0) * glm::inverse(rot));
+			glm::vec3 directiony = sphereTranslations[i].y * glm::normalize(glm::vec3(0, 1, 0) * glm::inverse(rot));
+			glm::vec3 directionz = sphereTranslations[i].z * glm::normalize(glm::vec3(0, 0, 1) * glm::inverse(rot));
+			glm::vec3 refPos1 = player->getPosition() + directionx + directiony + directionz;
+			if (glm::distance(refPos1, objectPosition) <= sphereRadius[i] + objectRadius) {
+				int j;
+				for (j = 0; j < 5; j++) {
+					rot = object->getRotationQ();
+					directionx = sphereTranslations[j].x * glm::normalize(glm::vec3(1, 0, 0) * glm::inverse(rot));
+					directiony = sphereTranslations[j].y * glm::normalize(glm::vec3(0, 1, 0) * glm::inverse(rot));
+					directionz = sphereTranslations[j].z * glm::normalize(glm::vec3(0, 0, 1) * glm::inverse(rot));
+					glm::vec3 refPos2 = object->getPosition() + directionx + directiony + directionz;
+					if (glm::distance(refPos1, refPos2) <= sphereRadius[i] + sphereRadius[j]) return true;
+				}
+			}
+		}
+	}
+
     return anyOverlap;
 }
 

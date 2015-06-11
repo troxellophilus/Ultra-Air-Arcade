@@ -28,7 +28,7 @@ vec3 snowDiffuse = vec3(0.5, 0.5, 0.5);
 vec3 snowAmbient = vec3(0.05, 0.05, 0.05) * snowDiffuse;
 
 vec3 woodDiffuse = vec3(0.3, 0.2, 0.05);
-vec3 woodAmbient = vec3(0.6, 0.41, 0.29);// * woodDiffuse;
+vec3 woodAmbient = vec3(0.6, 0.41, 0.29) * woodDiffuse;
 
 vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
 vec3 waterAmbient = vec3(0.0, 0.05, 0.07) * waterDiffuse;
@@ -93,7 +93,7 @@ void main(){
     		if (vPos.y < 0.5) {
 				float num = rand(vPos.xz);
 				ambient = waterAmbient;
-				if (num > 0.5) diffuse = waterDiffuse * num;
+				if (num > 0.8) diffuse = waterDiffuse * num;
 				else diffuse = waterDiffuse;
 			} else {
 				ambient = forestAmbient;

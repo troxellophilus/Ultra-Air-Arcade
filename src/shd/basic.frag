@@ -64,7 +64,7 @@ vec3 toonShade() {
             if (vPos.y < 0.5) {
                 float num = rand(vPos.xz);
                 ambient = waterAmbient;
-                if (num > 0.5) diffuse = waterDiffuse * num;
+                if (num > 0.8) diffuse = waterDiffuse * num;
                 else diffuse = waterDiffuse;
             } else {
                 ambient = forestAmbient;
@@ -102,14 +102,12 @@ void main() {
         float intensity = (500 * dist) / (dist * dist + dist + 1);
 
         outColor = vec4(intensity * toonShade(), 1.0);
-    } else if (renderObj == 2) {    // For rendering billboards
-            outColor = vec4(1.0, 1.0, 1.0, 0.5);
     } else if (renderObj == 3) {
         vec3 n = normalize(silh_vNor);
             vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
             if (dot(n, e) < 0.5)
-                outColor = vec4(1.0, 0.0, 1.0, 0.5);
+                outColor = vec4(n.xyz, 0.5);
             else
                 outColor = vec4(0.0,0.0,0.0,0.0);
     } 
@@ -125,4 +123,5 @@ void main() {
     else {                              // Catch-all
             outColor = vec4(vCol, 1.0);
     }
+
 }
