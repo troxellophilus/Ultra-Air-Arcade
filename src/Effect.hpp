@@ -98,7 +98,7 @@ void Effect::draw(float thrust) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-   cout << "Hello\n";
+   //cout << "Hello\n";
 	int i;
 	for (i = 0; i < NUM_EFFECT; i++) {
 		if (particles[i].toRender) {
@@ -152,7 +152,7 @@ void Effect::setShaderProg(GLuint programID) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
-   cout << "Bye\n" << endl;
+   //cout << "Bye\n" << endl;
 }
 
 #endif
