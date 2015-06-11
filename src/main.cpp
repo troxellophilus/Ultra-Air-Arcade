@@ -1073,9 +1073,11 @@ int main(int argc, char **argv) {
       for(int i = 0; i < opponents.size(); i++){
          t++;
          opponents[i].update();
+		opponents[i].update(view, projection);
          
          if(viewFrustum.sphereInFrustum(opponents[i].getPosition(), opponents[i].getRadius())){
             drawVBO(&(opponents[i]), pIndices, PLANE);
+			opponents[i].drawExhaust();
          }
          
          glm::vec3 playerPos = player.getPosition();
