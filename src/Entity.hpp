@@ -16,6 +16,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Particle.hpp"
+#include "Effect.hpp"
 #include "Materials.hpp"
 #include "types.h"
 
@@ -40,7 +41,8 @@ private:
 	Material  material; // Material of the entity
 	Material  base_material;
 	Particle flame; 	// Billboarded particle that will make up the jet exhause
-	glm::vec3 scale;    // scale of the object model
+	Effect effect;
+   glm::vec3 scale;    // scale of the object model
 	
 	// Components
 	AIComponent *ai_;
@@ -118,10 +120,13 @@ public:
 	void setType(EntityType new_type);
 
 	void setParticleProg(GLuint);
+   void setEffectProg(GLuint);   
 
 	// Methods
 	void update();
 	void update(glm::mat4, glm::mat4);
+   void updateEffect(glm::mat4, glm::mat4);
+   void drawEffect();
 	void drawExhaust();
 	
 	void pitch(float dy);
@@ -211,6 +216,10 @@ void Entity::setParticleProg(GLuint program) {
 	flame.setShaderProg(program);
 }
 
+void Entity::setEffectProg(GLuint program){
+   effect.setShaderProg(program);
+}
+
 void Entity::update() {
 	static int frames = 0;
 	static float fps = 1 / 60.f;
@@ -248,8 +257,16 @@ void Entity::update(glm::mat4 viewMat, glm::mat4 projMat) {
 	flame.update(viewMat, projMat, rotation, position);
 }
 
+void Entity::updateEffect(glm::mat4 viewMat, glm::mat4 projMat) {
+   effect.update(viewMat, projMat, rotation, position);
+}
+
 void Entity::drawExhaust() {
-	flame.draw(thrust);
+   flame.draw(thrust);
+}
+
+void Entity::drawEffect() {
+   effect.draw(thrust);
 }
 
 void Entity::throttleUp() {

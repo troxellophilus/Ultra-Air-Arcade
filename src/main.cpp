@@ -35,6 +35,7 @@
 #include "Frustum.h"
 #include "PlaneSound.hpp"
 #include "Explosion.hpp"
+#include "Effect.hpp" 
 
 #include "texture.hpp"
 #include "text2D.hpp"
@@ -1090,6 +1091,7 @@ int main(int argc, char **argv) {
 	projectileEntity.setMaterial(Materials::emerald);
 	int mIndices = initVBO(&projectileEntity, MISSILE);
 	projectileEntity.calculateBoundingSphereRadius();
+	projectileEntity.setEffectProg(particleShaders);
 
 	// Initialize opponents
 	RacerAI *ai;
@@ -1317,8 +1319,9 @@ int main(int argc, char **argv) {
 			                                   playerDirection);
 
 			Entity* ent = missle->getEntity();
-
-			drawVBO(ent, mIndices, MISSILE);
+			ent->updateEffect(view, projection);
+         ent->drawEffect();
+			//drawVBO(ent, mIndices, MISSILE);
 
 			bool collisionWithOpp = collision.detectEntityCollision(&opponents[mClosestOpponent], ent);
 			if (collisionWithOpp || collision.detectTerrainCollision(ent)) {
