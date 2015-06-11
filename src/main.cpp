@@ -243,6 +243,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 		else if (action == GLFW_PRESS && rules.getState() == Rules::FINISH) {
 			rules.setState(Rules::LEADERBOARD);
+
 			backgroundMusic.stop();
 			planeSound.stop();
 			themeMusic.playLooped();
@@ -250,9 +251,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 		else if (action == GLFW_PRESS && rules.getState() == Rules::LEADERBOARD) {
 			rules.setState(Rules::SPLASH);
-			backgroundMusic.stop();
-			planeSound.stop();
-			themeMusic.playLooped();
 		}
 		else if (rules.getState() == Rules::RACE) {
 
@@ -1286,11 +1284,7 @@ int main(int argc, char **argv) {
 					opponents[mClosestOpponent].setTargetRotationQ(glm::shortMix(opponents[mClosestOpponent].getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
 					((RacerAI *)opponents[mClosestOpponent].getAI())->setBounceTarget(ent);
 					((RacerAI *)opponents[mClosestOpponent].getAI())->setState(RacerAI::BOUNCE);
-					opponents[mClosestOpponent].throttleDown();
-					opponents[mClosestOpponent].throttleDown();
-					opponents[mClosestOpponent].throttleDown();
-					opponents[mClosestOpponent].throttleDown();
-					opponents[mClosestOpponent].throttleDown();
+					opponents[mClosestOpponent].setThrust(opponents[mClosestOpponent].getThrust() / 2.f);
 				}
 
 				explosion.occuring = true;
