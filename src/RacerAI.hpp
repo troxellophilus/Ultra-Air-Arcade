@@ -175,7 +175,7 @@ RacerAI::RacerAI() {
 		mod = -1;
 	start_loc = global_track[TRACK_LOCS - 1] + glm::vec3(8 - mod, 0, 8 - mod);
 	
-	noise = std::normal_distribution<>(0,1.2f);
+	noise = std::normal_distribution<>(0,1.0f);
 	
 	// Fill individual track locations with noise
 	for (int i = 0; i < TRACK_LOCS; i++)
