@@ -34,6 +34,7 @@
 #include "DrawText.h"
 #include "Frustum.h"
 #include "PlaneSound.hpp"
+#include "Explosion.hpp"
 
 #include "texture.hpp"
 #include "text2D.hpp"
@@ -195,6 +196,7 @@ Material p_mat_list[NUM_PLAYER_MATS] = {
 
 int closestOpponent;
 int mClosestOpponent;
+int particleTime;
 
 float randNum() {
 	return ((float) rand() / (RAND_MAX)) * 600.0;
@@ -1102,6 +1104,11 @@ int main(int argc, char **argv) {
 	//Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
 	bool color = false;
 
+   Explosion explosion;	
+
+   explosion = Explosion();
+   explosion.setShaderProg(particleShaders);
+
 	// Frame loop
 	while (!glfwWindowShouldClose(window)) {
 		float ratio;
@@ -1231,6 +1238,15 @@ int main(int argc, char **argv) {
 		camera.update();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
+      if (explosion.occuring == true) {
+         explosion.update(view, projection);
+         explosion.draw(10.0);          
+      
+         if (particleTime > 300) {
+            explosion.occuring = false;
+         }
+      }
+
 		if (beginProjectile == true) {
 			int isDone = missle->runProjectile(elapsed - missleTime,
                                   player.getPosition(), opponents[mClosestOpponent].getPosition(),
@@ -1253,6 +1269,13 @@ int main(int argc, char **argv) {
 				opponents[mClosestOpponent].throttleDown();
 				opponents[mClosestOpponent].throttleDown();
          	}
+         	
+            explosion.occuring = true;
+            
+            explosion.setPosition(ent->getPosition());
+            explosion.update(view, projection);
+            explosion.draw(10.0);   
+            particleTime = 0;
    
             missleTime = 0;
             beginProjectile = false;
