@@ -175,6 +175,9 @@ bool needStart = true;
 int countdown = 0;
 
 bool beginProjectile = false;
+bool startCooldown = false;
+bool missileCooldown = false;
+float cooldownTime = 0;
 Projectile *missle;
 Entity projectileEntity = Entity();
 float start;
@@ -286,7 +289,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			}
 
 			if (action == GLFW_PRESS && key == GLFW_KEY_X) {
-				if (!beginProjectile) {
+				if (!beginProjectile && missileCooldown == false) {
+					startCooldown = true;
 					beginProjectile = true;
 					mClosestOpponent = closestOpponent;
 					missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[mClosestOpponent].getPosition());
@@ -417,10 +421,10 @@ void initCollisions() {
 	collision = Collision(&terrain, &player, &opponents);
 
 	backgroundMusic.setVolume(50.f);
-	
+
 	themeMusic.setVolume(50.f);
 	themeMusic.playLooped();
-	
+
 	collision.setPlayerSound(&planeSound);
 	collision.setCollisionSound(&collisionSound);
 	collision.setEnemyCollisionSound(&enemyCollisionSound);
@@ -1104,10 +1108,10 @@ int main(int argc, char **argv) {
 	//Projectile pathPlane = Projectile(bigOpp, true, bigOpp.getPosition(), bigOpp.getPosition());
 	bool color = false;
 
-   Explosion explosion;	
+	Explosion explosion;
 
-   explosion = Explosion();
-   explosion.setShaderProg(particleShaders);
+	explosion = Explosion();
+	explosion.setShaderProg(particleShaders);
 
 	// Frame loop
 	while (!glfwWindowShouldClose(window)) {
@@ -1238,50 +1242,69 @@ int main(int argc, char **argv) {
 		camera.update();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
-      if (explosion.occuring == true) {
-         explosion.update(view, projection);
-         explosion.draw(10.0);          
-      
-         if (particleTime > 300) {
-            explosion.occuring = false;
-         }
-      }
+		if (explosion.occuring == true) {
+			explosion.update(view, projection);
+			explosion.draw(10.0);
+
+			if (particleTime > 300) {
+				explosion.occuring = false;
+			}
+		}
+
+		float cooldownStart;
+		if (startCooldown == true) {
+			startCooldown = false;
+			missileCooldown = true;
+			cooldownStart = glfwGetTime();
+		}
+
+		if (missileCooldown == true) {
+			cooldownTime = glfwGetTime() - cooldownStart;
+			char text[256];
+			// printf("Cooldown: %f\n", cooldownTime);
+			sprintf(text, "Cooldown: %.2f\n", cooldownTime);
+			printText2D(text, 0.75 * g_width, 0.50 * g_height, 15);
+		}
+
+		if (cooldownTime > 10) {
+			missileCooldown = false;
+		}
 
 		if (beginProjectile == true) {
 			int isDone = missle->runProjectile(elapsed - missleTime,
-                                  player.getPosition(), opponents[mClosestOpponent].getPosition(),
-                                  playerDirection);
+			                                   player.getPosition(), opponents[mClosestOpponent].getPosition(),
+			                                   playerDirection);
 
-         Entity* ent = missle->getEntity();
+			Entity* ent = missle->getEntity();
 
-         drawVBO(ent, mIndices, MISSILE);
+			drawVBO(ent, mIndices, MISSILE);
 
-         bool collisionWithOpp = collision.detectEntityCollision(&opponents[mClosestOpponent], ent);
-         if (collisionWithOpp || collision.detectTerrainCollision(ent)) {
-         	if (collisionWithOpp) {
-         		glm::vec3 vec_away_opp = glm::normalize(opponents[mClosestOpponent].getPosition() - ent->getPosition());
-                opponents[mClosestOpponent].setTargetRotationQ(glm::shortMix(opponents[mClosestOpponent].getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
-				((RacerAI *)opponents[mClosestOpponent].getAI())->setBounceTarget(ent);
-				((RacerAI *)opponents[mClosestOpponent].getAI())->setState(RacerAI::BOUNCE);
-				opponents[mClosestOpponent].throttleDown();
-				opponents[mClosestOpponent].throttleDown();
-				opponents[mClosestOpponent].throttleDown();
-				opponents[mClosestOpponent].throttleDown();
-				opponents[mClosestOpponent].throttleDown();
-         	}
-         	
-            explosion.occuring = true;
-            
-            explosion.setPosition(ent->getPosition());
-            explosion.update(view, projection);
-            explosion.draw(10.0);   
-            particleTime = 0;
-   
-            missleTime = 0;
-            beginProjectile = false;
-            delete missle;
-         }
-      }
+			bool collisionWithOpp = collision.detectEntityCollision(&opponents[mClosestOpponent], ent);
+			if (collisionWithOpp || collision.detectTerrainCollision(ent)) {
+				if (collisionWithOpp) {
+					glm::vec3 vec_away_opp = glm::normalize(opponents[mClosestOpponent].getPosition() - ent->getPosition());
+					opponents[mClosestOpponent].setTargetRotationQ(glm::shortMix(opponents[mClosestOpponent].getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
+					((RacerAI *)opponents[mClosestOpponent].getAI())->setBounceTarget(ent);
+					((RacerAI *)opponents[mClosestOpponent].getAI())->setState(RacerAI::BOUNCE);
+					opponents[mClosestOpponent].throttleDown();
+					opponents[mClosestOpponent].throttleDown();
+					opponents[mClosestOpponent].throttleDown();
+					opponents[mClosestOpponent].throttleDown();
+					opponents[mClosestOpponent].throttleDown();
+				}
+
+				explosion.occuring = true;
+
+				explosion.setPosition(ent->getPosition());
+				explosion.update(view, projection);
+				explosion.draw(10.0);
+				particleTime = 0;
+
+				missleTime = 0;
+				beginProjectile = false;
+				delete missle;
+			}
+		}
 
 		// Use the text shader
 		glUseProgram(textShaders);
@@ -1313,7 +1336,7 @@ int main(int argc, char **argv) {
 				start = glfwGetTime();
 
 				themeMusic.stop();
-      		backgroundMusic.playLooped();
+				backgroundMusic.playLooped();
 				planeSound.playLooped();
 			}
 
