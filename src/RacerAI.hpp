@@ -248,7 +248,7 @@ void RacerAI::race(int frames, Entity *agent) {
 	static int boost_lasts = 50;
 	
 	target = track[track_idx];// + glm::vec3(x, y, z);
-	
+
 	// update max thrust for hit rings
 	if (glm::distance(agent->getPosition(), global_track[track_idx]) < 2.f) {
 		agent->setMaxThrust(-2.0f);
@@ -300,14 +300,22 @@ void RacerAI::race(int frames, Entity *agent) {
 }
 
 void RacerAI::avoid(Entity *agent) {
+	static int count = 0;
+
 	agent->throttleDown();
+
+	if (count == 0) {
+		glm::vec3 vec_away_opp = glm::normalize(agent->getPosition() - avoid_target->getPosition());	
+
+		agent->setTargetRotationQ(glm::shortMix(agent->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.3f));
 	
-	glm::vec3 vec_away_opp = glm::normalize(agent->getPosition() - avoid_target->getPosition());
-	
-	agent->setTargetRotationQ(glm::shortMix(agent->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.3f));
-	
-	if (glm::distance(agent->getPosition(), avoid_target->getPosition()) > 2.0f)
+	}
+
+	count++;
+	if (count > 50) {
+		count = 0;
 		state = RACE;
+	}
 }
 
 void RacerAI::bounce(Entity *agent) {

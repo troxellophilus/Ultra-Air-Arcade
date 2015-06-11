@@ -198,20 +198,22 @@ void Rules::race(Camera *cam) {
 	
 	// Trigger avoidance states
 	for (Entity opp1 : *agents) {
+		if (((RacerAI *)opp1.getAI())->getState() == RacerAI::BOUNCE)
+			continue;
+
 		for (Entity opp2 : *agents) {
 			float d = glm::distance(opp1.getPosition(), opp2.getPosition());
-			if (d < 1.f && d > 0.00001f &&
-				((RacerAI *)opp1.getAI())->getState() != RacerAI::BOUNCE &&
+			if (d < 1.f && d > 0.001f &&
 				((RacerAI *)opp2.getAI())->getState() != RacerAI::BOUNCE) {
 				((RacerAI *)opp1.getAI())->setAvoidTarget(&opp2);
 				((RacerAI *)opp1.getAI())->setState(RacerAI::AVOID);
 				((RacerAI *)opp2.getAI())->setAvoidTarget(&opp1);
 				((RacerAI *)opp2.getAI())->setState(RacerAI::AVOID);
 			}
-			else {
-				((RacerAI *)opp1.getAI())->setState(RacerAI::RACE);
-				((RacerAI *)opp2.getAI())->setState(RacerAI::RACE);
-			}
+			//else {
+			//	((RacerAI *)opp1.getAI())->setState(RacerAI::RACE);
+			//	((RacerAI *)opp2.getAI())->setState(RacerAI::RACE);
+			//}
 		}
 	}
 	
@@ -237,15 +239,8 @@ void Rules::race(Camera *cam) {
 	
 	// When all racers have finish 3 laps, set state to finish
 	if (playerAI->getLap() == 3) {
-		//int unfinished = 0;
-		//for (RacerAI *opp : agentsAI) {
-		//   if (opp->getLap() < 3)
-		//        unfinished++;
-		//}
-		//if (unfinished == 0) {
-		//    state = FINISH;
-		//}
 		state = FINISH;
+		frames = 0;
 		printf("The race is complete!\nYou finished in %d place!\n", playerAI->getPlace());
 	}
 }

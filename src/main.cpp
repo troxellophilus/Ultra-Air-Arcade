@@ -35,6 +35,9 @@
 #include "Frustum.h"
 #include "PlaneSound.hpp"
 
+#include "texture.hpp"
+#include "text2D.hpp"
+
 #include "helper.h"
 #include "GLSL.h"
 #include "GLSLProgram.h"
@@ -63,6 +66,7 @@ GLuint depthCalcShaders;
 GLuint renderSceneShaders;
 GLuint skyBoxShaders;
 GLuint textShaders;
+GLuint hudShaders;
 GLuint propShaders;
 GLuint particleShaders;
 
@@ -127,11 +131,6 @@ GLuint propTexture;
 GLuint tbo_tex;
 // End
 
-// HUD vars
-GLint h_aCoord;
-GLint h_uText;
-GLint h_uColor;
-
 vector<float> terPosBuf;
 vector<float> terNorBuf;
 vector<unsigned int> terIndBuf;
@@ -171,6 +170,8 @@ bool collisionDetectedOpponent = false;
 bool renderShadows;
 int collisionCount = 0;
 
+bool hud = false;
+
 bool beginProjectile = false;
 Projectile *missle;
 Entity projectileEntity = Entity();
@@ -184,6 +185,9 @@ Material p_mat_list[NUM_PLAYER_MATS] = {
 	Materials::emerald,
 	Materials::jade
 };
+
+int closestOpponent;
+int mClosestOpponent;
 
 float randNum() {
 	return ((float) rand() / (RAND_MAX)) * 600.0;
@@ -233,6 +237,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			rules.setState(Rules::SPLASH);
 		}
 		else if (rules.getState() == Rules::RACE) {
+         hud = true;
+
 			// Check movement keys
 			if (key == GLFW_KEY_W) {
 				camera.move(Camera::FORWARD);
@@ -265,26 +271,31 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 					camera.setMode(Camera::TPC);
 			}
 			
-			if (action == GLFW_PRESS && key == GLFW_KEY_X) {
-				if (!beginProjectile) {
-					beginProjectile = true;
-					missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[1].getPosition());
-					missleTime = elapsed;
-					//cout << "MISSILE TIME: " << missleTime << endl;
-					//cout << "New Projectile" << endl;
-				}
-			}
+         if (action == GLFW_PRESS && key == GLFW_KEY_X) {
+            if(!beginProjectile) {      
+               beginProjectile = true;
+               mClosestOpponent = closestOpponent;
+               missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[mClosestOpponent].getPosition());
+               missleTime = elapsed;
+               //cout << "MISSILE TIME: " << missleTime << endl;
+               //cout << "New Projectile" << endl;
+            }
+         }
 			
 			if (key == GLFW_KEY_P) {
 				camera.setPlayer(&player);
 			}
 			if (key == GLFW_KEY_O) {
-				camera.setPlayer(&(opponents[0]));
+				static int which_opp = 0;
+				camera.setPlayer(&(opponents[which_opp++]));
 			}
 			
 			if (key == GLFW_KEY_N) {
 				printf("glm::vec3(%f, %f, %f),\n", player.getPosition().x, player.getPosition().y, player.getPosition().z);
 			}
+         if (key == GLFW_KEY_H) {
+            hud = !hud;
+         }
 		}
 	}
 }
@@ -746,46 +757,47 @@ void drawGround(glm::mat4 projMatrix, glm::mat4 viewMatrix) {
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 }
 
-void drawHUD(int fps, float pitch) {
-	char buffer[256], *text;
+void drawHUD(float pitch, float time) {
+	char buffer[256], text[256];
+
+   sprintf(text, "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10 );
+   printText2D(text, 0.145 * g_width, 0.55 * g_height, 0);
+
+   char suffix[2];
+
+   if (playerAI.getPlace() == 1) {
+      strncpy(suffix, "st", 2);
+   }
+   else if (playerAI.getPlace() == 2) {
+      strncpy(suffix, "nd", 2);
+   }
+   else if (playerAI.getPlace() == 3) {
+      strncpy(suffix, "rd", 2);
+   }
+   else {
+      strncpy(suffix, "th", 2);
+   }
+
+   sprintf(text, "%d%s", playerAI.getPlace(), suffix);
+   printText2D(text, 0.05 * g_width, 0.1 * g_height, 30);
+
+   sprintf(text, "%.0fm", player.getPosition().y * 10);
+   printText2D(text, 0.81 * g_width, 0.55 * g_height, 0);
+
+   sprintf(text, "%d/3", playerAI.getLap() + 1);
+   printText2D(text, 0.75 * g_width, 0.1 * g_height, 25);
+
+   int mod = (int) time / 60;
+
+   sprintf(text, "%d:%.03f", (int) time / 60, time - (60 * mod));
+   printText2D(text, 0.05 * g_width, 0.9 * g_height, 30);
 	
-	drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
-	drawText->addText(Text("_______                  _______", g_width / 2 - g_width / 4, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
-	
-	// drawText->addText(Text(" _______", 0.125 * g_width, 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-	// drawText->addText(Text("|_______|", 0.125 * g_width, 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
-	
-	// snprintf(buffer, sizeof(buffer), "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10);
-	// int len = strlen(buffer) + 1;
-	// text = new char[len];
-	// strncpy(text, buffer, len);
-	// drawText->addText(Text(text, 0.145 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
-	
-	// drawText->addText(Text("1st", 0.05 * g_width, 0.1 * g_height, 0, 0, drawText->getFontSize(30), 1));
-	// drawText.addText(Text("Thrust: 25%", 0.025 * g_width, 0.98 * g_height, 0, 0, drawText.getFontSize(90), 1));
-	// drawText.addText(Text("Weapon: Gun", 0.025 * g_width, 0.96 * g_height, 0, 0, drawText.getFontSize(90), 1));
-	
-	// snprintf(buffer, sizeof(buffer), "Collision Count: %d", collisionCount);
-	// len = strlen(buffer) + 1;
-	// text = new char[len];
-	// strncpy(text, buffer, len);
-	// drawText->addText(Text(text, 0.025 * g_width, 0.96 * g_height, 0, 0, drawText->getFontSize(45), 1));
-	
-	// drawText->addText(Text(" _______", 0.8 * g_width , 0.575 * g_height, 0, 1, drawText->getFontSize(90), 2));
-	// drawText->addText(Text("|_______|", 0.8 * g_width , 0.55 * g_height, 0, 1, drawText->getFontSize(90), 2));
-	
-	// snprintf(buffer, sizeof(buffer), "%.0fm", player.getPosition().y * 10);
-	// len = strlen(buffer) + 1;
-	// text = new char[len];
-	// strncpy(text, buffer, len);
-	// drawText->addText(Text(text, 0.81 * g_width, 0.55 * g_height, 0, 0, drawText->getFontSize(90), 1));
-	
-	// snprintf(buffer, sizeof(buffer), "FPS: %d", fps);
-	// drawText->addText(Text(buffer, 0.9 * g_width, 0.95 * g_height, 0, 0, drawText->getFontSize(90), 1));
-	
-	// glUniform1i(renderObj, 2);
+	drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(105), 2));
+	drawText->addText(Text("_______", g_width / 2 - g_width / 3, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
+   drawText->addText(Text("_______", g_width / 2 + g_width / 5, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
+
 	glDisable(GL_CULL_FACE);
-	glUseProgram(textShaders);
+	glUseProgram(hudShaders);
 	drawText->drawText();
 	glEnable(GL_CULL_FACE);
 }
@@ -841,7 +853,7 @@ int main(int argc, char **argv) {
 	loadShapes("../Assets/models/cube.obj", obj[1]);
 	loadShapes("../Assets/models/Pyro.obj", obj[2]);
 	loadShapes("../Assets/models/mig.obj", obj[3]);
-	loadShapes("../Assets/models/missile.obj", obj[4]);
+	loadShapes("../Assets/models/sphere.obj", obj[4]);
 	loadShapes("../Assets/models/Rock.obj", obj[5]);
 	loadShapes("../Assets/models/stone1.obj", obj[6]);
 	loadShapes("../Assets/models/stone2.obj", obj[7]);
@@ -876,7 +888,8 @@ int main(int argc, char **argv) {
 	renderSceneShaders = installShaders("shd/renderscene_vert.glsl", "shd/renderscene_frag.glsl");
 	passThroughShaders = installShaders("shd/basic.vert", "shd/basic.frag");
 	skyBoxShaders = installShaders("shd/skybox_vert.glsl", "shd/skybox_frag.glsl");
-	textShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
+	textShaders = installShaders("shd/TextVertexShader.vertexshader", "shd/TextVertexShader.fragmentshader");
+   hudShaders = installShaders("shd/text.v.glsl", "shd/text.f.glsl");
 	propShaders = installShaders("shd/propShader.vert", "shd/propShader.frag");
 	particleShaders = installShaders("shd/particle_vert.glsl", "shd/particle_frag.glsl");
 	
@@ -884,27 +897,32 @@ int main(int argc, char **argv) {
 	skybox = new Skybox(skyBoxShaders);
 	skybox->initShaderVars();
 	
-	drawText = new DrawText(textShaders);
+	drawText = new DrawText(hudShaders);
 	drawText->initResources(g_width, g_height);
 	
+   GLuint VertexArrayID;
+   glGenVertexArrays(1, &VertexArrayID);
+   glBindVertexArray(VertexArrayID);
+
+   // Load the texture
+   GLuint Texture = loadDDS("Fonts/uvmap.DDS");
+
+   // Initialize our little text library with the Holstein font
+   initText2D( textShaders, "Fonts/Holstein.DDS" );
+
 	initCollisions();
 	initGround();
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 	
-	/*
-	 for(int i = 0; i < 7; i++){
-	 Entity dumb;
-	 dumb.setObject(&obj[i+5]);
-	 indices[i] = initVBO(&dumb, ROCK + i, true);
-	 GLDEBUG
-	 }
-	 */
-	
-	/*
-	 std::vector<int> typeProp;
-	 std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
-	 */
-	
+	for (int i = 0; i < 7; i++) {
+      Entity dumb;
+      dumb.setObject(&obj[i+5]);
+      indices[i] = initVBO(&dumb, ROCK + i, true);
+   }
+    
+   std::vector<int> typeProp;
+   std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
+
 	// Initialize player
 	playerAI.setType(RacerAI::PLAYER);
 	player.setType(PLAYER_ENTITY);
@@ -931,7 +949,7 @@ int main(int argc, char **argv) {
 	//cout << "Init\n";
 	projectileEntity.setObject(&obj[4]);
 	projectileEntity.setPosition(glm::vec3(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]));
-	projectileEntity.setScale(glm::vec3(2.0, 2.0, 2.0));
+	projectileEntity.setScale(glm::vec3(0.2, 0.2, 0.2));
 	projectileEntity.setMaterial(Materials::emerald);
 	int mIndices = initVBO(&projectileEntity, MISSILE);
 	projectileEntity.calculateBoundingSphereRadius();
@@ -1039,55 +1057,53 @@ int main(int argc, char **argv) {
 			collision.update();
 		}
 		
-		// Update & draw player
-		player.update();
-		player.update(view, projection);
+		// Update & draw player		
+      glm::vec3 prevPlayerPos = player.getPosition();
+      player.update();
+		glm::vec3 playerDirection = prevPlayerPos - player.getPosition();     
+      player.update(view, projection);
+
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		drawVBO(&player, pIndices, PLANE);
       	player.drawExhaust();
 		//checkPlayerCollisions();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		
-		if (player.getPitch() > 0) {
-			if (pitch > 0) {
-				pitch -= 0.4;
-			}
-			else {
-				pitch -= 0.2;
-			}
-		}
-		else if (player.getPitch() < 0) {
-			if (pitch > 0) {
-				pitch += 0.4;
-			}
-			else {
-				pitch += 0.8;
-			}
-		}
-		else {
-			if (pitch > 0) {
-				pitch -= 0.2;
-			}
-			else if (pitch < 0) {
-				pitch += 0.2;
-			}
-		}
+      if (player.getPitch() > 0) {
+         pitch -= (pitch > 0 ? 0.4 : 0.2);
+      }
+      else if (player.getPitch() < 0) {
+         pitch += (pitch > 0 ? 0.4 : 0.8);
+      }
+      else {
+         pitch += (pitch > 0 ? -0.2 : (pitch < 0 ? 0.2 : 0));
+      }
 		
 		
-		int i = 0, t = 0;
-		// Update & draw opponents
-		for (auto &opponent : opponents) {
-			t++;
-			opponent.update();
-			opponent.update(view, projection);
-			if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
-				drawVBO(&opponent, pIndices, PLANE);
-            	opponent.drawExhaust();
-				i++;
-			}
-			//checkOpponentCollisions(opponent);
-			assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
-		}
+		int t = 0;
+      int minDistance = INT_MAX;
+      for(int i = 0; i < opponents.size(); i++){
+         t++;
+         opponents[i].update();
+         
+         if(viewFrustum.sphereInFrustum(opponents[i].getPosition(), opponents[i].getRadius())){
+            drawVBO(&(opponents[i]), pIndices, PLANE);
+         }
+         
+         glm::vec3 playerPos = player.getPosition();
+         glm::vec3 opponentPos = opponents[i].getPosition();
+
+         float distance = sqrt(((playerPos[0] - opponentPos[0]) * (playerPos[0] - opponentPos[0])) +
+          ((playerPos[1] - opponentPos[1]) * (playerPos[1] - opponentPos[1])) +
+          ((playerPos[2] - opponentPos[2]) * (playerPos[2] - opponentPos[2]))
+         );
+         if(distance < minDistance){
+            minDistance = distance;
+            closestOpponent = i;
+         }
+
+         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+      }
 		
 		/*
 		 //update scenery
@@ -1118,43 +1134,35 @@ int main(int argc, char **argv) {
 		camera.update();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		
-		/*
-		 //projectilw handling
-		 if (beginProjectile == true) {
-		 //cout << "MISSILE TIME: " << missleTime << endl;
-		 //cout << "ELAPSED: " << elapsed << endl;
-		 
-		 int isDone = missle->runProjectile(elapsed - missleTime,
-		 player.getPosition(), opponents[0].getPosition());
-		 
-		 Entity* ent = missle->getEntity();
-		 
-		 drawVBO(ent, mIndices, MISSILE);
-		 
-		 if (collision.detectEntityCollision(&opponents[0], ent)) {
-		 //Material m = check->getMaterial();
-		 //if(color == false){
-		 //cout << "IN\n" << endl;
-		 //check->setMaterial(Materials::wood);
-		 //color = true;
-		 //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
-		 //}
-		 //else if(color == true){
-		 //cout << "OUT\n" << endl;
-		 //check->setMaterial(Materials::jade);
-		 //color = false;
-		 //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
-		 //}
-		 
-		 missleTime = 0;
-		 beginProjectile = false;
-		 delete missle;
-		 }
-		 }
-		 */
+		if (beginProjectile == true) {
+         int isDone = missle->runProjectile(elapsed - missleTime,
+                                  player.getPosition(), opponents[mClosestOpponent].getPosition(),
+                                  playerDirection);
+
+         Entity* ent = missle->getEntity();
+
+         drawVBO(ent, mIndices, MISSILE);
+
+         if (collision.detectEntityCollision(&opponents[mClosestOpponent], ent) ||                 
+            collision.detectTerrainCollision(ent)) {
+   
+            missleTime = 0;
+            beginProjectile = false;
+            delete missle;
+         }
+      }
+      
 		
 		//Draw HUD
-		drawHUD(fps, pitch);
+      if (hud) {
+         glUseProgram(textShaders);
+
+         // Bind our texture in Texture Unit 0
+         glActiveTexture(GL_TEXTURE0);
+         glBindTexture(GL_TEXTURE_2D, Texture);
+
+         drawHUD(pitch, elapsed);
+      }
 		
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		
