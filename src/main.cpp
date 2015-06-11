@@ -778,11 +778,11 @@ void drawHUD(float pitch, float time) {
    printText2D(text, 0.81 * g_width, 0.55 * g_height, 0);
 
    sprintf(text, "%d/3", playerAI.getLap() + 1);
-   printText2D(text, 0.75 * g_width, 0.1 * g_height, 25);
+   printText2D(text, 0.85 * g_width, 0.1 * g_height, 25);
 
    int mod = (int) time / 60;
 
-   sprintf(text, "%d:%.03f", (int) time / 60, time - (60 * mod));
+   sprintf(text, "%02d:%06.03f", (int) time / 60, time - (60 * mod));
    printText2D(text, 0.05 * g_width, 0.9 * g_height, 30);
 	
 	drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(105), 2));
