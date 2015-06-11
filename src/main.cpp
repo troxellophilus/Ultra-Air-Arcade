@@ -705,7 +705,7 @@ void drawHUD(float pitch, float time) {
    char text[256];
 
    sprintf(text, "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10 );
-   printText2D(text, 0.145 * g_width, 0.55 * g_height, 20);
+   printText2D(text, 0.145 * g_width, 0.55 * g_height, 0);
 
    char suffix[2];
 
@@ -723,16 +723,16 @@ void drawHUD(float pitch, float time) {
    }
 
    sprintf(text, "%d%s", playerAI.getPlace(), suffix);
-   printText2D(text, 0.05 * g_width, 0.1 * g_height, 40);
+   printText2D(text, 0.05 * g_width, 0.1 * g_height, 20);
 
    sprintf(text, "%.0fm", player.getPosition().y * 10);
-   printText2D(text, 0.81 * g_width, 0.55 * g_height, 20);
+   printText2D(text, 0.81 * g_width, 0.55 * g_height, 0);
 
    sprintf(text, "Lap: %d/3", playerAI.getLap() + 1);
-   printText2D(text, 0.75 * g_width, 0.9 * g_height, 20);
+   printText2D(text, 0.75 * g_width, 0.9 * g_height, 15);
 
    sprintf(text, "%d:%.03f", (int) time / 60, time);
-   printText2D(text, 0.05 * g_width, 0.9 * g_height, 30);
+   printText2D(text, 0.05 * g_width, 0.9 * g_height, 20);
 }
 
 int main(int argc, char **argv) {
