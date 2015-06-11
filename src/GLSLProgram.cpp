@@ -445,11 +445,11 @@ int GLSLProgram::checkForOpenGLError(const char * file, int line) {
         case GL_INVALID_ENUM:
           message = "Invalid enum";
           break;
-        case GL_INVALID_VALUE:
-          message = "Invalid value";
-          break;
         case GL_INVALID_OPERATION:
           message = "Invalid operation";
+          break;
+          case GL_INVALID_VALUE:
+          message = "Invalid value";
           break;
         case GL_INVALID_FRAMEBUFFER_OPERATION:
           message = "Invalid framebuffer operation";

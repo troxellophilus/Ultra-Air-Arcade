@@ -1,39 +1,86 @@
-/*
- * Class to define and implement a Plane Sound component
- * Drew Troxell
- */
+#ifndef PLANESOUND_HPP
+#define PLANESOUND_HPP
 
-#ifndef PLANE_SOUND_H
-#define PLANE_SOUND_H
+#include <SFML/Audio.hpp>
 
-#include "Entity.hpp"
+using namespace std;
 
 class PlaneSound {
 private:
-
-public:
-    // Constructors
-    PlaneSound();
+    sf::SoundBuffer buffer;
+    sf::Sound sound;
+    float pitch = 1.f;
     
-    // Methods
-    void update(Entity *agent);
+public:
+    PlaneSound();
+    PlaneSound(std::string filename);
+    virtual ~PlaneSound();
+    void play();
+    void playLooped();
+    void stop();
+    void changePitch(int upOrDown);
+    void setPitch(float newPitch);
+    void setVolume(float newVolume);
 };
 
-// Constructors
-PlaneSound::PlaneSound() {
+PlaneSound::PlaneSound() { }
+
+PlaneSound::PlaneSound(std::string filename) {
+	buffer = sf::SoundBuffer();
+	sound = sf::Sound();
+
+    if (!buffer.loadFromFile(filename)) {
+        cout << "Error loading " << filename << endl;
+    }
+    sound.setBuffer(buffer);
 }
 
-// Methods
-void PlaneSound::update(Entity *e, Entity *p) {
-    static unsigned int frames = 0;
+PlaneSound::~PlaneSound() { }
 
-    // Get entity info and play sounds accordingly for planes 
-
-    frames++;
+void PlaneSound::play() {
+    sound.setLoop(false);
+    sound.play();
 }
 
-// Getters
+void PlaneSound::playLooped() {
+    sound.setLoop(true);
+    sound.play();
+}
 
-// Setters
+void PlaneSound::stop() {
+    sound.stop();
+}
+
+void PlaneSound::changePitch(int upOrDown) {
+    if (upOrDown == 1) {
+        if (pitch < 2.f) {
+            pitch += .025f;
+        }
+        sound.setPitch(pitch);
+    }
+    else if (upOrDown == -1) {
+        if (pitch > 0.3f) {
+            pitch -= .025f;
+        }
+        sound.setPitch(pitch);
+    }
+    else {
+        if (pitch > 1.0f) {
+            pitch -= .025f;
+        }
+        if (pitch < 1.0f) {
+            pitch += .025f;
+        }
+        sound.setPitch(pitch);
+    }
+}
+
+void PlaneSound::setPitch(float newPitch) {
+    sound.setPitch(newPitch);
+}
+
+void PlaneSound::setVolume(float newVolume) {
+    sound.setVolume(newVolume);
+}
 
 #endif

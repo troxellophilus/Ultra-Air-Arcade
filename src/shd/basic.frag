@@ -38,6 +38,10 @@ vec3 woodAmbient = vec3(0.6, 0.41, 0.29);
 vec3 waterDiffuse = vec3(0.4, 0.5, 0.7);
 vec3 waterAmbient = vec3(0.0, 0.05, 0.07) * waterDiffuse;
 
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(13,78))) * 4375);
+}
+
 vec3 toonShade() {
     vec3 n = normalize(silh_vNor);
     vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
@@ -50,38 +54,40 @@ vec3 toonShade() {
     float cosine = dot(lightVector, vNor);
     float dotProduct = dot(normalize(vNor), vec3(0, 1, 0));
 
-	if (renderObj == 1) { // Rendering for airplanes
-		float cosine = dot(lightVector, vNor);
-		return UaColor + UdColor * floor( cosine * levels ) * scaleFactor; 
-	}
+    if (renderObj == 1) { // Rendering for airplanes
+        float cosine = dot(lightVector, vNor);
+        return UaColor + UdColor * floor( cosine * levels ) * scaleFactor; 
+    }
 
     if (vPos.y < 40) {
-    	if (dotProduct > 0.6) {
-			if (vPos.y < 0.5) {
-				ambient = waterAmbient;
-				diffuse = waterDiffuse;
-			} else {
-				ambient = forestAmbient;
-				diffuse = forestDiffuse;
-			}
-    	} else if (dotProduct > 0.35) {
-    		ambient = sandAmbient;
-			diffuse = sandDiffuse;
-    	} else {
-    		ambient = woodAmbient;
-			diffuse = woodDiffuse;
-    	}
+        if (dotProduct > 0.6) {
+            if (vPos.y < 0.5) {
+                float num = rand(vPos.xz);
+                ambient = waterAmbient;
+                if (num > 0.5) diffuse = waterDiffuse * num;
+                else diffuse = waterDiffuse;
+            } else {
+                ambient = forestAmbient;
+                diffuse = forestDiffuse;
+            }
+        } else if (dotProduct > 0.35) {
+            ambient = sandAmbient;
+            diffuse = sandDiffuse;
+        } else {
+            ambient = woodAmbient;
+            diffuse = woodDiffuse;
+        }
     } else {
-    	if (dotProduct > 0.6) {
-    		ambient = snowAmbient;
-			diffuse = snowDiffuse;
-    	} else if (dotProduct > 0.25) {
-    		ambient = rocksAmbient;
-			diffuse = rocksDiffuse;
-    	} else {
-    		ambient = woodAmbient;
-			diffuse = woodDiffuse;
-    	}
+        if (dotProduct > 0.6) {
+            ambient = snowAmbient;
+            diffuse = snowDiffuse;
+        } else if (dotProduct > 0.25) {
+            ambient = rocksAmbient;
+            diffuse = rocksDiffuse;
+        } else {
+            ambient = woodAmbient;
+            diffuse = woodDiffuse;
+        }
     }
     
     diffuse *= floor( cosine * levels ) * scaleFactor;
@@ -90,33 +96,32 @@ vec3 toonShade() {
 }
 
 void main() {
-	// FOR PHONG SHADING
-	if (renderObj == 0 || renderObj == 1) {			// For rendering Characters and Terrain
-		float dist = length(lPos.xyz - vPos);
-		float intensity = (500 * dist) / (dist * dist + dist + 1);
+    // FOR PHONG SHADING
+    if (renderObj == 0 || renderObj == 1) {         // For rendering Characters and Terrain
+        float dist = length(lPos.xyz - vPos);
+        float intensity = (500 * dist) / (dist * dist + dist + 1);
 
-		outColor = vec4(intensity * toonShade(), 1.0);
-	} else if (renderObj == 2) {	// For rendering billboards
-			outColor = vec4(1.0, 1.0, 1.0, 0.5);
-	} else if (renderObj == 3) {
-		vec3 n = normalize(silh_vNor);
-    		vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
+        outColor = vec4(intensity * toonShade(), 1.0);
+    } else if (renderObj == 3) {
+        vec3 n = normalize(silh_vNor);
+            vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
-    		if (dot(n, e) < 0.2)
-        		outColor = vec4(1.0, 0.0, 1.0, 1.0);
-        	else
-        		outColor = vec4(0.0,0.0,0.0,0.0);
-	} 
-	else if(renderObj == 4)	{
-		vec3 n = normalize(silh_vNor);
-    	vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
+            if (dot(n, e) < 0.5)
+                outColor = vec4(n.xyz, 0.5);
+            else
+                outColor = vec4(0.0,0.0,0.0,0.0);
+    } 
+    else if(renderObj == 4) {
+        vec3 n = normalize(silh_vNor);
+        vec3 e = normalize( vec3( 0.0, 0.0, 0.0 ) - silh_vPos );
 
-		if (dot(n, e) < 0.2)
-    		outColor = vec4(0.0, 0.0, 0.0, 1.0);
-    	else
-    		outColor = vec4(forestDiffuse,1.0);
-	}
-	else {								// Catch-all
-			outColor = vec4(vCol, 1.0);
-	}
+        if (dot(n, e) < 0.2)
+            outColor = vec4(0.0, 0.0, 0.0, 1.0);
+        else
+            outColor = vec4(forestDiffuse,1.0);
+    }
+    else {                              // Catch-all
+            outColor = vec4(vCol, 1.0);
+    }
+
 }
