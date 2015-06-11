@@ -257,7 +257,7 @@ void RacerAI::race(int frames, Entity *agent) {
 		
 		// only play dings if the player hits the speed boost
 		if (type == PLAYER) {
-			bink.setVolume(50.f);
+			bink.setVolume(20.f);
 			bink.play();
 		}
 	}

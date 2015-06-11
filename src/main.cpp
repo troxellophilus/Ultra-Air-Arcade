@@ -141,6 +141,8 @@ Collision collision = Collision();
 PlaneSound planeSound = PlaneSound("../Assets/sound/JetEngine.wav");
 PlaneSound backgroundMusic = PlaneSound("../Assets/sound/destiny-short.wav");
 PlaneSound collisionSound = PlaneSound("../Assets/sound/explosion-01.wav");
+PlaneSound enemyCollisionSound = PlaneSound("../Assets/sound/splat.wav");
+PlaneSound themeMusic = PlaneSound("../Assets/sound/take-a-chance.wav");
 
 Terrain terrain = Terrain();
 Skybox *skybox;
@@ -236,12 +238,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 		else if (action == GLFW_PRESS && rules.getState() == Rules::FINISH) {
 			rules.setState(Rules::LEADERBOARD);
+			backgroundMusic.stop();
+			planeSound.stop();
+			themeMusic.playLooped();
 		}
 
 		else if (action == GLFW_PRESS && rules.getState() == Rules::LEADERBOARD) {
 			rules.setState(Rules::SPLASH);
+			backgroundMusic.stop();
+			planeSound.stop();
+			themeMusic.playLooped();
 		}
 		else if (rules.getState() == Rules::RACE) {
+
 			// Check movement keys
 			if (key == GLFW_KEY_W) {
 				camera.move(Camera::FORWARD);
@@ -405,13 +414,14 @@ void initGround() {
 void initCollisions() {
 	collision = Collision(&terrain, &player, &opponents);
 
-	planeSound.playLooped();
-
 	backgroundMusic.setVolume(50.f);
-	backgroundMusic.playLooped();
-
+	
+	themeMusic.setVolume(50.f);
+	themeMusic.playLooped();
+	
 	collision.setPlayerSound(&planeSound);
 	collision.setCollisionSound(&collisionSound);
+	collision.setEnemyCollisionSound(&enemyCollisionSound);
 }
 
 void initShaderVars() {
@@ -1181,21 +1191,32 @@ int main(int argc, char **argv) {
 
 		if (beginProjectile == true) {
 			int isDone = missle->runProjectile(elapsed - missleTime,
-			                                   player.getPosition(), opponents[mClosestOpponent].getPosition(),
-			                                   playerDirection);
+                                  player.getPosition(), opponents[mClosestOpponent].getPosition(),
+                                  playerDirection);
 
-			Entity* ent = missle->getEntity();
+         Entity* ent = missle->getEntity();
 
-			drawVBO(ent, mIndices, MISSILE);
+         drawVBO(ent, mIndices, MISSILE);
 
-			if (collision.detectEntityCollision(&opponents[mClosestOpponent], ent) ||
-			      collision.detectTerrainCollision(ent)) {
-
-				missleTime = 0;
-				beginProjectile = false;
-				delete missle;
-			}
-		}
+         bool collisionWithOpp = collision.detectEntityCollision(&opponents[mClosestOpponent], ent);
+         if (collisionWithOpp || collision.detectTerrainCollision(ent)) {
+         	if (collisionWithOpp) {
+         		glm::vec3 vec_away_opp = glm::normalize(opponents[mClosestOpponent].getPosition() - ent->getPosition());
+                opponents[mClosestOpponent].setTargetRotationQ(glm::shortMix(opponents[mClosestOpponent].getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.8f));
+				((RacerAI *)opponents[mClosestOpponent].getAI())->setBounceTarget(ent);
+				((RacerAI *)opponents[mClosestOpponent].getAI())->setState(RacerAI::BOUNCE);
+				opponents[mClosestOpponent].throttleDown();
+				opponents[mClosestOpponent].throttleDown();
+				opponents[mClosestOpponent].throttleDown();
+				opponents[mClosestOpponent].throttleDown();
+				opponents[mClosestOpponent].throttleDown();
+         	}
+   
+            missleTime = 0;
+            beginProjectile = false;
+            delete missle;
+         }
+      }
 
 		// Use the text shader
 		glUseProgram(textShaders);
@@ -1225,6 +1246,10 @@ int main(int argc, char **argv) {
 			if (needStart) {
 				needStart = false;
 				start = glfwGetTime();
+
+				themeMusic.stop();
+         		backgroundMusic.playLooped();
+				planeSound.playLooped();
 			}
 
 			drawHUD(pitch, elapsed);

@@ -30,6 +30,7 @@ private:
     int enemyStep;
     glm::vec3 convertedNor;
     PlaneSound *collisionSound;
+    PlaneSound *enemyCollisionSound;
 	glm::vec3 sphereTranslations[5];
 	float sphereRadius[5];
     
@@ -40,6 +41,7 @@ public:
     void setOpponents(vector<Entity> *opp);
     void setPlayerSound(PlaneSound *sound);
     void setCollisionSound(PlaneSound *sound);
+    void setEnemyCollisionSound(PlaneSound *sound);
     void update();
     bool detectEntityCollision(Entity *player, Entity *object);
     bool detectTerrainCollision(Entity *object);
@@ -104,6 +106,10 @@ void Collision::setCollisionSound(PlaneSound *sound) {
     collisionSound = sound;
 }
 
+void Collision::setEnemyCollisionSound(PlaneSound *sound) {
+    enemyCollisionSound = sound;
+}
+
 void Collision::update() {
     // A soft ceiling for the player
     if (player->getPosition().y > 50.f) {
@@ -157,6 +163,7 @@ void Collision::update() {
                 player->setTargetRotationQ(glm::shortMix(player->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.2f));
 		((RacerAI *)opp.getAI())->setBounceTarget(player);
 		((RacerAI *)opp.getAI())->setState(RacerAI::BOUNCE);
+                enemyCollisionSound->play();
             }
         }
 
