@@ -177,6 +177,12 @@ Entity projectileEntity = Entity();
 float start;
 float elapsed;
 
+//Lap Data
+int curLap = 0;
+float lap1 = 0.f;
+float lap2 = 0.f;
+float lap3 = 0.f;
+
 Material p_mat_list[NUM_PLAYER_MATS] = {
 	Materials::brass,
 	Materials::turquoise,
@@ -806,6 +812,37 @@ void drawHUD(float pitch, float time) {
 
 	sprintf(text, "%02d:%06.03f", (int) time / 60, time - (60 * mod));
 	printText2D(text, 0.05 * g_width, 0.9 * g_height, 30);
+
+
+	if (playerAI.getLap() > curLap) {
+		curLap++;
+		if (playerAI.getLap() == 1) {
+			lap1 = elapsed;
+		}
+		else if (playerAI.getLap() == 2) {
+			lap2 = elapsed - lap1;
+		}
+		else if (playerAI.getLap() == 3) {
+			lap3 = elapsed - lap2 - lap1;
+		}
+	}
+
+	if (lap1 > 0) {
+		mod = (int) lap1 / 60;
+		sprintf(text, "Lap 1: %02d:%06.03f", (int) lap1 / 60, lap1 - (60 * mod));
+		printText2D(text, 0.05 * g_width, 0.8 * g_height, 20);
+	}
+	if (lap2 > 0) {
+		mod = (int) lap2 / 60;
+		sprintf(text, "Lap 2: %02d:%06.03f", (int) lap2 / 60, lap2 - (60 * mod));
+		printText2D(text, 0.05 * g_width, 0.75 * g_height, 20);
+	}
+	if (lap3 > 0) {
+		mod = (int) lap3 / 60;
+		sprintf(text, "Lap 3: %02d:%06.03f", (int) lap3 / 60, lap3 - (60 * mod));
+		printText2D(text, 0.05 * g_width, 0.75 * g_height, 20);
+	}
+
 
 	drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(105), 2));
 	drawText->addText(Text("_______", g_width / 2 - g_width / 3, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
