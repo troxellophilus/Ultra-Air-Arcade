@@ -232,6 +232,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			rules.setState(Rules::SPLASH);
 		}
 		else if (rules.getState() == Rules::RACE) {
+         hud = true;
+
 			// Check movement keys
 			if (key == GLFW_KEY_W) {
 				camera.move(Camera::FORWARD);
@@ -760,18 +762,20 @@ void drawHUD(float pitch, float time) {
    }
 
    sprintf(text, "%d%s", playerAI.getPlace(), suffix);
-   printText2D(text, 0.05 * g_width, 0.1 * g_height, 20);
+   printText2D(text, 0.05 * g_width, 0.1 * g_height, 30);
 
    sprintf(text, "%.0fm", player.getPosition().y * 10);
    printText2D(text, 0.81 * g_width, 0.55 * g_height, 0);
 
    sprintf(text, "%d/3", playerAI.getLap() + 1);
-   printText2D(text, 0.75 * g_width, 0.9 * g_height, 25);
+   printText2D(text, 0.75 * g_width, 0.1 * g_height, 25);
 
-   // sprintf(text, "%d:%.03f", (int) time / 60, time % 60);
-   // printText2D(text, 0.05 * g_width, 0.9 * g_height, 20);
+   int mod = (int) time / 60;
+
+   sprintf(text, "%d:%.03f", (int) time / 60, time - (60 * mod));
+   printText2D(text, 0.05 * g_width, 0.9 * g_height, 30);
 	
-	drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(45), 2));
+	drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(105), 2));
 	drawText->addText(Text("_______", g_width / 2 - g_width / 3, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
    drawText->addText(Text("_______", g_width / 2 + g_width / 5, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
 
