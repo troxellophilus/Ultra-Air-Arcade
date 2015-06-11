@@ -26,6 +26,7 @@ public:
 	
 	// Getters
 	GameState getState();
+	int getClosestOpponentAhead();
 	
 	// Setters
 	void setPlayer(Entity *p);
@@ -42,6 +43,8 @@ private:
 	vector<Entity> *agents; // Pointer to the vector of agents in main
 	vector<RacerAI *> agentsAI;
 	
+	int closest_opponent_ahead;
+
 	PlaneSound countdown = PlaneSound("../Assets/sound/beep.wav");
 	
 	// state methods
@@ -57,6 +60,7 @@ private:
 
 // Constructors
 Rules::Rules() {
+	closest_opponent_ahead = 0;
 	state = SPLASH; // init game state
 }
 
@@ -226,6 +230,7 @@ void Rules::race(Camera *cam) {
 	float player_dist = glm::distance(global_track[player_next_idx], player->getPosition());
 	
 	int num_ahead = 0;
+	int idx = 0;
 	for (Entity opp : *agents) {
 		if (((RacerAI *)opp.getAI())->getLap() > playerAI->getLap())
 			num_ahead++;
@@ -234,10 +239,13 @@ void Rules::race(Camera *cam) {
 				num_ahead++;
 			else if (((RacerAI *)opp.getAI())->getNextIdx() == player_next_idx) {
 				float d = glm::distance(opp.getPosition(), global_track[player_next_idx]);
-				if (d < player_dist)
+				if (d < player_dist) {
+					closest_opponent_ahead = idx;
 					num_ahead++;
+				}
 			}
 		}
+		idx++;
 	}
 	playerAI->setPlace(num_ahead + 1);
 	
@@ -303,6 +311,10 @@ Rules::GameState Rules::getState() {
 	return state;
 }
 
+int Rules::getClosestOpponentAhead() {
+	return closest_opponent_ahead;
+}
+
 // Setters
 void Rules::setState(GameState s) {
 	state = s;
@@ -317,6 +329,7 @@ void Rules::setAgents(vector<Entity> *a) {
 	agents = a;
 	for (Entity e : *a)
 		agentsAI.push_back((RacerAI *)(e.getAI()));
+	closest_opponent_ahead = 0;
 }
 
 #endif

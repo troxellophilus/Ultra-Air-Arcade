@@ -292,8 +292,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 				if (!beginProjectile && missileCooldown == false) {
 					startCooldown = true;
 					beginProjectile = true;
-					mClosestOpponent = closestOpponent;
-					missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[mClosestOpponent].getPosition());
+					Entity targ_opp = opponents[rules.getClosestOpponentAhead()];
+					missle = new Projectile(projectileEntity, false, true, player.getPosition(), targ_opp.getPosition());
 					missleTime = elapsed;
 					//cout << "MISSILE TIME: " << missleTime << endl;
 					//cout << "New Projectile" << endl;
