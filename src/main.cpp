@@ -55,7 +55,7 @@
 using namespace std;
 //using namespace glm;
 
-enum { PLANE, MISSILE, CHECKPOINT, TERRAIN, ROCK, STONE1, STONE2, STONE3, STONE4, STONE5, TREE, NUM_VBO };
+enum { SPHERE, PLANE, MISSILE, CHECKPOINT, TERRAIN, ROCK, STONE1, STONE2, STONE3, STONE4, STONE5, TREE, NUM_VBO };
 
 //Shader IDs
 GLuint passThroughShaders;
@@ -151,6 +151,7 @@ Rules rules = Rules();
 RacerAI playerAI = RacerAI();
 Camera camera = Camera();
 Entity player = Entity(&playerAI);
+Entity boundingSphere = Entity();
 Frustum viewFrustum = Frustum();
 
 vector<Entity> opponents;
@@ -161,6 +162,7 @@ static float g_width, g_height;
 unsigned int numObj = 0;
 unsigned int collisions = 0;
 unsigned int pIndices = 0;
+unsigned int sIndices = 0;
 unsigned int whichShader = 0;
 float missleTime;
 
@@ -560,15 +562,27 @@ void drawPassthrough(Entity* entity, int nIndices, int whichbo)
 	
 	if (whichbo == CHECKPOINT)
 		glUniform1i(renderObj, 3);
-	
-	SetMaterial(entity->getMaterial());
+
 	glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
 	glm::mat4 Orient = entity->getRotationM();
 	glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
 	glm::mat4 com = Trans * Orient * Sc;
 	glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
 	assert(glGetError() == GL_NO_ERROR);
-	glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
+
+	/*if (whichbo == SPHERE) {
+		Sc = glm::scale(glm::mat4(1.0f), glm::vec3(player.getRadius()));
+		glm::vec3 directionx = 0.0f * glm::normalize(glm::vec3(1, 0, 0) * glm::inverse(player.getRotationQ()));
+		glm::vec3 directiony = -0.0f * glm::normalize(glm::vec3(0, 1, 0) * glm::inverse(player.getRotationQ()));
+		glm::vec3 directionz = 0.0f * glm::normalize(glm::vec3(0, 0, 1) * glm::inverse(player.getRotationQ()));
+		Trans = glm::translate( glm::mat4(1.0f), player.getPosition() + directionx + directiony + directionz);
+		com = Trans * Sc;
+		glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
+	}*/
+	
+	SetMaterial(entity->getMaterial());
+	if (whichbo == SPHERE) glDrawElements(GL_LINES, nIndices, GL_UNSIGNED_INT, 0);
+	else glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
 	assert(glGetError() == GL_NO_ERROR);
 	// Disable and unbind
 	GLSL::disableVertexAttribArray(aPos);
@@ -902,6 +916,10 @@ int main(int argc, char **argv) {
 	player.setParticleProg(particleShaders);
 	player.calculateBoundingSphereRadius();
 	pIndices = initVBO(&player, PLANE);
+
+	boundingSphere.setObject(&obj[0]);
+	sIndices = initVBO(&boundingSphere, SPHERE);
+	
 	
 	// Initialize camera
 	camera.setMode(Camera::TPC);
@@ -1095,6 +1113,7 @@ int main(int argc, char **argv) {
 		 }
 		 */
 		
+		drawVBO(&boundingSphere, sIndices, SPHERE);
 		// Update camera
 		camera.update();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));

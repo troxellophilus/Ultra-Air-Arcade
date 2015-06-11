@@ -64,7 +64,7 @@ vec3 toonShade() {
             if (vPos.y < 0.5) {
                 float num = rand(vPos.xz);
                 ambient = waterAmbient;
-                if (num > 0.5) diffuse = waterDiffuse * num;
+                if (num > 0.8) diffuse = waterDiffuse * num;
                 else diffuse = waterDiffuse;
             } else {
                 ambient = forestAmbient;

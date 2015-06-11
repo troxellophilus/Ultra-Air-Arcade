@@ -18,6 +18,8 @@
 
 using namespace std;
 
+enum {RIGHT_WING, LEFT_WING, FRONT, BACK, CENTER};
+
 class Collision {
 private:
     bool cflag;		// True if collision detected.
@@ -30,6 +32,8 @@ private:
     int enemyStep;
     glm::vec3 convertedNor;
     PlaneSound *collisionSound;
+	glm::vec3 sphereTranslations[5];
+	float sphereRadius[5];
     
 public:
     Collision();
@@ -54,6 +58,17 @@ Collision::Collision() {
     opponents = NULL;
     resetStep = 0;
     enemyStep = 0;
+
+	sphereTranslations[0] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[0] = 0.05;
+	sphereTranslations[1] = glm::vec3(-0.18, -0.025, 0.05);
+	sphereRadius[1] = 0.05;
+	sphereTranslations[2] = glm::vec3(0.0, -0.025, -0.2);
+	sphereRadius[2] = 0.05;
+	sphereTranslations[3] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[3] = 0.07;
+	sphereTranslations[4] = glm::vec3(0.0);
+	sphereRadius[4] = 0.05;
 }
 
 Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Entity> *opponentsPointer) {
@@ -64,6 +79,17 @@ Collision::Collision(Terrain *terrainPointer, Entity *playerPointer, vector<Enti
     opponents = opponentsPointer;
     resetStep = 0;
     enemyStep = 0;
+
+	sphereTranslations[0] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[0] = 0.05;
+	sphereTranslations[1] = glm::vec3(-0.18, -0.025, 0.05);
+	sphereRadius[1] = 0.05;
+	sphereTranslations[2] = glm::vec3(0.0, -0.025, -0.2);
+	sphereRadius[2] = 0.05;
+	sphereTranslations[3] = glm::vec3(0.18, -0.025, 0.05);
+	sphereRadius[3] = 0.07;
+	sphereTranslations[4] = glm::vec3(0.0);
+	sphereRadius[4] = 0.05;
 }
 
 Collision::~Collision() { }
@@ -128,12 +154,12 @@ void Collision::update() {
 
     for (Entity opp : *opponents) {
         if (detectEntityCollision(player, &opp)) {
-            if (opp.getPosition().x == opp.getPosition().x) {
+            //if (opp.getPosition().x == opp.getPosition().x) {
                 glm::vec3 vec_away_opp = glm::normalize(player->getPosition() - opp.getPosition());
                 player->setTargetRotationQ(glm::shortMix(player->getRotationQ(), glm::rotation(glm::vec3(0, 0, -1), vec_away_opp), 0.2f));
 		((RacerAI *)opp.getAI())->setBounceTarget(player);
 		((RacerAI *)opp.getAI())->setState(RacerAI::BOUNCE);
-            }
+            //}
         }
 
         for (Entity opp1 : *opponents) {
@@ -189,6 +215,29 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
     //cout << xOverlap << " " << yOverlap << " " << zOverlap << endl;
     
     anyOverlap = xOverlap && yOverlap && zOverlap;
+
+	// For hierarchical bounding spheres
+	if (anyOverlap) {
+		int i;
+		for (i = 0; i < 5; i++) {
+			glm::quat rot = player->getRotationQ();
+			glm::vec3 directionx = sphereTranslations[i].x * glm::normalize(glm::vec3(1, 0, 0) * glm::inverse(rot));
+			glm::vec3 directiony = sphereTranslations[i].y * glm::normalize(glm::vec3(0, 1, 0) * glm::inverse(rot));
+			glm::vec3 directionz = sphereTranslations[i].z * glm::normalize(glm::vec3(0, 0, 1) * glm::inverse(rot));
+			glm::vec3 refPos1 = player->getPosition() + directionx + directiony + directionz;
+			if (glm::distance(refPos1, objectPosition) <= sphereRadius[i] + objectRadius) {
+				int j;
+				for (j = 0; j < 5; j++) {
+					rot = object->getRotationQ();
+					directionx = sphereTranslations[j].x * glm::normalize(glm::vec3(1, 0, 0) * glm::inverse(rot));
+					directiony = sphereTranslations[j].y * glm::normalize(glm::vec3(0, 1, 0) * glm::inverse(rot));
+					directionz = sphereTranslations[j].z * glm::normalize(glm::vec3(0, 0, 1) * glm::inverse(rot));
+					glm::vec3 refPos2 = object->getPosition() + directionx + directiony + directionz;
+					if (glm::distance(refPos1, refPos2) <= sphereRadius[i] + sphereRadius[j]) return true;
+				}
+			}
+		}
+	}
     
     return anyOverlap;
 }
