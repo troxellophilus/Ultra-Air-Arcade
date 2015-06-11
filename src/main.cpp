@@ -753,6 +753,25 @@ void drawColorSelect() {
 	printText2D("Press space bar to start the race", g_width / 12, g_height / 4, 25);
 }
 
+void drawCountdown() {
+	int size = 30 + countdown % 30;
+
+	if (countdown > 0 && countdown <= 30)
+		printText2D("5", g_width / 2 - size, g_height / 2, size);
+	if (countdown > 30 && countdown <= 60)
+		printText2D("4", g_width / 2 - size, g_height / 2, size);
+	if (countdown > 60 && countdown <= 90)
+		printText2D("3", g_width / 2 - size, g_height / 2, size);
+	if (countdown > 90 && countdown <= 120)
+		printText2D("2", g_width / 2 - size, g_height / 2, size);
+	if (countdown > 120 && countdown <= 150)
+		printText2D("1", g_width / 2 - size, g_height / 2, size);
+	if (countdown > 150 && countdown <= 180)
+		printText2D("GO!", g_width / 2 - size, g_height / 2, size);
+
+	countdown++;
+}
+
 void drawHUD(float pitch, float time) {
 	char buffer[256], text[256];
 
@@ -1160,22 +1179,7 @@ int main(int argc, char **argv) {
 
 		// Draw Countdown
 		if (rules.getState() == Rules::SETUP) {
-			int size = 30 + countdown % 30;
-			// Setup all racers in starting positions
-			if (countdown > 0 && countdown <= 30)
-				printText2D("5", g_width / 2 - size, g_height / 2, size);
-			if (countdown > 30 && countdown <= 60)
-				printText2D("4", g_width / 2 - size, g_height / 2, size);
-			if (countdown > 60 && countdown <= 90)
-				printText2D("3", g_width / 2 - size, g_height / 2, size);
-			if (countdown > 90 && countdown <= 120)
-				printText2D("2", g_width / 2 - size, g_height / 2, size);
-			if (countdown > 120 && countdown <= 150)
-				printText2D("1", g_width / 2 - size, g_height / 2, size);
-			if (countdown > 150 && countdown <= 180)
-				printText2D("GO!", g_width / 2 - size, g_height / 2, size);
-
-			countdown++;
+			drawCountdown();
 		}
 
 		// Draw HUD
