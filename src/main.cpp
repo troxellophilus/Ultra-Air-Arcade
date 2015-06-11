@@ -184,6 +184,9 @@ Material p_mat_list[NUM_PLAYER_MATS] = {
 	Materials::jade
 };
 
+int closestOpponent;
+int mClosestOpponent;
+
 float randNum() {
 	return ((float) rand() / (RAND_MAX)) * 600.0;
 }
@@ -266,15 +269,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 					camera.setMode(Camera::TPC);
 			}
 			
-			if (action == GLFW_PRESS && key == GLFW_KEY_X) {
-				if (!beginProjectile) {
-					beginProjectile = true;
-					missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[1].getPosition());
-					missleTime = elapsed;
-					//cout << "MISSILE TIME: " << missleTime << endl;
-					//cout << "New Projectile" << endl;
-				}
-			}
+         if (action == GLFW_PRESS && key == GLFW_KEY_X) {
+            if(!beginProjectile) {      
+               beginProjectile = true;
+               mClosestOpponent = closestOpponent;
+               missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[mClosestOpponent].getPosition());
+               missleTime = elapsed;
+               //cout << "MISSILE TIME: " << missleTime << endl;
+               //cout << "New Projectile" << endl;
+            }
+         }
 			
 			if (key == GLFW_KEY_P) {
 				camera.setPlayer(&player);
@@ -837,7 +841,7 @@ int main(int argc, char **argv) {
 	loadShapes("../Assets/models/cube.obj", obj[1]);
 	loadShapes("../Assets/models/Pyro.obj", obj[2]);
 	loadShapes("../Assets/models/mig.obj", obj[3]);
-	loadShapes("../Assets/models/missile.obj", obj[4]);
+	loadShapes("../Assets/models/sphere.obj", obj[4]);
 	loadShapes("../Assets/models/Rock.obj", obj[5]);
 	loadShapes("../Assets/models/stone1.obj", obj[6]);
 	loadShapes("../Assets/models/stone2.obj", obj[7]);
@@ -898,20 +902,15 @@ int main(int argc, char **argv) {
 	initGround();
 	assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 	
-	/*
-	 for(int i = 0; i < 7; i++){
-	 Entity dumb;
-	 dumb.setObject(&obj[i+5]);
-	 indices[i] = initVBO(&dumb, ROCK + i, true);
-	 GLDEBUG
-	 }
-	 */
-	
-	/*
-	 std::vector<int> typeProp;
-	 std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
-	 */
-	
+	for (int i = 0; i < 7; i++) {
+      Entity dumb;
+      dumb.setObject(&obj[i+5]);
+      indices[i] = initVBO(&dumb, ROCK + i, true);
+   }
+    
+   std::vector<int> typeProp;
+   std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
+
 	// Initialize player
 	playerAI.setType(RacerAI::PLAYER);
 	player.setType(PLAYER_ENTITY);
@@ -934,7 +933,7 @@ int main(int argc, char **argv) {
 	//cout << "Init\n";
 	projectileEntity.setObject(&obj[4]);
 	projectileEntity.setPosition(glm::vec3(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]));
-	projectileEntity.setScale(glm::vec3(2.0, 2.0, 2.0));
+	projectileEntity.setScale(glm::vec3(0.2, 0.2, 0.2));
 	projectileEntity.setMaterial(Materials::emerald);
 	int mIndices = initVBO(&projectileEntity, MISSILE);
 	projectileEntity.calculateBoundingSphereRadius();
@@ -1042,9 +1041,12 @@ int main(int argc, char **argv) {
 			collision.update();
 		}
 		
-		// Update & draw player
-		player.update();
-		player.update(view, projection);
+		// Update & draw player		
+      glm::vec3 prevPlayerPos = player.getPosition();
+      player.update();
+		glm::vec3 playerDirection = prevPlayerPos - player.getPosition();     
+      player.update(view, projection);
+
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		drawVBO(&player, pIndices, PLANE);
       	player.drawExhaust();
@@ -1062,20 +1064,30 @@ int main(int argc, char **argv) {
       }
 		
 		
-		int i = 0, t = 0;
-		// Update & draw opponents
-		for (auto &opponent : opponents) {
-			t++;
-			opponent.update();
-			opponent.update(view, projection);
-			if (viewFrustum.sphereInFrustum(opponent.getPosition(), opponent.getRadius())) {
-				drawVBO(&opponent, pIndices, PLANE);
-            	opponent.drawExhaust();
-				i++;
-			}
-			//checkOpponentCollisions(opponent);
-			assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
-		}
+		int t = 0;
+      int minDistance = INT_MAX;
+      for(int i = 0; i < opponents.size(); i++){
+         t++;
+         opponents[i].update();
+         
+         if(viewFrustum.sphereInFrustum(opponents[i].getPosition(), opponents[i].getRadius())){
+            drawVBO(&(opponents[i]), pIndices, PLANE);
+         }
+         
+         glm::vec3 playerPos = player.getPosition();
+         glm::vec3 opponentPos = opponents[i].getPosition();
+
+         float distance = sqrt(((playerPos[0] - opponentPos[0]) * (playerPos[0] - opponentPos[0])) +
+          ((playerPos[1] - opponentPos[1]) * (playerPos[1] - opponentPos[1])) +
+          ((playerPos[2] - opponentPos[2]) * (playerPos[2] - opponentPos[2]))
+         );
+         if(distance < minDistance){
+            minDistance = distance;
+            closestOpponent = i;
+         }
+
+         assert(!GLSLProgram::checkForOpenGLError(__FILE__,__LINE__));
+      }
 		
 		/*
 		 //update scenery
@@ -1105,40 +1117,24 @@ int main(int argc, char **argv) {
 		camera.update();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		
-		/*
-		 //projectilw handling
-		 if (beginProjectile == true) {
-		 //cout << "MISSILE TIME: " << missleTime << endl;
-		 //cout << "ELAPSED: " << elapsed << endl;
-		 
-		 int isDone = missle->runProjectile(elapsed - missleTime,
-		 player.getPosition(), opponents[0].getPosition());
-		 
-		 Entity* ent = missle->getEntity();
-		 
-		 drawVBO(ent, mIndices, MISSILE);
-		 
-		 if (collision.detectEntityCollision(&opponents[0], ent)) {
-		 //Material m = check->getMaterial();
-		 //if(color == false){
-		 //cout << "IN\n" << endl;
-		 //check->setMaterial(Materials::wood);
-		 //color = true;
-		 //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] - 40.0, bigOpp.getPosition()[2]));
-		 //}
-		 //else if(color == true){
-		 //cout << "OUT\n" << endl;
-		 //check->setMaterial(Materials::jade);
-		 //color = false;
-		 //bigOpp.setPosition(glm::vec3(bigOpp.getPosition()[0], bigOpp.getPosition()[1] + 40.0, bigOpp.getPosition()[2]));
-		 //}
-		 
-		 missleTime = 0;
-		 beginProjectile = false;
-		 delete missle;
-		 }
-		 }
-		 */
+		if (beginProjectile == true) {
+         int isDone = missle->runProjectile(elapsed - missleTime,
+                                  player.getPosition(), opponents[mClosestOpponent].getPosition(),
+                                  playerDirection);
+
+         Entity* ent = missle->getEntity();
+
+         drawVBO(ent, mIndices, MISSILE);
+
+         if (collision.detectEntityCollision(&opponents[mClosestOpponent], ent) ||                 
+            collision.detectTerrainCollision(ent)) {
+   
+            missleTime = 0;
+            beginProjectile = false;
+            delete missle;
+         }
+      }
+      
 		
 		//Draw HUD
       if (hud) {
