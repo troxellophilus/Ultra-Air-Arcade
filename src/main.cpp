@@ -50,6 +50,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <iterator>
 
 //#define _DEBUG
 #define NUM_PLAYER_MATS 5
@@ -188,6 +190,8 @@ int curLap = 0;
 float lap1 = 0.f;
 float lap2 = 0.f;
 float lap3 = 0.f;
+vector<float> lapTimes;
+bool addLapsData = false;
 
 Material p_mat_list[NUM_PLAYER_MATS] = {
 	Materials::brass,
@@ -243,14 +247,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 		else if (action == GLFW_PRESS && rules.getState() == Rules::FINISH) {
 			rules.setState(Rules::LEADERBOARD);
-
-			backgroundMusic.stop();
-			planeSound.stop();
-			themeMusic.playLooped();
 		}
 
 		else if (action == GLFW_PRESS && rules.getState() == Rules::LEADERBOARD) {
 			rules.setState(Rules::SPLASH);
+			backgroundMusic.stop();
+			planeSound.stop();
+			themeMusic.playLooped();
 		}
 		else if (rules.getState() == Rules::RACE) {
 
@@ -287,11 +290,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			}
 
 			if (action == GLFW_PRESS && key == GLFW_KEY_X) {
-				if (!beginProjectile && missileCooldown == false) {
+				if (!beginProjectile && missileCooldown == false && playerAI.getPlace() > 3) {
 					startCooldown = true;
 					beginProjectile = true;
-					Entity targ_opp = opponents[rules.getClosestOpponentAhead()];
-					missle = new Projectile(projectileEntity, false, true, player.getPosition(), targ_opp.getPosition());
+					mClosestOpponent = closestOpponent;
+					missle = new Projectile(projectileEntity, false, true, player.getPosition(), opponents[mClosestOpponent].getPosition());
 					missleTime = elapsed;
 					//cout << "MISSILE TIME: " << missleTime << endl;
 					//cout << "New Projectile" << endl;
@@ -894,6 +897,50 @@ void drawFinish() {
 	printText2D(text, 0.15 * g_width, 0.40 * g_height, 25);
 }
 
+void drawLeaderboard() {
+	char text[256];
+	float position = 0.8f;
+
+	printText2D("Fastest Laps", 0.15 * g_width, 0.90 * g_height, 40);
+
+	for (int i = 0; i < lapTimes.size(); i++) {
+		int mod = (int) lapTimes[i] / 60;
+		sprintf(text, "%d. %02d:%06.03f", i + 1, (int) lapTimes[i] / 60, lapTimes[i] - (60 * mod));
+		printText2D(text, 0.15 * g_width, position * g_height, 30);
+		position -= 0.05;
+	}
+}
+
+void drawCooldown() {
+	char text[256];
+	sprintf(text, "Cooldown: %.2f\n", cooldownTime);
+	printText2D(text, 0.75 * g_width, 0.50 * g_height, 15);
+}
+
+bool floatCompare(float a, float b) {
+	return a < b;
+}
+
+void initLapTimes() {
+	std::fstream myfile("laptimes.txt", std::ios_base::in);
+	float a;
+
+	while (myfile >> a) {
+		lapTimes.push_back(a);
+	}
+
+	myfile.close();
+
+	std::sort(lapTimes.begin(), lapTimes.end(), floatCompare);
+}
+
+void saveLapTimes() {
+	std::ofstream outputFile;
+	std::ofstream output_file("laptimes.txt");
+	std::ostream_iterator<float> output_iterator(output_file, "\n");
+	std::copy(lapTimes.begin(), lapTimes.end(), output_iterator);
+}
+
 int main(int argc, char **argv) {
 	const GLubyte* renderer;
 	const GLubyte* version;
@@ -1001,6 +1048,8 @@ int main(int argc, char **argv) {
 
 	// Initialize our little text library with the Holstein font
 	initText2D( textShaders, "Fonts/Holstein.DDS" );
+
+	initLapTimes();
 
 	initCollisions();
 	initGround();
@@ -1173,15 +1222,12 @@ int main(int argc, char **argv) {
 			curLap++;
 			if (playerAI.getLap() == 1) {
 				lap1 = elapsed;
-				printf("MAIN LAP 1 %f\n", lap1);
 			}
 			else if (playerAI.getLap() == 2) {
 				lap2 = elapsed - lap1;
-				printf("MAIN LAP 2 %f\n", lap2);
 			}
 			else if (playerAI.getLap() == 3) {
 				lap3 = elapsed - lap2 - lap1;
-				printf("MAIN LAP 3 %f\n", lap3);
 			}
 		}
 
@@ -1258,10 +1304,7 @@ int main(int argc, char **argv) {
 
 		if (missileCooldown == true) {
 			cooldownTime = glfwGetTime() - cooldownStart;
-			char text[256];
-			// printf("Cooldown: %f\n", cooldownTime);
-			sprintf(text, "Cooldown: %.2f\n", cooldownTime);
-			printText2D(text, 0.75 * g_width, 0.50 * g_height, 15);
+			drawCooldown();
 		}
 
 		if (cooldownTime > 10) {
@@ -1320,6 +1363,8 @@ int main(int argc, char **argv) {
 		// Draw Countdown
 		if (rules.getState() == Rules::SETUP) {
 			drawCountdown();
+			needStart = true;
+			lap1 = lap2 = lap3 = 0;
 		}
 
 		// Draw HUD
@@ -1340,6 +1385,20 @@ int main(int argc, char **argv) {
 		// Draw Finish
 		if (rules.getState() == Rules::FINISH) {
 			drawFinish();
+
+			if (addLapsData) {
+				addLapsData = false;
+				lapTimes.push_back(lap1);
+				lapTimes.push_back(lap2);
+				lapTimes.push_back(lap3);
+				std::sort(lapTimes.begin(), lapTimes.end(), floatCompare);
+				saveLapTimes();
+			}
+		}
+
+		// Draw Leaderboard
+		if (rules.getState() == Rules::LEADERBOARD) {
+			// drawLeaderboard();
 		}
 
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
