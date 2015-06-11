@@ -169,6 +169,7 @@ bool renderShadows;
 int collisionCount = 0;
 
 bool needStart = true;
+int countdown = 0;
 
 bool beginProjectile = false;
 Projectile *missle;
@@ -1155,6 +1156,26 @@ int main(int argc, char **argv) {
 		// Draw Color Select
 		if (rules.getState() == Rules::CSEL) {
 			drawColorSelect();
+		}
+
+		// Draw Countdown
+		if (rules.getState() == Rules::SETUP) {
+			int size = 30 + countdown % 30;
+			// Setup all racers in starting positions
+			if (countdown > 0 && countdown <= 30)
+				printText2D("5", g_width / 2 - size, g_height / 2, size);
+			if (countdown > 30 && countdown <= 60)
+				printText2D("4", g_width / 2 - size, g_height / 2, size);
+			if (countdown > 60 && countdown <= 90)
+				printText2D("3", g_width / 2 - size, g_height / 2, size);
+			if (countdown > 90 && countdown <= 120)
+				printText2D("2", g_width / 2 - size, g_height / 2, size);
+			if (countdown > 120 && countdown <= 150)
+				printText2D("1", g_width / 2 - size, g_height / 2, size);
+			if (countdown > 150 && countdown <= 180)
+				printText2D("GO!", g_width / 2 - size, g_height / 2, size);
+
+			countdown++;
 		}
 
 		// Draw HUD
