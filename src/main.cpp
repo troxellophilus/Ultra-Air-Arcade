@@ -169,6 +169,7 @@ bool renderShadows;
 int collisionCount = 0;
 
 bool hud = false;
+bool needStart = true;
 
 bool beginProjectile = false;
 Projectile *missle;
@@ -236,6 +237,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 		else if (rules.getState() == Rules::RACE) {
          hud = true;
+         if (needStart) {
+            needStart = false;
+            start = glfwGetTime();
+         }
 
 			// Check movement keys
 			if (key == GLFW_KEY_W) {
@@ -993,7 +998,6 @@ int main(int argc, char **argv) {
 	double lastTime = glfwGetTime();
 	int fps = 0;
 	
-	float start = glfwGetTime();
 	elapsed = 0;
 	float last = -1;
 	float pitch = 0;
