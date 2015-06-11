@@ -153,23 +153,27 @@ void Rules::setup(Camera *cam) {
 	
 	start_count++;
 	
-	if (start_count == 30)
+	if (start_count == 45) {
 		printf("4\n");
+		countdown.play();
+	}
 	
-	if (start_count == 60) {
+	if (start_count == 90) {
 		printf("3\n");
 		countdown.play();
 	}
 	
-	if (start_count == 90)
+	if (start_count == 135) {
 		printf("2\n");
+		countdown.play();		
+	}
 	
-	if (start_count == 120) {
+	if (start_count == 180) {
 		printf("1\n");
 		countdown.play();
 	}
 	
-	if (start_count == 180) {
+	if (start_count == 225) {
 		printf("GO!\n");
 		countdown.setPitch(2.f);
 		countdown.play();

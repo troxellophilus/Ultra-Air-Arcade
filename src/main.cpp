@@ -770,46 +770,46 @@ void drawColorSelect() {
 }
 
 void drawCountdown() {
-	int size = 30 + countdown % 30;
+	int size = 30 + countdown % 45;
 
-	if (countdown > 0 && countdown <= 30)
+	if (countdown > 0 && countdown <= 45)
 		printText2D("5", g_width / 2 - size, g_height / 2, size);
-	if (countdown > 30 && countdown <= 60)
+	if (countdown > 45 && countdown <= 90)
 		printText2D("4", g_width / 2 - size, g_height / 2, size);
-	if (countdown > 60 && countdown <= 90)
+	if (countdown > 90 && countdown <= 135)
 		printText2D("3", g_width / 2 - size, g_height / 2, size);
-	if (countdown > 90 && countdown <= 120)
+	if (countdown > 135 && countdown <= 180)
 		printText2D("2", g_width / 2 - size, g_height / 2, size);
-	if (countdown > 120 && countdown <= 150)
+	if (countdown > 180 && countdown <= 225)
 		printText2D("1", g_width / 2 - size, g_height / 2, size);
-	if (countdown > 150 && countdown <= 180)
+	if (countdown > 225 && countdown <= 250)
 		printText2D("GO!", g_width / 2 - size, g_height / 2, size);
 
 	countdown++;
 }
 
 void drawHUD(float pitch, float time) {
-	char buffer[256], text[256];
+	char text[256];
 
 	sprintf(text, "%.0f", fabs(player.getVelocity().x + player.getVelocity().y + player.getVelocity().z) * 10 );
 	printText2D(text, 0.145 * g_width, 0.55 * g_height, 0);
 
-	char suffix[2];
+	std::string suffix;
 
 	if (playerAI.getPlace() == 1) {
-		strncpy(suffix, "st", 2);
+		suffix = "st";
 	}
 	else if (playerAI.getPlace() == 2) {
-		strncpy(suffix, "nd", 2);
+		suffix = "nd";
 	}
 	else if (playerAI.getPlace() == 3) {
-		strncpy(suffix, "rd", 2);
+		suffix = "rd";
 	}
 	else {
-		strncpy(suffix, "th", 2);
+		suffix = "th";
 	}
 
-	sprintf(text, "%d%s", playerAI.getPlace(), suffix);
+	sprintf(text, "%d%s", playerAI.getPlace(), suffix.c_str());
 	printText2D(text, 0.05 * g_width, 0.1 * g_height, 30);
 
 	sprintf(text, "%.0fm", player.getPosition().y * 10);
@@ -822,20 +822,6 @@ void drawHUD(float pitch, float time) {
 
 	sprintf(text, "%02d:%06.03f", (int) time / 60, time - (60 * mod));
 	printText2D(text, 0.05 * g_width, 0.9 * g_height, 30);
-
-
-	if (playerAI.getLap() > curLap) {
-		curLap++;
-		if (playerAI.getLap() == 1) {
-			lap1 = elapsed;
-		}
-		else if (playerAI.getLap() == 2) {
-			lap2 = elapsed - lap1;
-		}
-		else if (playerAI.getLap() == 3) {
-			lap3 = elapsed - lap2 - lap1;
-		}
-	}
 
 	if (lap1 > 0) {
 		mod = (int) lap1 / 60;
@@ -853,7 +839,6 @@ void drawHUD(float pitch, float time) {
 		printText2D(text, 0.05 * g_width, 0.75 * g_height, 20);
 	}
 
-
 	drawText->addText(Text(".", g_width / 2, g_height / 2, 0, 3, drawText->getFontSize(105), 2));
 	drawText->addText(Text("_______", g_width / 2 - g_width / 3, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
 	drawText->addText(Text("_______", g_width / 2 + g_width / 5, g_height / 2 + pitch, 0, 1, drawText->getFontSize(45), 2));
@@ -862,6 +847,47 @@ void drawHUD(float pitch, float time) {
 	glUseProgram(hudShaders);
 	drawText->drawText();
 	glEnable(GL_CULL_FACE);
+}
+
+void drawFinish() {
+	char text[256];
+
+	printText2D("The race is complete!", 0.15 * g_width, 0.85 * g_height, 35);
+
+	std::string suffix;
+
+	if (playerAI.getPlace() == 1) {
+		suffix = "st";
+	}
+	else if (playerAI.getPlace() == 2) {
+		suffix = "nd";
+	}
+	else if (playerAI.getPlace() == 3) {
+		suffix = "rd";
+	}
+	else {
+		suffix = "th";
+	}
+
+	sprintf(text, "You finished in %d%s place!\n", playerAI.getPlace(), suffix.c_str());
+	printText2D(text, 0.05 * g_width, 0.65 * g_height, 35);
+
+	int mod = (int) lap1 / 60;
+	sprintf(text, "Lap 1: %02d:%06.03f", (int) lap1 / 60, lap1 - (60 * mod));
+	printText2D(text, 0.15 * g_width, 0.55 * g_height, 25);
+
+	mod = (int) lap2 / 60;
+	sprintf(text, "Lap 2: %02d:%06.03f", (int) lap2 / 60, lap2 - (60 * mod));
+	printText2D(text, 0.15 * g_width, 0.50 * g_height, 25);
+
+	mod = (int) lap3 / 60;
+	sprintf(text, "Lap 3: %02d:%06.03f", (int) lap3 / 60, lap3 - (60 * mod));
+	printText2D(text, 0.15 * g_width, 0.45 * g_height, 25);
+
+	float totaltime = lap1 + lap2 + lap3;
+	mod = (int) totaltime / 60;
+	sprintf(text, "Total: %02d:%06.03f", (int) totaltime / 60, totaltime - (60 * mod));
+	printText2D(text, 0.15 * g_width, 0.40 * g_height, 25);
 }
 
 int main(int argc, char **argv) {
@@ -1134,6 +1160,22 @@ int main(int argc, char **argv) {
 			pitch += (pitch > 0 ? -0.2 : (pitch < 0 ? 0.2 : 0));
 		}
 
+		if (playerAI.getLap() > curLap) {
+			curLap++;
+			if (playerAI.getLap() == 1) {
+				lap1 = elapsed;
+				printf("MAIN LAP 1 %f\n", lap1);
+			}
+			else if (playerAI.getLap() == 2) {
+				lap2 = elapsed - lap1;
+				printf("MAIN LAP 2 %f\n", lap2);
+			}
+			else if (playerAI.getLap() == 3) {
+				lap3 = elapsed - lap2 - lap1;
+				printf("MAIN LAP 3 %f\n", lap3);
+			}
+		}
+
 		int t = 0;
 		int minDistance = INT_MAX;
 		for (int i = 0; i < opponents.size(); i++) {
@@ -1248,11 +1290,16 @@ int main(int argc, char **argv) {
 				start = glfwGetTime();
 
 				themeMusic.stop();
-         		backgroundMusic.playLooped();
+      		backgroundMusic.playLooped();
 				planeSound.playLooped();
 			}
 
 			drawHUD(pitch, elapsed);
+		}
+
+		// Draw Finish
+		if (rules.getState() == Rules::FINISH) {
+			drawFinish();
 		}
 
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
