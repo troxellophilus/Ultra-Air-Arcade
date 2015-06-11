@@ -17,6 +17,7 @@
 
 #include "Materials.hpp"
 #include "types.h"
+#include "CookTorranceMaterial.hpp"
 
 #define GAME_SCALE 0.01
 
@@ -72,6 +73,7 @@ private:
 	int ammunition;
     
 public:
+    CookTorranceMaterial *ctmaterial;
     // Constructor
     Entity(AIComponent *ai);
     Entity();

@@ -131,7 +131,10 @@ GLuint propM;
 GLuint propP;
 GLuint prop_light_position;
 GLuint propTexture;
+GLuint textureHandle;
 GLuint tbo_tex;
+GLuint roughness, fresnel, geometric;
+GLuint ctDiffuse;
 // End
 
 // HUD vars
@@ -369,46 +372,40 @@ glm::mat4 SetModel(vec3 trans, glm::vec3 rot, vec3 sc, int num) {
 }
 
 int initVBO(Entity *e, int whichbo, bool textures = false) {
+   GLDEBUG
    vector<float> posBuf, norBuf, texBuf;
    vector<unsigned int> indBuf;
    if(textures)
       e->packVertices(&posBuf, &norBuf, &indBuf, &texBuf);
    else
       e->packVertices(&posBuf, &norBuf, &indBuf);
-
+   GLDEBUG
    // Send the position array to the GPU
    glGenBuffers(1, &pbo[whichbo]);
    glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
    glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
-
+   GLDEBUG
    // Send the normal array to the GPU
    glGenBuffers(1, &nbo[whichbo]);
    glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
    glBufferData(GL_ARRAY_BUFFER, norBuf.size()*sizeof(float), &norBuf[0], GL_STATIC_DRAW);
-
+   GLDEBUG
    // Send the index array to the GPU
    glGenBuffers(1, &ibo[whichbo]);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indBuf.size()*sizeof(unsigned int), &indBuf[0], GL_STATIC_DRAW);
-
+   GLDEBUG
    // Unbind the arrays
    glBindBuffer(GL_ARRAY_BUFFER, 0);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
    GLSL::checkVersion();
-   assert(glGetError() == GL_NO_ERROR);
+   GLDEBUG
 
    if(textures)
    {
-
-      // Generate a texture buffer object
-      glGenBuffers(1, &tbo[whichbo]);
-
-      // Bind the current texture to be the newly generated texture object
-      glBindBuffer(GL_TEXTURE_BUFFER, tbo[whichbo]);
-      glBufferData(GL_TEXTURE_BUFFER, sizeof(tbo[whichbo]), &texBuf[0], GL_STATIC_DRAW);
-
-      // Unbind
-      glBindTexture(GL_TEXTURE_2D, 0);
+         glGenBuffers(1, &tbo[whichbo]);
+        glBindBuffer(GL_ARRAY_BUFFER, tbo[whichbo]);
+        glBufferData(GL_ARRAY_BUFFER, texBuf.size()*sizeof(float), &texBuf[0], GL_STATIC_DRAW);
    }
 
    return (int)indBuf.size();
@@ -485,18 +482,22 @@ void initCollisions() {
 
 void initShaderVars() {
    // Set up the shader variables
-    GLDEBUG
     // Set up the shader variables
-   pPos = glGetAttribLocation(propShaders, "prop_position");
-   pNor = glGetAttribLocation(propShaders, "prop_normal");
-   tbo_tex = glGetAttribLocation(propShaders, "vertTex");
-
+   GLDEBUG
    propV = glGetUniformLocation(propShaders, "V");
+   GLDEBUG
    propM = glGetUniformLocation(propShaders, "M");
+   GLDEBUG
    propP = glGetUniformLocation(propShaders, "P");
+   GLDEBUG
    prop_light_position = glGetUniformLocation(propShaders, "lPos");
-   propTexture = glGetUniformLocation(propShaders, "tex_un");
+   GLDEBUG
+   roughness = glGetUniformLocation(propShaders, "roughness");
+   fresnel =   glGetUniformLocation(propShaders, "fresnel");
+   geometric = glGetUniformLocation(propShaders, "geometric");
+   ctDiffuse = glGetUniformLocation(propShaders, "diffuse");
 
+   GLDEBUG
    aPos = glGetAttribLocation(passThroughShaders, "aPos");
    aNor = glGetAttribLocation(passThroughShaders, "aNor");
    shadowPos = glGetAttribLocation(renderSceneShaders, "aPos");
@@ -670,50 +671,48 @@ void drawProp(Entity* entity, int nIndices, int whichbo)
 {
    
 
-   glEnableVertexAttribArray(pPos);
+    glEnableVertexAttribArray(0);
    glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
-   glVertexAttribPointer(pPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-   // Enable and bind normal array for drawing
-   glEnableVertexAttribArray(pNor);
-   glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
-   glVertexAttribPointer(pNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+   glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
    GLDEBUG
 
+   // Enable and bind normal array for drawing
+   glEnableVertexAttribArray(1);
+   glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
+   glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+   GLDEBUG
 
    // Bind index array for drawing
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
+   GLDEBUG
 
    glUniform3f(prop_light_position, lightPosition.x, lightPosition.y, lightPosition.z);
-
-   //bind textures
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[whichbo]);
-   glActiveTexture(GL_TEXTURE0);
-   GLDEBUG
-   glBindTexture(GL_TEXTURE_BUFFER, tbo_tex);
-   GLDEBUG
-   glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, tbo[whichbo]);
-   GLDEBUG
-   glUniform1i(propTexture,0);
    GLDEBUG
 
-
+   if(entity->ctmaterial)
+   {
+      CookTorranceMaterial ctmaterial = *(entity->ctmaterial);
+      glUniform1f(roughness, ctmaterial.roughness);
+      glUniform1f(fresnel, ctmaterial.fresnel);
+      glUniform1f(geometric, ctmaterial.geometric);
+      vec3 diffuse = entity->getMaterial().getAmbient();
+      glUniform3f(ctDiffuse,diffuse.x,diffuse.y, diffuse.z);
+   }
+   GLDEBUG
 
    glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
    glm::mat4 Orient = entity->getRotationM();
    glm::mat4 Sc = glm::scale(glm::mat4(1.0f), entity->getScale());
    glm::mat4 com = Trans * Orient * Sc;
-   glUniformMatrix4fv(propM, 1, GL_FALSE, glm::value_ptr(com));
-
+   glUniformMatrix4fv(uModelMatrix, 1, GL_FALSE, glm::value_ptr(com));
    glDrawElements(GL_TRIANGLES, nIndices, GL_UNSIGNED_INT, 0);
-
+   GLDEBUG
 
    // Disable and unbind
-   GLSL::disableVertexAttribArray(pNor);
-   GLSL::disableVertexAttribArray(pPos);
+   GLSL::disableVertexAttribArray(0);
+   GLSL::disableVertexAttribArray(1);
    glBindBuffer(GL_ARRAY_BUFFER, 0);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void drawVBO(Entity *entity, int nIndices, int whichbo, GLuint shader = passThroughShaders) {
@@ -974,21 +973,20 @@ int main(int argc, char **argv) {
    initCollisions();
    initBillboard();
    initGround();
-   assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
-
-   /*
+   GLDEBUG
+   
    for(int i = 0; i < 7; i++){
+        cout << "object " << i << endl;
         Entity dumb;
-        dumb.setObject(&obj[i+5]);
+      dumb.setObject(&obj[i+5]);
         indices[i] = initVBO(&dumb, ROCK + i, true);
-        GLDEBUG
     }
-    */
+    
 
-   /*
+   
     std::vector<int> typeProp;
     std::vector<Entity> props = generateScenery(typeProp, obj, &terrain);
-    */
+    
 
    // Initialize player
    playerAI.setType(RacerAI::PLAYER);
@@ -1208,13 +1206,13 @@ int main(int argc, char **argv) {
          assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
       }
 
-	/*
+	
       //update scenery
        for(int i = 0; i < props.size(); i++){
           //cout << indices[typeProp[i]] << endl;
           drawVBO(&props[i], indices[typeProp[i]], ROCK + typeProp[i], propShaders);
        }
-       */
+       
 
       //update skybox 
       skybox->render(view, projection, camera.getPosition());
