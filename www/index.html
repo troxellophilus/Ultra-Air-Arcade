@@ -56,7 +56,7 @@
         <div class=".col-md-6 .col-md-offset-3">
            <h1 id="overview">Ultra Air Arcade</h1>
 
-           <img src="./img/title_screen.png" width="60%" class="img-responsive" alt="Responsive image">
+           <img src="./img/title_screen.png" width="55%" class="img-responsive" alt="Responsive image">
 
            <dl class="dl-horizontal">
              <dt>Created by</dt>
@@ -141,7 +141,7 @@
 	   <p>The terrain is loaded in using a greyscale heightmap. The shade of grey in each pixel determines just how high the terrain will be. This makes it expecially easy for every entity to be able to know where it is reletive to the terrain. Procedural generation of different props was also made. This was done using blue noise. This assigns multiple cells to the enviroment, ensures the cells do not touch each other, and then randomly places object in the cell. The latter feature was taken out in the 100 percent version, as textures were not able to bind to the objects; however the placement of the objects worked perfectly and was shown in the 90 percent demo.</p>
       <h4>Spline Animation <small>Billy Aujla</small> </h4>
 	   <p>Made spline system that can update to hit a target using a Catmull-Rom spline. An object traveling across will move at a constant speed regardless of how far the control points are from each other. It can also change the contol points as an object is traveling across the spline curve to make it much more dynamic.</p>
-     <h4>Shading <small> LeJon McGowan</small>></h4>
+     <h4>Shading <small> LeJon McGowan</small></h4>
 	   <p>There are two main techniques of shading used here: toon shading and Cook-Torrance shading.</p>
 
       <p>Toon shading take in the diffuse colors of a terrrain, then clamps down final color to create a distinct number of shades. This technique is use to simulate hand-drawn painting and drawing produced by artists. This is seen on the terrain of the track, where there is a clear transition from one shade of color to the next. Height is also taken into account for the terrain, allowing diffrent diffuse calues to be represented at different height (white snow at high peaks, yeallow-ish sand valley towards the bottom). </p>
@@ -162,7 +162,6 @@
               <div class="thumbnail">
                 <img src="./img/gray_flight3.png" alt="...">
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -170,7 +169,6 @@
               <div class="thumbnail">
                 <img src="./img/brown_flight3.png" alt="...">
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -178,7 +176,6 @@
               <div class="thumbnail">
                 <img src="./img/pink_flight1.png" alt="...">
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -188,7 +185,6 @@
               <div class="thumbnail">
                 <img src="./img/gray_flight2.png" alt="...">
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -196,7 +192,6 @@
               <div class="thumbnail">
                 <img src="./img/brown_flight2.png" alt="...">
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -204,7 +199,6 @@
               <div class="thumbnail">
                 <img src="./img/collision1.png" alt="...">
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -225,8 +219,9 @@
            <h2 id="links">Resources</h1>
            <p>The following are resources we either used or found helpful in the course of developing Ultra Air Arcade:</p>
            <ul>
+             <li><a href="http://tf3dm.com">TF3DM</a> - A good resource for free 3D assets.</li>
+	     <li><a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions">opengl-tutorial quaternions</a> - A good entry point for understanding how to use Quaternions in your game.</li>
              <li><a href="http://opengameart.org">Open Game Art</a> - A good resource for free graphics assets.</li>
-             <li><a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Wikipedia Conway's Game of Life</a> - Provides background on the cellular automation rules.</li>
              <li><a href="http://www.reddit.com/r/gamedev">r/gamedev</a> - An excellent community of aspiring game developers.</li>
              <li><a href="http://www.amazon.com/Foundations-Computer-Graphics-Steven-Gortler/dp/0262017350">Foundations of Computer Graphics by Steven Gortler</a> - The class text is an excellent resource for OpenGL basics.</li>
              <li><a href="http://incompetech.com">Incompetech</a> - A library of royalty-free sounds.</li>
@@ -243,12 +238,10 @@
            <dl>
              <dt>Component - Based Shader Handling</dt>
 	     <dd>Using a component-based system for handling the loading of shaders, and their references to different game elements would have helped speed the process of inserting graphics elements, different shading effects, framebuffers, geometry shaders, etc.</dd>
-             <dt>Thing 1</dt>
-	     <dd>Description of thing 1</dd>
-             <dt>Thing 1</dt>
-	     <dd>Description of thing 1</dd>
-             <dt>Thing 1</dt>
-	     <dd>Description of thing 1</dd>
+             <dt>Articulated Plane Animations</dt>
+	     <dd>Animations on plane control surfaces would have increased the visual appeal of the models.</dd>
+	     <dt>Bump mapped terrain</dt>
+	     <dd>Bump mapping the terrain would have provided it with more depth and made the game more visually appealing.</dd>
            </dl>
         </div>
       </div>
