@@ -96,8 +96,8 @@
            <h2 id="technologies">Technologies</h1>
 	   <h4>Technology name <small>Owner's name</small></h4>
 	   <p>Brief overview of technology in game.</p>
-	   <h4>Collision Detection <small>Riley McGovern and Zachary Weisman</small></h4>
-	   <p>The collision detection in Ultra Air Arcade was done using hierarchical bounding spheres for the planes. The spheres are arranged into two levels: One large sphere surrounding the entire volume of the aircraft, and five smaller spheres placed on the left and right wings, tail and nose, and one in the center. For the collision with the terrain, the plane's Y coordinate was checked to make sure it was not below the height of the terrain object's height based on the plane's position.</p>
+           <h4>Collision Detection <small>Riley McGovern and Zachary Weisman</h4>
+	   <p>The collision detection in Ultra Air Arcade was done using hierarchical bounding spheres for the planes. The spheres are arranged into two levels: One large sphere surrounding the entire volume of the aircraft, and five smaller spheres placed on the left and right wings, tail and nose, and one in the center. To reduce computational complexity, the game would not check any of the five smaller spheres until after a collision was flagged with the large outer sphere. For the collision with the terrain, the plane's Y coordinate was checked to make sure it was not below the height of the terrain object's height based on the plane's position.</p>
 	   <h4>Collision Detection Response <small>Riley McGovern</small></h4>
 	   <p>The collision detection response in Ultra Air Arcade contained collisions between a plane and another plane, a plane and the terrain, and a plane and a missile. The collisions between two planes were based on the positional vectors of the two planes that were colliding and  small math with quaternions would softly "bounce" them off of each other. The collisions between a plane and the terrain would send back the plane two times the normal vector of the triangle of the terrain that the plane hit. After resetting, the plane would continue using it's thrust that it had before the collision so the plane would not get too far behind the opponents. The collisions between a missile and a plane would cause the targeted plane to lose half of it's thrust, so that the player could catch up.</p>
 	   <h4>Sound <small>Riley McGovern</small></h4>
@@ -105,6 +105,9 @@
 	   <h4>Skybox <small>Zachary Weisman</small></h4>
 	   <p>A simple cube map was implemented, and an array of textures were loaded onto it. A special GLSL datatype - samplerCube - handled the fetching of the correct texel depending on what the camera was facing, thus making implementation relatively simple. The position of the skybox was locked to the players x - z coordinate, but was given a y - position of zero in order to keep an accurate sense of height as the player travels up and down.</p>
 	   <h4>Shadows <small>Zachary Weisman</small></h4>
+	   <p>Shadows in our game were implemented using the shadow mapping technique. Using shadow maps, the scene is rendered twice using two separate sets of shaders. The first pass simply writes the depth value per pixel of the scene from the light-sources perspective to a framebuffer object; this is called a depth map. Then, on the CPU, that depth map is transformed to fit over the scene from the cameras perspective. Finally, a separate shader is run to render to the screen using the depth at each pixel to calculate a light factor, or simply a number to multiply the output color by in order to reduce its brightness, and make it appear shadowed.</p>
+	   <h4>Particles <small>Zachary Weisman</small></h4>
+	   <p>A particle class was developed for Ultra Air Arcade that was based off of a simple billboard system. Upon initialization of a particle object, sixty variable sized billboards would be created, and upon rendering, the particles would be instanced one per frame for the first sixty frames of their lives, which makes them appear from the same position at different times. This, along with a randomness factor calculated at instantiation helps to make them move a little more naturally.</p>
 	   <p>Brief overview of technology in game.</p>
 	   <h4>3D Camera View & Flight Dynamics <small>Drew Troxell</small></h4>
 	   <p>In order to provide a fulfilling flight control system and camera view, the 3D camera is controlled by two areas: Entity.hpp and Camera.hpp. The Entity class contains the flight dynamics necessary to propel one of our jet models through the air. The flight utilizes a mostly physical model, relying on a forward thrust force and a counteracting drag force to stabilize acceleration. Each entity maintains attributes such as mass, surface area, and drag coefficient to support this. Flight occurs on a time step that is set by the current fps of the game. All rotations of a plane are contained in two quaternions: the rotation and the target rotation. The rotation quaternion contains the current rotation of the model, while the target rotation contains the rotation to which the plane model is attempting to rotate. The rotation quaternion is proportionally controlled toward the target rotation, allowing for a very clean feedback system that makes fast rotations when the mouse is moved swiftly and slow rotations when the mouse is moved lightly.</p>
@@ -212,8 +215,8 @@
         <div class=".col-md-6 .col-md-offset-3">
            <h2 id="future">Future Work</h1>
            <dl>
-             <dt>Thing 1</dt>
-	     <dd>Description of thing 1</dd>
+             <dt>Component - Based Shader Handling</dt>
+	     <dd>Using a component-based system for handling the loading of shaders, and their references to different game elements would have helped speed the process of inserting graphics elements, different shading effects, framebuffers, geometry shaders, etc.</dd>
              <dt>Thing 1</dt>
 	     <dd>Description of thing 1</dd>
              <dt>Thing 1</dt>
