@@ -65,7 +65,11 @@ vector<Entity> generateScenery(vector<int> &types, Object *obj, Terrain *terrain
             prop.setObject(&obj[5+type]);
             prop.setPosition(glm::vec3(x, height, z));
             //prop.setScale(glm::vec3(2.0, 2.0, 2.0));
-            prop.setMaterial(Materials::emerald);
+            prop.ctmaterial = new CookTorranceMaterial(0.8f,1.5f,0.2f);
+            prop.setMaterial(Materials::obsidian);
+            if(type == 6)  
+               prop.setMaterial(Materials::emerald);
+
             
             //if(type == 0){
             //}

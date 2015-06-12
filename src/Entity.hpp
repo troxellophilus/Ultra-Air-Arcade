@@ -19,6 +19,7 @@
 #include "Effect.hpp"
 #include "Materials.hpp"
 #include "types.h"
+#include "CookTorranceMaterial.hpp"
 
 #define GAME_SCALE 0.01
 
@@ -43,6 +44,7 @@ private:
 	Particle flame; 	// Billboarded particle that will make up the jet exhause
 	Effect effect;
    glm::vec3 scale;    // scale of the object model
+   bool hasPower;
 	
 	// Components
 	AIComponent *ai_;
@@ -77,6 +79,7 @@ private:
 	int ammunition;
 	
 public:
+    CookTorranceMaterial* ctmaterial;
 	// Constructor
 	Entity(AIComponent *ai);
 	Entity();
@@ -145,6 +148,12 @@ public:
 	void addAmmo(int);
 	int getAmmo();
 	void subtractAmmo(int);
+
+    bool hasPowerUp();
+
+    void getPowerUp();
+
+    void removePowerUp();
 	
 	bool collisionFlag;
 };
@@ -218,6 +227,18 @@ void Entity::setParticleProg(GLuint program) {
 
 void Entity::setEffectProg(GLuint program){
    effect.setShaderProg(program);
+}
+
+bool Entity::hasPowerUp(){
+   return hasPower;
+}
+
+void Entity::getPowerUp(){
+   hasPower = true;   
+}
+
+void Entity::removePowerUp(){
+   hasPower = false;
 }
 
 void Entity::update() {
