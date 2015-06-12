@@ -107,7 +107,7 @@
            <h4>Shadows - Zachary Weisman</h4>
 	   <p>Shadows in our game were implemented using the shadow mapping technique. Using shadow maps, the scene is rendered twice using two separate sets of shaders. The first pass simply writes the depth value per pixel of the scene from the light-sources perspective to a framebuffer object; this is called a depth map. Then, on the CPU, that depth map is transformed to fit over the scene from the cameras perspective. Finally, a separate shader is run to render to the screen using the depth at each pixel to calculate a light factor, or simply a number to multiply the output color by in order to reduce its brightness, and make it appear shadowed.</p>
            <h4>Particles - Zachary Weisman</h4>
-	   <p>Brief overview of technology in game.</p>
+	   <p>A particle class was developed for Ultra Air Arcade that was based off of a simple billboard system. Upon initialization of a particle object, sixty variable sized billboards would be created, and upon rendering, the particles would be instanced one per frame for the first sixty frames of their lives, which makes them appear from the same position at different times. This, along with a randomness factor calculated at instantiation helps to make them move a little more naturally.</p>
            <h4>Technology name</h4>
 	   <p>Brief overview of technology in game.</p>
            <h4>Technology name</h4>
