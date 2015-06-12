@@ -776,6 +776,12 @@ void drawSplash() {
 	printText2D("Ultra Air Arcade", g_width / 24, g_height / 1.2, 60);
 
 	printText2D("Press any key to play", g_width / 12, g_height / 4, 40);
+
+	printText2D("Controls", g_width / 1.4, g_height / 1.75, 25);
+	printText2D("W,S to throttle", g_width / 1.4, g_height / 1.75 - 30, 20);
+	printText2D("A,D to roll", g_width / 1.4, g_height / 1.75 - 60, 20);
+	printText2D("X to shoot", g_width / 1.4, g_height / 1.75 - 90, 20);
+	printText2D("Mouse to turn", g_width / 1.4, g_height / 1.75 - 120, 20);
 }
 
 void drawColorSelect() {
