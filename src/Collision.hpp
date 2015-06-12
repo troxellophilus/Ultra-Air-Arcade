@@ -23,14 +23,14 @@ private:
     bool cflag;		// True if collision detected.
     bool ptFlag; // True if player is being reset.
     Terrain *terrain; // Pointer to the terrain.
-    Entity *player;
-    vector<Entity> *opponents;
-    PlaneSound *planeSound;
-    int resetStep;
-    int enemyStep;
-    glm::vec3 convertedNor;
-    PlaneSound *collisionSound;
-    PlaneSound *enemyCollisionSound;
+    Entity *player; // Pointer to the player
+    vector<Entity> *opponents; // Pointer to the opponents
+    PlaneSound *planeSound; // Pointer to the plane sound
+    int resetStep; // Frame counter for resetting the player
+    int enemyStep; // Frame counter for resetting an opponent
+    glm::vec3 convertedNor; // Converted normal vector for colliding with terrain
+    PlaneSound *collisionSound; // Pointer to the collision sound
+    PlaneSound *enemyCollisionSound; // Pointer to the enemy collision sound
 	glm::vec3 sphereTranslations[5];
 	float sphereRadius[5];
     
@@ -116,6 +116,7 @@ void Collision::update() {
         player->setPosition(glm::vec3(player->getPosition().x, 50.f, player->getPosition().z));
     }
 
+    // Collision detection for the player against the terrain
     if (detectTerrainCollision(player)) {
         player->collisionFlag = true;
         player->setMaterial(Materials::red);
@@ -125,11 +126,9 @@ void Collision::update() {
         convertedNor = glm::vec3(normalVec(0), normalVec(1), normalVec(2));
         planeSound->changePitch(0);
         collisionSound->play();
-        // camera->setMode(Camera::CameraMode::FREE);
-        // for (int i = 0; i < 100; i++)
-        //     camera->move(Camera::CameraDirection::BACK);
     }
 
+    // Collision response for the player against the terrain
     if (player->collisionFlag) {
         glm::vec3 playerPos = player->getPosition();
         player->setPosition(playerPos + (convertedNor * 0.0167f));
@@ -152,11 +151,12 @@ void Collision::update() {
             player->setMaterial(player->getBaseMaterial());
 	    player->setThrust(-1.f);
 	    player->setVelocity(glm::vec3(0.f, 0.f, -10.f));
-            // camera->setMode(Camera::CameraMode::TPC);
         }
     }
 
+    // Checking for collisions with opponents
     for (Entity opp : *opponents) {
+        // Checking for collisions between player and opponents
         if (detectEntityCollision(player, &opp)) {
             if (opp.getPosition().x == opp.getPosition().x) {
                 glm::vec3 vec_away_opp = glm::normalize(player->getPosition() - opp.getPosition());
@@ -167,6 +167,7 @@ void Collision::update() {
             }
         }
 
+        // Checking for collisions between two opponents
         for (Entity opp1 : *opponents) {
             if (opp1.getPosition() != opp.getPosition()) {
                 if (detectEntityCollision(&opp, &opp1)) {
@@ -180,6 +181,7 @@ void Collision::update() {
             }
         }
 
+        // Detecting collisions between opponent and terrain
         if (detectTerrainCollision(&opp)) {
             //opp.collisionFlag = true;
             opp.setMaterial(Materials::red);
@@ -214,10 +216,6 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
         yOverlap = false;
     if (fabs(objectPosition.z - playerPosition.z) > (objectRadius + playerRadius))
         zOverlap = false;
-
-    //return glm::distance(objectPosition, playerPosition) > (objectRadius + playerRadius);
-
-    //cout << xOverlap << " " << yOverlap << " " << zOverlap << endl;
     
     anyOverlap = xOverlap && yOverlap && zOverlap;
     
@@ -248,8 +246,8 @@ bool Collision::detectEntityCollision(Entity *player, Entity *object) {
 }
 
 bool Collision::detectTerrainCollision(Entity *object) {
-    //return false;
 
+    // Converts the object vector to Eigen and sends that to the collision function in terrain
     Eigen::Vector3f convertedVector = Eigen::Vector3f(object->getPosition().x, object->getPosition().y, object->getPosition().z);
     return terrain->detectCollision(convertedVector, object->getRadius());
 }
