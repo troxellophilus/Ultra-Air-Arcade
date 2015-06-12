@@ -105,7 +105,7 @@
            <h4>Skybox - Zachary Weisman</h4>
 	   <p>A simple cube map was implemented, and an array of textures were loaded onto it. A special GLSL datatype - samplerCube - handled the fetching of the correct texel depending on what the camera was facing, thus making implementation relatively simple. The position of the skybox was locked to the players x - z coordinate, but was given a y - position of zero in order to keep an accurate sense of height as the player travels up and down.</p>
            <h4>Shadows - Zachary Weisman</h4>
-	   <p>Brief overview of technology in game.</p>
+	   <p>Shadows in our game were implemented using the shadow mapping technique. Using shadow maps, the scene is rendered twice using two separate sets of shaders. The first pass simply writes the depth value per pixel of the scene from the light-sources perspective to a framebuffer object; this is called a depth map. Then, on the CPU, that depth map is transformed to fit over the scene from the cameras perspective. Finally, a separate shader is run to render to the screen using the depth at each pixel to calculate a light factor, or simply a number to multiply the output color by in order to reduce its brightness, and make it appear shadowed.</p>
            <h4>Technology name</h4>
 	   <p>Brief overview of technology in game.</p>
            <h4>Technology name</h4>
