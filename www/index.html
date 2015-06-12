@@ -96,12 +96,12 @@
            <h2 id="technologies">Technologies</h1>
            <h4>Technology name</h4>
 	   <p>Brief overview of technology in game.</p>
-           <h4>Technology name</h4>
-	   <p>Brief overview of technology in game.</p>
-           <h4>Technology name</h4>
-	   <p>Brief overview of technology in game.</p>
-           <h4>Technology name</h4>
-	   <p>Brief overview of technology in game.</p>
+           <h4>Collision Detection - Riley McGovern</h4>
+	   <p>The collision detection in Ultra Air Arcade was done using hierarchical bounding spheres for the planes. For the collision with the terrain, the plane's Y coordinate was checked to make sure it was not below the height of the terrain object's height based on the plane's position.</p>
+           <h4>Collision Detection Response - Riley McGovern</h4>
+	   <p>The collision detection response in Ultra Air Arcade contained collisions between a plane and another plane, a plane and the terrain, and a plane and a missile. The collisions between two planes were based on the positional vectors of the two planes that were colliding and  small math with quaternions would softly "bounce" them off of each other. The collisions between a plane and the terrain would send back the plane two times the normal vector of the triangle of the terrain that the plane hit. After resetting, the plane would continue using it's thrust that it had before the collision so the plane would not get too far behind the opponents. The collisions between a missile and a plane would cause the targeted plane to lose half of it's thrust, so that the player could catch up.</p>
+           <h4>Sound - Riley McGovern</h4>
+	   <p>The sound in Ultra Air Arcade was run through a third party library called SFML. The library was wrapped in a custom class for use within the game. The sound of the plane was done by increasing and decreasing the pitch based on whether the player was speeding up or slowing down. Both the main theme song and race song were played on a loop. Collisions with the terrain and other planes were played in short snippets when those collisions occurred. The main countdown was done by counting down frames and playing the sound after a certain number of frames had passed. All sound was used from royalty-free sound libraries that are listed below for reference.</p>
            <h4>Technology name</h4>
 	   <p>Brief overview of technology in game.</p>
            <h4>Technology name</h4>
@@ -198,6 +198,10 @@
              <li><a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Wikipedia Conway's Game of Life</a> - Provides background on the cellular automation rules.</li>
              <li><a href="http://www.reddit.com/r/gamedev">r/gamedev</a> - An excellent community of aspiring game developers.</li>
              <li><a href="http://www.amazon.com/Foundations-Computer-Graphics-Steven-Gortler/dp/0262017350">Foundations of Computer Graphics by Steven Gortler</a> - The class text is an excellent resource for OpenGL basics.</li>
+             <li><a href="http://incompetech.com">Incompetech</a> - A library of royalty-free sounds.</li>
+             <li><a href="http://soundbible.com">SoundBible.com</a> - Another library of royalty-free sounds.</li>
+             <li><a href="http://www.soundjay.com">Sound Jay</a> - Yet another library of royalty-free sounds.</li>
+             <li><a href="http://www.sfml-dev.org">SFML</a> - Library used for playing and modifying sounds.</li>
            </ul>
         </div>
       </div>
