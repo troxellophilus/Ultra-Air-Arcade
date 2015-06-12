@@ -986,7 +986,7 @@ int main(int argc, char **argv) {
 	g_height = 768;
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
+	window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | V1.0", NULL, NULL);
 	if ( window == NULL ) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
