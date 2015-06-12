@@ -12,13 +12,8 @@ in vec3 vPos;
 
 out vec4 outColor;
 
-float Gaussian (float x, float deviation)
-{
-   return (1.0 / sqrt(2.0 * 3.141592 * deviation)) * exp(-((x * x) / (2.0 * deviation)));
-}
-
 void main() {
-   vec3 ambientLight = vCol; 
+   vec3 ambientLight = vCol;
    vec3 lColor = vec3(1.0, 1.0, 1.0);
    vec3 lDirection = normalize(lPos);
 
@@ -55,7 +50,7 @@ void main() {
       specular = (schlick * geoAtt * roughness) / (NdotL * NdotL * 3.14);
    }
    float dist = length(lPos.xyz - vPos);
-   float intensity = (1000 * dist) / (dist * dist + dist + 1);
+   float intensity = (750 * dist) / (dist * dist + dist + 1);
    
    vec3 finalColor = intensity * (lColor * NdotL * (geometric + specular * (1.0 - geometric)) + ambientLight);
    outColor =  vec4(finalColor,1.0);

@@ -44,6 +44,7 @@ private:
 	Particle flame; 	// Billboarded particle that will make up the jet exhause
 	Effect effect;
    glm::vec3 scale;    // scale of the object model
+   bool hasPower;
 	
 	// Components
 	AIComponent *ai_;
@@ -78,6 +79,7 @@ private:
 	int ammunition;
 	
 public:
+    CookTorranceMaterial* ctmaterial;
 	// Constructor
 	Entity(AIComponent *ai);
 	Entity();
@@ -146,6 +148,12 @@ public:
 	void addAmmo(int);
 	int getAmmo();
 	void subtractAmmo(int);
+
+    bool hasPowerUp();
+
+    void getPowerUp();
+
+    void removePowerUp();
 	
 	bool collisionFlag;
 };

@@ -441,12 +441,16 @@ void initShaderVars() {
 	// Set up the shader variables
 	pPos = glGetAttribLocation(propShaders, "prop_position");
 	pNor = glGetAttribLocation(propShaders, "prop_normal");
+	ctDiffuse = glGetUniformLocation(propShaders, "diffuse");
 
 	propV = glGetUniformLocation(propShaders, "V");
 	propM = glGetUniformLocation(propShaders, "M");
 	propP = glGetUniformLocation(propShaders, "P");
 	prop_light_position = glGetUniformLocation(propShaders, "lPos");
 	propTexture = glGetUniformLocation(propShaders, "tex_un");
+	roughness = glGetUniformLocation(propShaders, "roughness");
+	fresnel = glGetUniformLocation(propShaders, "fresnel");
+	geometric = glGetUniformLocation(propShaders, "geometric");
 
 	aPos = glGetAttribLocation(passThroughShaders, "aPos");
 	aNor = glGetAttribLocation(passThroughShaders, "aNor");
@@ -615,14 +619,14 @@ void drawProp(Entity* entity, int nIndices, int whichbo)
 {
 
 
-	glEnableVertexAttribArray(pPos);
+	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, pbo[whichbo]);
-	glVertexAttribPointer(pPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	// Enable and bind normal array for drawing
-	glEnableVertexAttribArray(pNor);
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, nbo[whichbo]);
-	glVertexAttribPointer(pNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(aNor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	GLDEBUG
 
 
@@ -630,17 +634,18 @@ void drawProp(Entity* entity, int nIndices, int whichbo)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[whichbo]);
 
 	glUniform3f(prop_light_position, lightPosition.x, lightPosition.y, lightPosition.z);
-
-	//bind textures
-	glActiveTexture(GL_TEXTURE0);
 	GLDEBUG
-	glBindTexture(GL_TEXTURE_BUFFER, tbo_tex);
+	if(entity->ctmaterial)
+	{
+		CookTorranceMaterial material = *(entity->ctmaterial);
+		glUniform1f(fresnel, material.fresnel);
+		glUniform1f(geometric, material.geometric);
+		glUniform1f(roughness, material.roughness);
+	}
 	GLDEBUG
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, tbo[whichbo]);
+	vec3 diffuse = entity->getMaterial().getAmbient();
+	glUniform3f(ctDiffuse,diffuse.x,diffuse.y,diffuse.z);
 	GLDEBUG
-	glUniform1i(propTexture, 0);
-	GLDEBUG
-
 
 
 	glm::mat4 Trans = glm::translate( glm::mat4(1.0f), entity->getPosition());
@@ -653,11 +658,10 @@ void drawProp(Entity* entity, int nIndices, int whichbo)
 
 
 	// Disable and unbind
-	GLSL::disableVertexAttribArray(pNor);
-	GLSL::disableVertexAttribArray(pPos);
+	GLSL::disableVertexAttribArray(0);
+	GLSL::disableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void drawVBO(Entity *entity, int nIndices, int whichbo, GLuint shader = passThroughShaders) {
@@ -972,8 +976,8 @@ int main(int argc, char **argv) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	g_width = 1024;
-	g_height = 768;
+	g_width = 1024 * 2;
+	g_height = 768 * 2;
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow(g_width, g_height, "Ultra Air Arcade | alpha build", NULL, NULL);
@@ -1078,6 +1082,7 @@ int main(int argc, char **argv) {
 	player.setBaseMaterial(p_mat_list[0]);
 	player.setParticleProg(particleShaders);
 	player.calculateBoundingSphereRadius();
+	player.ctmaterial = new CookTorranceMaterial(0.8f,0.8f,0.5f);
 	pIndices = initVBO(&player, PLANE);
 
 	// Initialize camera
@@ -1114,6 +1119,7 @@ int main(int argc, char **argv) {
 		opp.setMaterial(p_mat_list[odx % NUM_PLAYER_MATS]);
 		opp.setBaseMaterial(p_mat_list[odx % NUM_PLAYER_MATS]);
 		opp.setParticleProg(particleShaders);
+		opp.ctmaterial = new CookTorranceMaterial(0.6f,0.1f,0.2f);
 
 		opponents.push_back(opp);
 		odx++;
@@ -1209,7 +1215,7 @@ int main(int argc, char **argv) {
 		player.update(view, projection);
 
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
-		drawVBO(&player, pIndices, PLANE);
+		drawVBO(&player, pIndices, PLANE, propShaders);
 		player.drawExhaust();
 		assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 
@@ -1244,7 +1250,7 @@ int main(int argc, char **argv) {
 			opponents[i].update(view, projection);
 
 			if (viewFrustum.sphereInFrustum(opponents[i].getPosition(), opponents[i].getRadius())) {
-				drawVBO(&(opponents[i]), pIndices, PLANE);
+				drawVBO(&(opponents[i]), pIndices, PLANE, propShaders);
 				opponents[i].drawExhaust();
 			}
 
@@ -1263,13 +1269,13 @@ int main(int argc, char **argv) {
 			assert(!GLSLProgram::checkForOpenGLError(__FILE__, __LINE__));
 		}
 
-		/*
+		
 		 //update scenery
 		 for(int i = 0; i < props.size(); i++){
 		 //cout << indices[typeProp[i]] << endl;
 		 drawVBO(&props[i], indices[typeProp[i]], ROCK + typeProp[i], propShaders);
 		 }
-		 */
+		 
 
 		//update skybox
 		skybox->render(view, projection, camera.getPosition());
