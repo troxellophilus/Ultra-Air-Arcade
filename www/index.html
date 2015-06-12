@@ -39,6 +39,7 @@
             <li class="active"><a href="#">Top</a></li>
             <li><a href="#overview">Overview</a></li>
             <li><a href="#download">Download</a></li>
+	    <li><a href="#guide">Mini Guide</a></li>
             <li><a href="#technologies">Technologies</a></li>
             <li><a href="#gallery">Pictures</a></li>
             <li><a href="#video">Video</a></li>
@@ -55,7 +56,7 @@
         <div class=".col-md-6 .col-md-offset-3">
            <h1 id="overview">Ultra Air Arcade</h1>
 
-           <img src="./img/5.png" width="60%" class="img-responsive" alt="Responsive image">
+           <img src="./img/title_screen.png" width="55%" class="img-responsive" alt="Responsive image">
 
            <dl class="dl-horizontal">
              <dt>Created by</dt>
@@ -65,29 +66,48 @@
 	     	<dd>Riley McGovern</dd>
 	     	<dd>Lejon McGowan</dd>
 	     	<dd>Zachary Weisman</dd>
-		<br />
              <dt>Class</dt>
-             	<dd>CPE 476</dd>
-		<br />
+             	<dd>CPE 476 Spring 2015</dd>
              <dt>Professor</dt>
              	<dd>Dr. Zoe Wood</dd>
-		<br />
              <dt>Inspired by</dt>
 	     	<dd>Mario Kart</dd>
 	     	<dd>War Thunder</dd>
 	     	<dd>Air Brawl</dd>
            </dl>
 
-	   <p>Description of the game (3-5 sentences).</p>
+	   <p>Ultra Air Arcade is a flight racing game inspired by the racing of Mario Kart and the flight models of War Thunder and Air Brawl. The game has a fast-paced race around a challenging terrain in the shape of a circular valley, with many hills and cliffs to stand in a racer's path. Try to earn first place and beat your best times in this high velocity plane racer!</p>
         </div>
       </div>
 
       <div class="row">
         <div class=".col-md-6 .col-md-offset-3">
           <h2 id="download">Download</h2>
-          <a href="./dl/UltraAirArcadeV1.0_osx.zip">Download Ultra Air Arcade for OSX</a>
+          <a href="./dl/UltraAirArcadeV1.0_osx.tar.gz">Download Ultra Air Arcade for OSX</a>
 	  <br />
 	  <a href="./dl/UltraAirArcadeV1.0_fed.zip">Download Ultra Air Arcade for Fedora</a>
+          <br />
+	  <p>Source code is also available at <a href="https://github.com/troxellophilus/Ultra-Air-Arcade">GitHub</a>.</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class=".col-md-6 .col-md-offset-3">
+          <h2 id="guide">Installation & Play Guide</h2>
+	  <h3>Installing from links above</h3>
+	  <p>To run the game from the precompiled links above, download the game for your system, decompress the tar.gz file, and run the "Ultra Air Arcade" file in the bin directory. The tarball comes with all assets and shaders required at runtime.</p>
+	  <h3>Installing from source</h3>
+	  <p>To run the game from source, clone the repository from the github link above, enter the src directory, and run "make osx" to build for Mac OSX or "make fedora" to build for Linux. Then run the a.out file that is created from the make.</p>
+	  <h3>How to play</h3>
+	  <h4>Goals</h4>
+	  <p>The goal of Ultra Air Arcade is to win the race is the fastest time possible. Feedback is provided at the end of each race for the player's finishing place as well as individual lap times and overall race time.</p>
+	  <h4>Controls</h4>
+	  <ul>
+		  <li>W, S: Throttle up/down</li>
+		  <li>A, D: Roll left/right</li>
+		  <li>Mouse: Turning & Pitching (inverted pitch)</li>
+		  <li>X: Fire projectile</li>
+	  </ul>
         </div>
       </div>
 
@@ -120,38 +140,45 @@
 	   <p>In order to perform view frustum culling on the objects in Ultra Air Arcade, the view frustum has to be defined. There are six planes that make up the view frustum: near plane, far plane, top plane, bottom plane, left plane, right plane. Once they are calculated, Frustum.cpp has a method to check if a bounding sphere is within the view frustum that is defined for the current frame. Each object in the world has a bounding sphere and is checked to determine if it should or should not be drawn. This operation is an optimization to only draw objects that can be seen through the view of the camera.</p>
 	   <h4>Heads Up Display <small>Aaron Koeppel</small></h4>
 	   <p>The HUD in Ultra Air Arcade was partially created using a third party library called FreeType and also using texture reader. The use of both of these technologies were wrapped in custom classes for use within the game. The HUD displays text information about the game on the splash screen. It displays plane color selection on the color selection screen. The main HUD shows how much time has passed in the race, your lap times when you complete a lap, your current place in the race, and your current lap. When you complete a race, it displays your final place, your lap times, and your total race time.</p>
-           <h4>Technology name</h4>
-	   <p>Brief overview of technology in game.</p>
+      <h4>Enviroment <small> Billy Aujla </small></h4>
+	   <p>The terrain is loaded in using a greyscale heightmap. The shade of grey in each pixel determines just how high the terrain will be. This makes it expecially easy for every entity to be able to know where it is reletive to the terrain. Procedural generation of different props was also made. This was done using blue noise. This assigns multiple cells to the enviroment, ensures the cells do not touch each other, and then randomly places object in the cell. The latter feature was taken out in the 100 percent version, as textures were not able to bind to the objects; however the placement of the objects worked perfectly and was shown in the 90 percent demo.</p>
+      <h4>Spline Animation <small>Billy Aujla</small> </h4>
+	   <p>Made spline system that can update to hit a target using a Catmull-Rom spline. An object traveling across will move at a constant speed regardless of how far the control points are from each other. It can also change the contol points as an object is traveling across the spline curve to make it much more dynamic.</p>
+     <h4>Shading <small> LeJon McGowan</small></h4>
+	   <p>There are two main techniques of shading used here: toon shading and Cook-Torrance shading.</p>
+
+      <p>Toon shading take in the diffuse colors of a terrrain, then clamps down final color to create a distinct number of shades. This technique is use to simulate hand-drawn painting and drawing produced by artists. This is seen on the terrain of the track, where there is a clear transition from one shade of color to the next. Height is also taken into account for the terrain, allowing diffrent diffuse calues to be represented at different height (white snow at high peaks, yeallow-ish sand valley towards the bottom). </p>
+
+      <p>Additionally, silhouettes are used to create a distinct, black outline at the edges of the terrain. These are created by taking into account the player's view at an instance and shading points where the angle between it and the terrain's normals fall below a certain threshold. This threshlod can be increased to create a larger silhouette. </p>
+
+      <p> Cook-Torrance shading is one method of physically-based rendering, where an object is shaded based on its real-world properties. Cook torrace takes into account the amount of light an object reflects, how the light is disperesed, and the geometry of the object. These allow smooth surface to retain the shimmering properies, and rougher materials to look duller. The planes and envoronmental props both make use of this shading technique</p>
         </div>
       </div>
 
       <div class="row">
         <div class=".col-md-6 .col-md-offset-3">
           <h2 id="gallery">Pictures</h1>
-          <p>Photos with captions.</p>
+	  <p>Click on the images for full size versions.</p>
 
           <div class="row">
             <div class="col-sm-6 col-md-4">
               <div class="thumbnail">
-                <img src="./img/1.png" alt="...">
+		      <a href="./img/gray_flight3.png"><img src="./img/gray_flight3.png" alt="..."></a>
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="thumbnail">
-                <img src="./img/2.png" alt="...">
+		      <a href="./img/brown_flight1.png"><img src="./img/brown_flight1.png" alt="..."></a>
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="thumbnail">
-                <img src="./img/3.png" alt="...">
+		      <a href="./img/pink_flight1.png"><img src="./img/pink_flight1.png" alt="..."></a>
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -159,25 +186,22 @@
           <div class="row">
             <div class="col-sm-6 col-md-4">
               <div class="thumbnail">
-                <img src="./img/4.png" alt="...">
+		      <a href="./img/brown_flight3.png"><img src="./img/brown_flight3.png" alt="..."></a>
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="thumbnail">
-                <img src="./img/5.png" alt="...">
+		      <a href="./img/brown_flight2.png"><img src="./img/brown_flight2.png" alt="..."></a>
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="thumbnail">
-                <img src="./img/6.png" alt="...">
+		      <a href="./img/collision1.png"><img src="./img/collision1.png" alt="..."></a>
                 <div class="caption">
-			<p>Caption for image 1</p>
                 </div>
               </div>
             </div>
@@ -198,8 +222,9 @@
            <h2 id="links">Resources</h1>
            <p>The following are resources we either used or found helpful in the course of developing Ultra Air Arcade:</p>
            <ul>
+             <li><a href="http://tf3dm.com">TF3DM</a> - A good resource for free 3D assets.</li>
+	     <li><a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions">opengl-tutorial quaternions</a> - A good entry point for understanding how to use Quaternions in your game.</li>
              <li><a href="http://opengameart.org">Open Game Art</a> - A good resource for free graphics assets.</li>
-             <li><a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Wikipedia Conway's Game of Life</a> - Provides background on the cellular automation rules.</li>
              <li><a href="http://www.reddit.com/r/gamedev">r/gamedev</a> - An excellent community of aspiring game developers.</li>
              <li><a href="http://www.amazon.com/Foundations-Computer-Graphics-Steven-Gortler/dp/0262017350">Foundations of Computer Graphics by Steven Gortler</a> - The class text is an excellent resource for OpenGL basics.</li>
              <li><a href="http://incompetech.com">Incompetech</a> - A library of royalty-free sounds.</li>
@@ -216,12 +241,10 @@
            <dl>
              <dt>Component - Based Shader Handling</dt>
 	     <dd>Using a component-based system for handling the loading of shaders, and their references to different game elements would have helped speed the process of inserting graphics elements, different shading effects, framebuffers, geometry shaders, etc.</dd>
-             <dt>Thing 1</dt>
-	     <dd>Description of thing 1</dd>
-             <dt>Thing 1</dt>
-	     <dd>Description of thing 1</dd>
-             <dt>Thing 1</dt>
-	     <dd>Description of thing 1</dd>
+             <dt>Articulated Plane Animations</dt>
+	     <dd>Animations on plane control surfaces would have increased the visual appeal of the models.</dd>
+	     <dt>Bump mapped terrain</dt>
+	     <dd>Bump mapping the terrain would have provided it with more depth and made the game more visually appealing.</dd>
            </dl>
         </div>
       </div>
